@@ -1,2 +1,3 @@
-*.cpp__tests
-*.exe
+*
+!*.cpp
+
