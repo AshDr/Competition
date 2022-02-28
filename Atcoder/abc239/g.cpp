@@ -49,12 +49,105 @@ LL exgcd(LL a,LL b,LL &x,LL &y) {
 
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;
-const int INF = 2147483647;
+const LL INF = 1e18;
 const LL MOD = 1e9 + 7;
 int TT = 1;
-
+struct Flow {
+    static constexpr int INF = 1e9;
+    int n;
+    struct Edge {
+        int to;
+        LL cap;
+        Edge(int to, LL cap) : to(to), cap(cap) {}
+    };
+    std::vector<Edge> e;
+    std::vector<std::vector<int>> g;
+    std::vector<int> cur, h;
+    Flow(int n) : n(n), g(n) {}
+    bool bfs(int s, int t) {
+        h.assign(n, -1);
+        std::queue<int> que;
+        h[s] = 0;
+        que.push(s);
+        while (!que.empty()) {
+            int u = que.front();
+            que.pop();
+            for (int i : g[u]) {
+                int v = e[i].to;
+                LL c = e[i].cap;
+                if (c > 0 && h[v] == -1) {
+                    h[v] = h[u] + 1;
+                    if (v == t)
+                        return true;
+                    que.push(v);
+                }
+            }
+        }
+        return false;
+    }
+    LL dfs(int u, int t, LL f) {
+        if (u == t)
+            return f;
+        LL r = f;
+        for (int &i = cur[u]; i < int(g[u].size()); ++i) {
+            int j = g[u][i];
+            int v = e[j].to;
+            LL c = e[j].cap;
+            if (c > 0 && h[v] == h[u] + 1) {
+                LL a = dfs(v, t, std::min(r, c));
+                e[j].cap -= a;
+                e[j ^ 1].cap += a;
+                r -= a;
+                if (r == 0)
+                    return f;
+            }
+        }
+        return f - r;
+    }
+    void addEdge(int u, int v, LL c) {
+        g[u].push_back(e.size());
+        e.emplace_back(v, c);
+        g[v].push_back(e.size());
+        e.emplace_back(u, 0);
+    }
+    LL maxFlow(int s, int t) {
+        LL ans = 0;
+        while (bfs(s, t)) {
+            cur.assign(n, 0);
+            ans += dfs(s, t, INF);
+        }
+        return ans;
+    }
+};
+ 
 void solve() {
-    
+    int n,m;
+    cin >> n >> m;
+    Flow flow(2 * n);
+    // 拆点
+    for(int i = 0; i < m; i++) {
+        int u,v;
+        cin >> u >> v;
+        u--;v--;
+        flow.addEdge(2 * u + 1,2 * v,INF);
+        flow.addEdge(2 * v + 1,2 * u,INF);
+    }
+    for(int i = 0; i < n ;i++) {
+        int x;
+        cin >> x;
+        if(i > 0 && i < n - 1) {
+            flow.addEdge(2 * i,2 * i + 1,x);
+        }
+    }
+    cout << flow.maxFlow(1,2 * (n - 1)) << '\n';
+    vector<int> ans;
+    for(int i = 1; i < n - 1; i++) {
+        if(flow.h[2 * i] != -1 && flow.h[2 * i + 1] == -1) { //用的是最后一次的bfs结果
+            ans.push_back(i);
+        }
+    }
+    cout << sz(ans) << '\n';
+    for(auto x: ans) cout << x + 1 << " \n"[x == ans.back()];
 }
 int main() {
     #ifdef ASHDR
