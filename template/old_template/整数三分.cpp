@@ -49,6 +49,18 @@ LL calc(int pos) {
     LL res1 = max(x - a[pos],0ll),res2 = max(y - (tot  - a[pos]),0ll);
     return res1 + res2;
 }
+/*
+// 凸函数
+    auto ternary_search = [&](int l, int r) { // 注意是要(l,r)
+        while(r - l > 2) {
+            int lmid = l + r >> 1; 
+            int rmid = lmid + 1;  
+            if(f(lmid) < f(rmid)) l = lmid;
+            else r = rmid;
+        }
+        return f(l + 1);
+    };
+*/
 int totnum;
 void solve() {
     cin>>n;
@@ -65,16 +77,21 @@ void solve() {
             int lmid = l + (r - l) / 3; // l + 1/3区间大小
             int rmid = r - (r - l) / 3;  // r - 1/3区间大小
             lans = calc(lmid),rans = calc(rmid); 
-            //debug(i,lmid,lans);
-            //debug(i,rmid,rans);
-         // 求凹函数的极小值
+            /*
+            lmid= l + r >> 1;
+            rmid = lmid + 1;
+            也行
+            */
+            // 求凹函数的极小值
             if(lans <= rans) r = rmid - 1;
             else l = lmid + 1;
+
             // 求凸函数的极大值
-            //if(lasn >= rans) l = lmid + 1;
-            //else r = rmid - 1;
+            //if(lans >= rans) r = rmid - 1;
+            //else l = lmid + 1;
         }
         cout<<min(lans,rans)<<'\n';
+        // 直接calc(l) 也行
     }
 
 }

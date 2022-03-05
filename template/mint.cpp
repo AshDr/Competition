@@ -104,7 +104,6 @@ struct static_mint {
 using mint = static_mint<998244353>;
 
 
-
 // simple mint
 LL inv(LL a) {LL u=0,v=1,b=mod;while(a) {LL t=b/a;b-=t*a,u-=t*v;swap(a,b);swap(u,v);}u%=mod;if(u<0)u+=mod;return u;}
 struct mint {
