@@ -57,11 +57,12 @@ struct node {
 }tr[N];
 int n;
 int a[N],rt = 1;
+LL s[N];
 void cartesianTree(){
 	stack<int> stk;
 	for(int i = 1; i <= n; i++) {
 		int t = 0;
-		while(!stk.empty() && a[stk.top()] > a[i]) t = stk.top(),stk.pop();
+		while(!stk.empty() && a[stk.top()] < a[i]) t = stk.top(),stk.pop();
 		if(stk.size()) tr[i].ls = tr[stk.top()].rs,tr[stk.top()].rs = i;
 		else tr[i].ls = t,rt = i;
 		stk.push(i);
@@ -69,16 +70,76 @@ void cartesianTree(){
 }
 
 void solve() {
-	// cin >> n;
-	n = read();
-	for(int i = 1; i <= n; i++) a[i] = read();
-	cartesianTree();
- 	LL ans1 = 0, ans2 =0;
- 	for(int i = 1; i <= n; i++) {
- 		ans1 ^= 1ll*i * (tr[i].ls + 1);
- 		ans2 ^= 1ll*i * (tr[i].rs + 1);
- 	}
- 	cout << ans1 << ' ' << ans2 << '\n';
+	cin >> n;
+    for(int i = 1; i <= n; i++) {
+        cin >> a[i];
+        s[i] = s[i - 1] + a[i];
+    }
+    cartesianTree();
+    // cout << rt << '\n';
+    // for(int i = 1; i <= n; i++) cout << i << ':' << tr[i].ls << ' ' << tr[i].rs << '\n';
+    vector<vector<pair<int, LL>>> ps(2);
+    ps[0].emplace_back(0, 0);
+    for (int i = 1; i <= n; i++)
+        ps[s[i] & 1].emplace_back(i, s[i]);
+    LL ans = 0;
+    function<void(int , int , int)> dfs = [&](int curm, int curl, int curr) {
+        if(curm - curl < curr - curm) {
+            for(int L = curl; L <= curm; L++) {
+                LL p = s[L - 1];
+                int resl = 0,resr = 0;
+                {
+                    int l = 0, r = sz(ps[p & 1]);
+                    while(l < r) {
+                        int mid = (l + r) >> 1;
+                        if(ps[p & 1][mid].second >= p + 2 * a[curm] and ps[p & 1][mid].first >= curm) r = mid;
+                        else l = mid + 1;
+                    }
+                    resl = l;
+                }
+                {
+                    int l = 0, r = sz(ps[p & 1]);
+                    while(l < r) {
+                        int mid = (l + r) >> 1;
+                        if(ps[p & 1][mid].first > curr) r = mid;
+                        else l = mid + 1;
+                    }
+                    resr = l;
+                }
+                ans += max(resr - resl,0);
+            }
+        }
+        else {
+            for (int R = curm; R <= curr; R++) {
+                LL p = s[R];
+                int resl = 0, resr = 0;
+                {
+                    int l = -1, r = sz(ps[p & 1]) - 1; //!!!
+                    while (l < r) {
+                        int mid = (l + r + 1) / 2;
+                        if (ps[p & 1][mid].second <= p - 2 * a[curm] and ps[p & 1][mid].first < curm) l = mid;
+                        else r = mid - 1;
+                    }
+                    resl = l;
+                }
+                {
+                    int l = -1, r = sz(ps[p & 1]) - 1;//!!!
+                    while (l < r) {
+                        int mid = (l + r + 1) / 2;
+                        if (ps[p & 1][mid].first < curl - 1) l = mid;
+                        else r = mid - 1;
+                    }
+                    resr = l;
+                }
+                ans += max(resl - resr, 0);
+            }
+        }
+        //cout << curm << ' ' << ans << '\n';
+        if(tr[curm].ls) dfs(tr[curm].ls, curl, curm - 1);
+        if(tr[curm].rs) dfs(tr[curm].rs, curm + 1,curr);
+    };//heuristic
+    dfs(rt, 1, n);
+    cout << ans << '\n';
 }
 int main() {
     #ifdef ASHDR
