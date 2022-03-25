@@ -114,7 +114,7 @@ void solve() {
                 LL p = s[R];
                 int resl = 0, resr = 0;
                 {
-                    int l = -1, r = sz(ps[p & 1]) - 1; //!!!
+                    int l = -1, r = sz(ps[p & 1]) - 1; //!!!l - 1
                     while (l < r) {
                         int mid = (l + r + 1) / 2;
                         if (ps[p & 1][mid].second <= p - 2 * a[curm] and ps[p & 1][mid].first < curm) l = mid;
@@ -123,7 +123,7 @@ void solve() {
                     resl = l;
                 }
                 {
-                    int l = -1, r = sz(ps[p & 1]) - 1;//!!!
+                    int l = -1, r = sz(ps[p & 1]) - 1;//!!!l - 1
                     while (l < r) {
                         int mid = (l + r + 1) / 2;
                         if (ps[p & 1][mid].first < curl - 1) l = mid;
