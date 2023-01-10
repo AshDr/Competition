@@ -372,6 +372,21 @@ struct circle {
         } 
         return res;
     }
+
+    //求两圆相交的面积
+    double areacircle(circle v){
+        int rel = relationcircle(v);
+        if(rel >= 4)return 0.0;
+        if(rel <= 2)return min(area(),v.area());
+        double d = p.distance(v.p);
+        double hf = (r+v.r+d)/2.0;
+        double ss = 2*sqrt(hf*( hf - r )*(hf-v.r)*(hf-d));
+        double a1 = acos((r*r+d*d-v.r*v.r)/(2.0*r*d));
+        a1 = a1*r*r;
+        double a2 = acos((v.r*v.r+d*d-r*r)/(2.0*v.r*d));
+        a2 = a2*v.r*v.r;
+        return a1+a2-ss;
+     }
 };
 //0 开始
 struct polygon {

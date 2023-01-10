@@ -72,7 +72,7 @@ int exbsgs(LL a,LL b,LL p) {
     b = (b % p + p) % p;
     if(1 % p == b % p) return 0;
     int x,y;
-    int d = exgcd(a,p,x,y);
+    int d = exgcd(a,p,x,y); 
     if(d > 1) {
         if(b % d) return -INF;
         exgcd(a/d,p/d,x,y);

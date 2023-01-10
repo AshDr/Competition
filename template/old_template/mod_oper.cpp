@@ -17,9 +17,9 @@ struct static_mint {
   mint inv() const {
     return pow(M - 2);
   }
-  friend mint pow(const mint & m, long long n) {
+  friend mint mpow(const mint & m, long long n) {
     return m.pow(n);
-  }
+  }//外部使用时 需要对arg1进行强制转换
   friend mint inv(const mint & m) {
     return m.inv();
   }
@@ -101,4 +101,18 @@ struct static_mint {
     return is;
   }
 };
-using mint = static_mint<998244353>;
+using mint = static_mint<MOD>;
+mint fac[N],invf[N],invv[N];
+void init(int n) {
+    fac[0] = 1;
+    for(int i = 1; i <= n; i++) fac[i] = fac[i - 1] * i;
+    invf[n] = inv(fac[n]);
+    invf[0] = invf[1] = 1;
+    for(int i = n - 1; i >= 2; i--) invf[i] = invf[i + 1] * (i + 1); 
+    invv[0] = invv[1] = 1;
+    for(int i = 2; i <= n; i++) invv[i] = invv[MOD % i] * (MOD - MOD / i); 
+}
+mint binom(int x, int y) {
+    if(y > x) return 0;
+    return fac[x] * invf[x - y] * invf[y];
+}
