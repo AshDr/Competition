@@ -12,6 +12,8 @@
 
 */
 #include <bits/stdc++.h>
+#include <functional>
+#include <iostream>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -87,7 +89,9 @@ void solve() {
         if(f) cout << -1 << "\n";//补图为菊花图
         else cout << -2 << "\n";//否则就是补图存在K3和K2的情况
         for(int i = 1; i <= n; i++) cnt[i] = 0;
+        
     }
+    
 }
 int main() {
     #ifdef ASHDR
