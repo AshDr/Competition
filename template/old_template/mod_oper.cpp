@@ -21,6 +21,7 @@ struct static_mint {
     return m.pow(n);
   }//外部使用时 需要对arg1进行强制转换
   friend mint inv(const mint & m) {
+    if(m == 0 || m == 1) return mint(1);
     return m.inv();
   }
   mint operator + () const {

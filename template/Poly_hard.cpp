@@ -1,5 +1,4 @@
 int rev[600005];
-mint a[N],b[N],c[N],tmp1[N],tmp2[N],tmp3[N];
 void cpy(mint *a, mint *b, int len) {
     for (int i = 0; i < len; ++i) b[i] = a[i];
     return ;
@@ -36,7 +35,7 @@ void ntt(mint *a, int w, int b) {// w is bit
     }
     return ;
 }
-void mul(mint *a, mint *b,mint *c, int n) {//n must be 2^k
+void Mul(mint *a, mint *b,mint *c, int n) {//n must be 2^k
     int N = n + n;
     int limit = 0;
     while((1 << limit) <= N) limit++;
@@ -44,7 +43,16 @@ void mul(mint *a, mint *b,mint *c, int n) {//n must be 2^k
     for(int i = 0; i < (1 << limit); i++) c[i] = a[i] * b[i];
     ntt(a,limit,1);ntt(b,limit,1);ntt(c,limit,1);
 }
-void inversion(mint *a, mint *b, mint *c, int n) {//n must be 2^k 
+void Mula(mint *a, mint *b,int n) {//n must be 2^k
+    int N = n + n;
+    int limit = 0;
+    while((1 << limit) <= N) limit++;
+    ntt(a,limit,0);ntt(b,limit,0);
+    for(int i = 0; i < (1 << limit); i++) a[i] = a[i] * b[i];
+    ntt(a,limit,1);ntt(b,limit,1);
+}
+void Inversion(mint *a, mint *b, int n) {//n must be 2^k 
+    static mint tmp1[N];
     clr(b, 2 * n);
     if (a[0] == 1) b[0] = 1;
     else b[0] = mpow(a[0], MOD - 2);
@@ -55,31 +63,64 @@ void inversion(mint *a, mint *b, mint *c, int n) {//n must be 2^k
         //a = f
         //c = f -> ntt 扩展到 (1 << (w + 1))
         //b = f^-1 (1 << (w - 1)) 扩展到 (1 << (w + 1))
-        cpy(a, c, len), ntt(c, w + 1, 0), ntt(b, w + 1, 0); //因为在len这一次最后最大次数是*2的
-        for (int i = 0; i < (len << 1); ++i) (b[i] *= MOD + 2ll - b[i] * c[i]);
+        cpy(a, tmp1, len), ntt(tmp1, w + 1, 0), ntt(b, w + 1, 0); //因为在len这一次最后最大次数是*2的
+        for (int i = 0; i < (len << 1); ++i) (b[i] *= MOD + 2ll - b[i] * tmp1[i]);
         ntt(b, w + 1, 1);
         for (int i = len; i < (len << 1); ++i) b[i] = 0;
     }
+    for(int i = 0; i < (n << 1); i++) tmp1[i] = 0;
+    for(int i = n; i < (n << 1); i++) b[i] = 0;
 }// b is inversion
-void der(mint *a, mint *b, int n) { //n must be 2^k 
+void Der(mint *a, mint *b, int n) { //n must be 2^k 
     for(int i = 0; i < n - 1; i++) {
         b[i] = a[i + 1] * (i + 1);
     }
     b[n - 1] = 0;
 }
-void integ(mint *a,mint *b, int n) {
+void Integ(mint *a,mint *b, int n) {
     b[0] = 0;
     for(int i = 1; i < n; i++) {
         b[i] = a[i - 1] * inv(mint(i));
     }
 }
-void ln(mint *a, mint *b, int n) {//n = len  must be 2^k
-    der(a, tmp1, n);
-    int bit = 0;
-    inversion(a, tmp2, tmp3, n);
-    mul(tmp1,tmp2,c,n);
-    integ(c, b, n);
+void Ln(mint *a, mint *b, int n) {//n must be 2^k
+    static mint da[N],iva[N],mulres[N];
+    Der(a, da, n);
+    Inversion(a, iva, n);
+    Mul(da,iva,mulres,n);
+    Integ(mulres, b, n);
+    for(int i = 0; i < (n << 1); i++) da[i]=iva[i]=mulres[i]=0;
 }
+void Exp(mint *a, mint *b, int n) {//n must be 2^k
+    if(n == 1) {
+        b[0] = 1;
+        return ;
+    }
+    static mint lnb[N];
+    Exp(a, b, (n >> 1));Ln(b, lnb, n);
+    lnb[0] = a[0]-lnb[0]+1;
+    for(int i = 1; i < n; i++) lnb[i] = a[i]-lnb[i];
+    Mula(b, lnb, n);
+    for(int i = n,l = (n << 1); i < l; i++) b[i] = lnb[i] = 0;
+    
+}
+void Sqrt(mint *a, mint *b, int n) {//n must be 2^k
+    b[0] = 1;
+    mint inv2 = inv(mint(2));
+    static mint tmpa[N],tmpb[N];
+    for(int i = 1; i < (n << 1);  i <<= 1) {
+        cpy(a, tmpa, i);
+        Inversion(b, tmpb, i);
+        Mula(tmpa, tmpb, i);
+        for(int j = 0; j < i; j++) b[j] = (b[j] + tmpa[j]) * inv2;
+        for(int j = i; j < (i << 1); j++) b[j] = 0;
+    }
+    for(int i = 0; i < (n << 1); i++) tmpa[i] = tmpb[i] = 0;
+    for(int i = n; i < (n << 1); i++) b[i] = 0; 
+}//b_x = (a_x+(b0_x)^2) / (2*b0_x) = (a_x/b0_x + b0_x)/2
+//常数有一点点大
+mint f[N],g[N];
+//记得改mod
 //读入数组后记得先初始化limit，作为参数传入 
 int limit;
-for(limit=0;limit <= n;++limit);
+for(limit=1;limit <= n; limit <<= 1);
