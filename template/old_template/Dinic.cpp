@@ -5,7 +5,7 @@ const int N = 1e4 + 10;
 const int M = 2e5 + 10;
 const int INF = 1e9;
 int n,m,S,T;
-int head[N],to[M],nxt[M],wei[M],tot;
+int head[N],to[M],nxt[M],wei[M],tot;//wei is the rest of flow
 int d[N],skip[N],q[N];
 void addedge(int x, int y, int z) {
 	to[tot] = y;wei[tot] = z;nxt[tot] = head[x];head[x] = tot++;

@@ -154,7 +154,7 @@ struct Line {
         int d2 = sgn((e-s)^(v.e-s));
         int d3 = sgn((v.e-v.s) ^ (s-v.s));
         int d4 = sgn((v.e - v.s) ^ (e - v.s));
-        if((d1^d2) == -2 && (d3 ^ d4) == -2) return 2;
+        if((d1^d2) == -2 && (d3 ^ d4) == -2) return 2; //-1 and 1
         return (d1 == 0 && sgn((v.s-s)*(v.s-e)) <= 0) || 
                (d2 == 0 && sgn((v.e - s)*(v.e - e)) <= 0) ||
                (d3 == 0 && sgn((s - v.s)*(s - v.e)) <= 0) ||

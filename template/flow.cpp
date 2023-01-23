@@ -1,67 +1,70 @@
+template<class T>
 struct Flow {
-    static constexpr int INF = 1e9;
-    int n;
+    const int n;
     struct Edge {
-        int to, cap;
-        Edge(int to, int cap) : to(to), cap(cap) {}
+        int to;
+        T cap;
+        Edge(int to, T cap) : to(to), cap(cap) {}
     };
     std::vector<Edge> e;
     std::vector<std::vector<int>> g;
     std::vector<int> cur, h;
     Flow(int n) : n(n), g(n) {}
+    
     bool bfs(int s, int t) {
         h.assign(n, -1);
         std::queue<int> que;
         h[s] = 0;
         que.push(s);
         while (!que.empty()) {
-            int u = que.front();
+            const int u = que.front();
             que.pop();
             for (int i : g[u]) {
-                int v = e[i].to;
-                int c = e[i].cap;
+                auto [v, c] = e[i];
                 if (c > 0 && h[v] == -1) {
                     h[v] = h[u] + 1;
-                    if (v == t)
+                    if (v == t) {
                         return true;
+                    }
                     que.push(v);
                 }
             }
         }
         return false;
     }
-    int dfs(int u, int t, int f) {
-        if (u == t)
+    
+    T dfs(int u, int t, T f) {
+        if (u == t) {
             return f;
-        int r = f;
+        }
+        auto r = f;
         for (int &i = cur[u]; i < int(g[u].size()); ++i) {
-            int j = g[u][i];
-            int v = e[j].to;
-            int c = e[j].cap;
+            const int j = g[u][i];
+            auto [v, c] = e[j];
             if (c > 0 && h[v] == h[u] + 1) {
-                int a = dfs(v, t, std::min(r, c));
+                auto a = dfs(v, t, std::min(r, c));
                 e[j].cap -= a;
                 e[j ^ 1].cap += a;
                 r -= a;
-                if (r == 0)
+                if (r == 0) {
                     return f;
+                }
             }
         }
         return f - r;
     }
-    void addEdge(int u, int v, int c) {
+    void addEdge(int u, int v, T c) {
         g[u].push_back(e.size());
         e.emplace_back(v, c);
         g[v].push_back(e.size());
         e.emplace_back(u, 0);
     }
-    int maxFlow(int s, int t) {
-        int ans = 0;
+    T maxFlow(int s, int t) {
+        T ans = 0;
         while (bfs(s, t)) {
             cur.assign(n, 0);
-            ans += dfs(s, t, INF);
+            ans += dfs(s, t, std::numeric_limits<T>::max());
         }
         return ans;
     }
 };
- 

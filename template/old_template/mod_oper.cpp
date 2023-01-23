@@ -66,6 +66,10 @@ struct static_mint {
     const mint & rhs) {
     return mint(lhs) /= rhs;
   }
+  friend mint operator % (const mint & lhs,
+    const LL & rhs) {
+    return mint(lhs.val % rhs);
+  }
   friend bool operator == (const mint & lhs,
     const mint & rhs) {
     return lhs.val == rhs.val;
@@ -87,6 +91,41 @@ struct static_mint {
   mint operator--(int) {
     mint result( * this);* this -= 1;
     return result;
+  }
+  bool sqrt(mint &res) const {
+    if (MOD == 2 || x == 0) {
+      res = *this;
+      return true;
+    }
+    if (pow((MOD - 1) / 2) != 1) return false;
+    if (MOD % 4 == 3) {
+      res = pow((MOD + 1) / 4);
+      return true;
+    }
+    int pw = (MOD - 1) / 2;
+    int K = 30;
+    while((1 << K) > pw) K--;
+    while(true) {
+      mint t = myRand(MOD);
+      mint a = 0, b = 0, c = 1;
+      for (int k = K; k >= 0; k--) {
+        a = b * b;
+        b = b * c * 2;
+        c = c * c + a * *this;
+        if (((pw >> k) & 1) == 0) continue;
+        a = b;
+        b = b * t + c;
+        c = c * t + a * *this;
+      }
+      if (b == 0) continue;
+      c -= 1;
+      c *= mint() - b.inv();
+      if (c * c == *this) {
+        res = c;
+        return true;
+      }
+    }
+    assert(false);
   }
   template <typename T> explicit operator T() const {
     return T(val);

@@ -83,7 +83,7 @@ void Integ(mint *a,mint *b, int n) {
         b[i] = a[i - 1] * inv(mint(i));
     }
 }
-void Ln(mint *a, mint *b, int n) {//n must be 2^k
+void Ln(mint *a, mint *b, int n) {//n must be 2^k a[0] must be 1
     static mint da[N],iva[N],mulres[N];
     Der(a, da, n);
     Inversion(a, iva, n);
@@ -91,7 +91,7 @@ void Ln(mint *a, mint *b, int n) {//n must be 2^k
     Integ(mulres, b, n);
     for(int i = 0; i < (n << 1); i++) da[i]=iva[i]=mulres[i]=0;
 }
-void Exp(mint *a, mint *b, int n) {//n must be 2^k
+void Exp(mint *a, mint *b, int n) {//n must be 2^k. a[0] must be 0
     if(n == 1) {
         b[0] = 1;
         return ;
@@ -104,8 +104,9 @@ void Exp(mint *a, mint *b, int n) {//n must be 2^k
     for(int i = n,l = (n << 1); i < l; i++) b[i] = lnb[i] = 0;
     
 }
-void Sqrt(mint *a, mint *b, int n) {//n must be 2^k
+void Sqrt(mint *a, mint *b, int n) {//n must be 2^k. a[0] must be 1 or 0
     b[0] = 1;
+    //b[0]=0;
     mint inv2 = inv(mint(2));
     static mint tmpa[N],tmpb[N];
     for(int i = 1; i < (n << 1);  i <<= 1) {
@@ -118,6 +119,12 @@ void Sqrt(mint *a, mint *b, int n) {//n must be 2^k
     for(int i = 0; i < (n << 1); i++) tmpa[i] = tmpb[i] = 0;
     for(int i = n; i < (n << 1); i++) b[i] = 0; 
 }//b_x = (a_x+(b0_x)^2) / (2*b0_x) = (a_x/b0_x + b0_x)/2
+void Pow(mint *a, mint *b, int n, LL k) {
+    static mint c[N];
+    Ln(a, c, n);
+    for(int i = 0; i < n; i++) c[i] *= k;
+    Exp(c, b, n);
+}
 //常数有一点点大
 mint f[N],g[N];
 //记得改mod
