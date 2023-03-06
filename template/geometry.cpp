@@ -19,6 +19,14 @@ struct Point {
     void output() {
         cout<<x<<' '<<y<<endl;
     }
+    friend std::ostream & operator << (std::ostream & os,
+        const Point & rhs) {
+        return os << rhs.x << " " << rhs.y;
+    }
+    friend std::istream & operator >> (std::istream & is, Point & rhs) {
+        is >> rhs.x >> rhs.y;
+        return is;
+    }
     bool operator == (Point b) const {
         return sgn(x - b.x) == 0 && sgn(y - b.y) == 0;
     }
@@ -77,6 +85,17 @@ struct Point {
         return Point(p.x + v.x*c - v.y*s,p.y + v.x*s + v.y*c);
     }//绕p转x°
 };
+vector<Point> convexHull(vector<Point> ps) {    // 求凸包
+    int n = ps.size(); if(n <= 1) return ps;
+    sort(ps.begin(), ps.end());
+    vector<Point> qs(n * 2); int k = 0;
+    for (int i = 0; i < n; qs[k++] = ps[i++]) 
+        while (k > 1 && sgn((qs[k - 1] - qs[k - 2])^(ps[i] - qs[k - 2])) <= 0) --k;
+    for (int i = n - 2, t = k; i >= 0; qs[k++] = ps[i--])
+        while (k > t && sgn((qs[k - 1] - qs[k - 2])^(ps[i] - qs[k - 2])) <= 0) --k;
+    qs.resize(k - 1);
+    return qs;
+}
 struct Line {
     Point s,e;
     Line (){}
