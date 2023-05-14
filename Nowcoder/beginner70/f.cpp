@@ -12,6 +12,7 @@
 
 */
 #include <bits/stdc++.h>
+#include <functional>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -20,6 +21,7 @@ typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
 typedef unsigned int ui;
 typedef unsigned long long ull;
+typedef pair<double,double> pdd;
 template <class T>
 istream& operator>>(istream& is, vector<T>& v) {
   for (T& x : v)
@@ -62,38 +64,60 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 40 + 10;
+const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 998244353;
+const ll MOD = 1e9 + 7;
 int TT = 1;
-int n,m;
-ll dp[N][N][N][N];//dp[d][l][r][val] 考虑d~m位,当前在d位,,l~r的所有串满足第一段的第d位都相同,且值至少为val 且 l~r满足<关系的方案数
-char s[N][N];
-ll dfs(int d, int l, int r, int val) {
-	if(val>9) {
-		return 0;
+int n,m,k;
+vector<int> G[N];
+int vis[N],siz[N],vis_siz[N];
+void dfs(int u, int fa) {
+	siz[u]=1;
+	if(vis[u]) vis_siz[u]=1;
+	for(auto v: G[u]) {
+		if(v==fa) continue;
+		dfs(v,u);
+		siz[u]+=siz[v];
+		vis_siz[u]+=vis_siz[v];
 	}
-	if(d==m+1) {
-		return dp[d][l][r][val]=(l<r?0:1);
-	}
-	if(dp[d][l][r][val]!=-1) return dp[d][l][r][val];
-	dp[d][l][r][val]=0;
-	dp[d][l][r][val]+=dfs(d,l,r,val+1)%MOD;
-	for(int i=l; i<=r; i++) {
-		if(s[i][d]!='?'&&s[i][d]!='0'+val) break;
-		dp[d][l][r][val]+=dfs(d+1,l,i,0)*(i==r?1:dfs(d,i+1,r,val+1));
-		dp[d][l][r][val]%=MOD;
-	}
-	return dp[d][l][r][val];
 }
+
 void solve() {
     cin>>n>>m;
-    for(int i=1; i<=n; i++) {
-    	cin>>(s[i]+1);
+    for(int i=1; i<=n-1; i++) {
+    	int u,v;
+    	cin>>u>>v;
+    	G[u].push_back(v);
+    	G[v].push_back(u);
     }
-    memset(dp,-1,sizeof(dp));
-    cout<<dfs(1,1,n,0)<<"\n";
+    cin>>k;
+    for(int i=1; i<=k; i++) {
+    	int x;
+    	cin>>x;
+    	vis[x]=1;
+    }
+    dfs(1,0);
+    vector<vector<ll>> dp(n+1,vector<ll>(m+1,0));
+    function<void(int ,int )> gao= [&](int u, int fa) {
+        if(vis_siz[u]==1&&vis[u]==1) {
+            return ;
+        }
+        for(auto v: G[u]) {
+            if(v==fa||vis_siz[v]==0) continue;
+            gao(v,u);
+            vector<ll> ndp(m+1,0);
+            for(int i=0; i<=min(vis_siz[u],m); i++) ndp[i]=dp[u][i]+dp[v][0]+2;
+            for(int i=0; i<=min(vis_siz[u],m); i++) {
+                for(int j=i; j>=0; j--) {
+                    ndp[i]=min(ndp[i],dp[u][i-j]+(j>=vis_siz[v]?0:2+dp[v][j]));
+                }
+            }      
+            dp[u]=ndp;
+        }
+    };
+    gao(1,0);
+    cout<<dp[1][min(vis_siz[1],m)]<<"\n";
 }
 int main() {
     #ifdef ASHDR

@@ -1,4 +1,16 @@
-//轻重链剖分 边权 注意query和modify有可能会l>r 要判一下
+/*
+           ▃▆█▇▄▖
+       ▟◤▖　　　  ◥█  
+   ◢◤ 　  ◢▐　　     ▐▉
+ ▗◤　  　   ▂ ▗▖　 ▕ █▎
+ ◤　▗▅▖ ◥▄　 ▀▀▀◣　█▊
+▐　▕▎  ◥▖◣◤　 　　◢██
+█◣　◥▅█▀　     　▐███◤
+▐█▙▂　　　      ◢███◤
+　◥██◣　　　　 ◢▄◤
+　　　▀██▅▇▀▎▇
+
+*/
 #include <bits/stdc++.h>
 #include <vector>
 #define LOG(FMT...) fprintf(stderr, FMT)

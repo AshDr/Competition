@@ -12,6 +12,7 @@
 
 */
 #include <bits/stdc++.h>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -20,6 +21,7 @@ typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
 typedef unsigned int ui;
 typedef unsigned long long ull;
+typedef pair<double,double> pdd;
 template <class T>
 istream& operator>>(istream& is, vector<T>& v) {
   for (T& x : v)
@@ -39,7 +41,8 @@ void dbg_out() { cerr << "\b\b )" << endl; }
 template <typename Head, typename... Tail>
 void dbg_out(Head H, Tail... T){cerr << H << ", ";dbg_out(T...);}
 #define debug(...) cerr << "( " << #__VA_ARGS__ << " ) = ( ", dbg_out(__VA_ARGS__)
-mt19937 myrand(chrono::steady_clock::now().time_since_epoch().count());
+mt19937_64 myrand(chrono::steady_clock::now().time_since_epoch().count());
+ll myRand(ll B) {return (ull)myrand()%B;}
 ll gcd(ll x, ll y) {return y == 0 ? x : gcd(y, x % y);}
 ll qpow(ll base, ll x, ll mod) {
     ll res = 1;
@@ -62,38 +65,68 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 40 + 10;
+const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 998244353;
+const ll MOD = 1e9 + 7;
 int TT = 1;
-int n,m;
-ll dp[N][N][N][N];//dp[d][l][r][val] 考虑d~m位,当前在d位,,l~r的所有串满足第一段的第d位都相同,且值至少为val 且 l~r满足<关系的方案数
-char s[N][N];
-ll dfs(int d, int l, int r, int val) {
-	if(val>9) {
-		return 0;
-	}
-	if(d==m+1) {
-		return dp[d][l][r][val]=(l<r?0:1);
-	}
-	if(dp[d][l][r][val]!=-1) return dp[d][l][r][val];
-	dp[d][l][r][val]=0;
-	dp[d][l][r][val]+=dfs(d,l,r,val+1)%MOD;
-	for(int i=l; i<=r; i++) {
-		if(s[i][d]!='?'&&s[i][d]!='0'+val) break;
-		dp[d][l][r][val]+=dfs(d+1,l,i,0)*(i==r?1:dfs(d,i+1,r,val+1));
-		dp[d][l][r][val]%=MOD;
-	}
-	return dp[d][l][r][val];
-}
-void solve() {
-    cin>>n>>m;
-    for(int i=1; i<=n; i++) {
-    	cin>>(s[i]+1);
+template <typename T>
+struct Fenwick {
+    const int n;
+    std::vector<T> a;
+    Fenwick(int n) : n(n), a(n) {}
+    void add(int x, T v) {
+        for (int i = x; i < n; i += i & -i) {
+            a[i] += v;
+        }
     }
-    memset(dp,-1,sizeof(dp));
-    cout<<dfs(1,1,n,0)<<"\n";
+    T sum(int x) {
+        T ans = 0;
+        if(x <= 0) return ans;
+        for (int i = x; i > 0; i -= i & -i) {
+            ans += a[i];
+        }
+        return ans;
+    }
+    T rangeSum(int l, int r) {
+        return sum(r) - sum(l - 1);
+    }
+    int find_kth(int k) {
+        int ans = 0,cnt = 0;
+        for (int i = 1 << __lg(n);i >= 0;i--)  //这里的20适当的取值，与MAX_VAL有关，一般取lg(MAX_VAL)
+        {
+            ans += (1 << i);
+            if (ans >= n || cnt + a[ans] >= k)
+                ans -= (1 << i);
+            else
+                cnt += a[ans];
+        }
+        return ans + 1;
+    }//注意k不能太大
+};
+int n,k,q;
+ll a,b,Aa[N],Ab[N];
+void solve() {
+    cin>>n>>k>>a>>b>>q;
+    Fenwick<ll> ca(n+1),cb(n+1);
+    for(int i=1; i<=q; i++) {
+        int op,x,y;
+        cin>>op;
+        if(op==1) {
+            cin>>x>>y;
+            ca.add(x, -Aa[x]);
+            Aa[x]=min(Aa[x]+y,a);
+            ca.add(x, Aa[x]);
+
+            cb.add(x, -Ab[x]);
+            Ab[x]=min(Ab[x]+y,b);
+            cb.add(x, Ab[x]);
+        }else {
+            cin>>x;
+            ll ans=cb.sum(x-1)+ca.rangeSum(x+k, n);
+            cout<<ans<<"\n";
+        }
+    } 
 }
 int main() {
     #ifdef ASHDR

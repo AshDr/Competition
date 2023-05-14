@@ -12,6 +12,8 @@
 
 */
 #include <bits/stdc++.h>
+#include <limits.h>
+#include <string>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -62,38 +64,56 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 40 + 10;
+const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 998244353;
+const ll MOD = 1e9 + 7;
 int TT = 1;
-int n,m;
-ll dp[N][N][N][N];//dp[d][l][r][val] 考虑d~m位,当前在d位,,l~r的所有串满足第一段的第d位都相同,且值至少为val 且 l~r满足<关系的方案数
-char s[N][N];
-ll dfs(int d, int l, int r, int val) {
-	if(val>9) {
-		return 0;
-	}
-	if(d==m+1) {
-		return dp[d][l][r][val]=(l<r?0:1);
-	}
-	if(dp[d][l][r][val]!=-1) return dp[d][l][r][val];
-	dp[d][l][r][val]=0;
-	dp[d][l][r][val]+=dfs(d,l,r,val+1)%MOD;
-	for(int i=l; i<=r; i++) {
-		if(s[i][d]!='?'&&s[i][d]!='0'+val) break;
-		dp[d][l][r][val]+=dfs(d+1,l,i,0)*(i==r?1:dfs(d,i+1,r,val+1));
-		dp[d][l][r][val]%=MOD;
-	}
-	return dp[d][l][r][val];
+string s[N];
+int n;
+int get_num(string ss){
+    int cnt=0;
+    for(auto ch: ss) {
+        cnt+=(ch=='0');
+    }
+    return cnt;
+}
+bool check(string ss) {
+    int cnt1=0;
+    for(auto ch:ss) {
+        cnt1+=(ch=='1');
+        if(ch!='0'&&ch!='1') return false;
+    }
+    return cnt1<=1;
 }
 void solve() {
-    cin>>n>>m;
+    cin>>n;
+    int f=0,bad_cnt=0;
+    int num=0,bad=0;
     for(int i=1; i<=n; i++) {
-    	cin>>(s[i]+1);
+        cin>>s[i];
+        if(s[i]=="0") f=1;
+        else {
+            if(!check(s[i])) {
+                bad=i;
+                ++bad_cnt;
+                continue;
+            }
+            num+=get_num(s[i]);
+        }
     }
-    memset(dp,-1,sizeof(dp));
-    cout<<dfs(1,1,n,0)<<"\n";
+    // assert(bad_cnt>=1);
+    // cout<<bad_cnt<<"\n";
+    if(f) cout<<0<<"\n";
+    else {
+        if(bad==0) {
+            bad=1;
+            num-=get_num(s[1]);
+        }
+        cout<<s[bad];
+        for(int i=0; i<num; i++) cout<<'0';
+        cout<<"\n";
+    }
 }
 int main() {
     #ifdef ASHDR

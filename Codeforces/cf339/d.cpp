@@ -62,38 +62,86 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 40 + 10;
+const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 998244353;
+const ll MOD = 1e9 + 7;
 int TT = 1;
-int n,m;
-ll dp[N][N][N][N];//dp[d][l][r][val] 考虑d~m位,当前在d位,,l~r的所有串满足第一段的第d位都相同,且值至少为val 且 l~r满足<关系的方案数
-char s[N][N];
-ll dfs(int d, int l, int r, int val) {
-	if(val>9) {
-		return 0;
-	}
-	if(d==m+1) {
-		return dp[d][l][r][val]=(l<r?0:1);
-	}
-	if(dp[d][l][r][val]!=-1) return dp[d][l][r][val];
-	dp[d][l][r][val]=0;
-	dp[d][l][r][val]+=dfs(d,l,r,val+1)%MOD;
-	for(int i=l; i<=r; i++) {
-		if(s[i][d]!='?'&&s[i][d]!='0'+val) break;
-		dp[d][l][r][val]+=dfs(d+1,l,i,0)*(i==r?1:dfs(d,i+1,r,val+1));
-		dp[d][l][r][val]%=MOD;
-	}
-	return dp[d][l][r][val];
-}
+int n;
+ll A,cf,cm,m;
+ll res_mn,ful;
 void solve() {
-    cin>>n>>m;
-    for(int i=1; i<=n; i++) {
-    	cin>>(s[i]+1);
+    cin>>n>>A>>cf>>cm>>m;
+    vector<pair<ll,int>> a(n);
+    vector<pair<ll,int>> res(n);
+    for(int i=0; i<n; i++) cin>>a[i].first,a[i].second=i,res[i]=a[i];
+    sort(a.begin(),a.end());
+    sort(res.begin(),res.end());
+    vector<ll> pre(n);
+    pre[0]=a[0].first;
+    for(int i=1; i<n; i++) pre[i]=pre[i-1]+a[i].first;
+    ll mn=a[0].first;
+    int r=n-1;
+    ll ans=0;
+    auto check = [&](ll cur,ll lb) {
+    	ll sum=0;
+        int lo=0,hi=n-1;
+        while(lo<hi) {
+            int mid=(lo+hi+1)>>1;
+            if(a[mid].first>=lb) hi=mid-1;
+            else lo=mid;
+        }
+        sum=1ll*(lo+1)*lb-pre[lo];
+    	return cur>=sum;
+    };
+    ll curm=m;
+    ll lo=mn,hi=A;
+    while(lo<hi) {
+        ll mid=(lo+hi+1)>>1;
+        if(check(curm,mid)) lo=mid;
+        else hi=mid-1;
     }
-    memset(dp,-1,sizeof(dp));
-    cout<<dfs(1,1,n,0)<<"\n";
+    res_mn=lo;ful=0;
+    ans=max(ans,cm*lo);
+    //113
+    for(int i=1; i<=n; i++) {
+    	if(r>=0&&m>=A-a[r].first) {
+            m-=(A-a[r].first);
+            pre[r]=pre[r]-a[r].first+A;
+            a[r--].first=A;
+            // cout<<i<<"?\n";
+    	}
+    	else break;
+    	ll curm=m;
+    	ll lo=mn,hi=A;
+    	while(lo<hi) {
+    		ll mid=(lo+hi+1)>>1;
+    		if(check(curm,mid)) lo=mid;
+    		else hi=mid-1;
+    	}
+        // cout<<i<<" "<<lo<<"\n";
+    	if(i*cf+cm*lo>ans) {
+            res_mn=lo;
+            ful=i;
+            ans=i*cf+cm*lo;
+        }
+    }//满级个数
+    cout<<ans<<"\n";
+    for(int i=0; i<n; i++) {
+        if(res[i].first<res_mn) res[i].first=res_mn; 
+    }
+    for(int i=n-1; i>=0; i--) {
+        if(ful) {
+            res[i].first=A;
+            --ful;
+        }
+        else break;
+    } 
+    vector<ll> fin(n);
+    for(int i=0; i<n; i++) {
+        fin[res[i].second]=res[i].first;
+    }
+    cout<<fin<<"\n";
 }
 int main() {
     #ifdef ASHDR

@@ -62,38 +62,60 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 40 + 10;
+const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 998244353;
+const ll MOD = 1e9 + 7;
+const double eps=1e-8;
+typedef pair<double,double> pdd;
 int TT = 1;
-int n,m;
-ll dp[N][N][N][N];//dp[d][l][r][val] 考虑d~m位,当前在d位,,l~r的所有串满足第一段的第d位都相同,且值至少为val 且 l~r满足<关系的方案数
-char s[N][N];
-ll dfs(int d, int l, int r, int val) {
-	if(val>9) {
-		return 0;
-	}
-	if(d==m+1) {
-		return dp[d][l][r][val]=(l<r?0:1);
-	}
-	if(dp[d][l][r][val]!=-1) return dp[d][l][r][val];
-	dp[d][l][r][val]=0;
-	dp[d][l][r][val]+=dfs(d,l,r,val+1)%MOD;
-	for(int i=l; i<=r; i++) {
-		if(s[i][d]!='?'&&s[i][d]!='0'+val) break;
-		dp[d][l][r][val]+=dfs(d+1,l,i,0)*(i==r?1:dfs(d,i+1,r,val+1));
-		dp[d][l][r][val]%=MOD;
-	}
-	return dp[d][l][r][val];
+int n;
+pii a[N];
+// bool check(pii pt1, pii pt2, pii pt3) {
+// 	if(pt1.first==pt2.first) {
+// 		if((pt1.second+pt2.second)%2==0 && pt3.second==(pt1.second+pt2.second)/2) {
+//             return true;
+//         }
+//         return false;
+//     }
+// 	if(pt1.second==pt2.second) {
+// 		if((pt1.first+pt2.first)%2==0 && pt3.first==(pt1.first+pt2.first)/2) {
+//             return true;
+//         }
+// 	    return false;
+//     }
+// 	pdd pt4={1.0*(pt1.first+pt2.first)/2,1.0*(pt1.second+pt2.second)/2};
+// 	double k=1.0*(pt2.second-pt1.second)/(pt2.first-pt1.first),b=pt1.second-k*pt1.first;
+// 	double k_=-1.0/k,b_=pt4.second-k_*pt4.first;
+// 	if(fabs(pt3.first*k_+b_-pt3.second)<eps) return true;
+// 	return false;
+// }
+int get_dis(pii x, pii y) {
+    return (x.first-y.first)*(x.first-y.first)+(x.second-y.second)*(x.second-y.second);
+}
+bool check(pii pt1, pii pt2, pii pt3) {
+    if(pt1.first==pt2.first&&pt2.first==pt3.first) return false;
+    if(pt1.second==pt2.second&&pt2.second==pt3.second) return false;
+    double k=1.0*(pt2.second-pt1.second)/(pt2.first-pt1.first),b=pt1.second-k*pt1.first;
+    if(fabs(pt3.first*k+b-pt3.second)<eps) return false;
+    
+    if(get_dis(pt1, pt2)==get_dis(pt1, pt3)) return true;
+    if(get_dis(pt2, pt1)==get_dis(pt2, pt3)) return true;
+    if(get_dis(pt3, pt1)==get_dis(pt3, pt2)) return true;
+    return false;
 }
 void solve() {
-    cin>>n>>m;
+	cin>>n;
+	int ans=0;
+    for(int i=1; i<=n; i++) cin>>a[i].first>>a[i].second;
     for(int i=1; i<=n; i++) {
-    	cin>>(s[i]+1);
+    	for(int j=i+1; j<=n; j++) {
+    		for(int k=j+1; k<=n; k++) {
+    			if(check(a[i],a[j],a[k])) ++ans;
+    		}
+    	}
     }
-    memset(dp,-1,sizeof(dp));
-    cout<<dfs(1,1,n,0)<<"\n";
+    cout<<ans<<"\n";
 }
 int main() {
     #ifdef ASHDR

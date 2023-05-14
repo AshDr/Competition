@@ -12,6 +12,7 @@
 
 */
 #include <bits/stdc++.h>
+#include <numeric>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -20,6 +21,7 @@ typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
 typedef unsigned int ui;
 typedef unsigned long long ull;
+typedef pair<double,double> pdd;
 template <class T>
 istream& operator>>(istream& is, vector<T>& v) {
   for (T& x : v)
@@ -62,38 +64,36 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 40 + 10;
+const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 998244353;
+const ll MOD = 1e9 + 7;
 int TT = 1;
-int n,m;
-ll dp[N][N][N][N];//dp[d][l][r][val] 考虑d~m位,当前在d位,,l~r的所有串满足第一段的第d位都相同,且值至少为val 且 l~r满足<关系的方案数
-char s[N][N];
-ll dfs(int d, int l, int r, int val) {
-	if(val>9) {
-		return 0;
-	}
-	if(d==m+1) {
-		return dp[d][l][r][val]=(l<r?0:1);
-	}
-	if(dp[d][l][r][val]!=-1) return dp[d][l][r][val];
-	dp[d][l][r][val]=0;
-	dp[d][l][r][val]+=dfs(d,l,r,val+1)%MOD;
-	for(int i=l; i<=r; i++) {
-		if(s[i][d]!='?'&&s[i][d]!='0'+val) break;
-		dp[d][l][r][val]+=dfs(d+1,l,i,0)*(i==r?1:dfs(d,i+1,r,val+1));
-		dp[d][l][r][val]%=MOD;
-	}
-	return dp[d][l][r][val];
-}
+int n,k,ans[N];
 void solve() {
-    cin>>n>>m;
-    for(int i=1; i<=n; i++) {
-    	cin>>(s[i]+1);
+    cin>>n>>k;
+    int t=k;
+    string s;
+    cin>>s;
+    ll mx=0;
+    for(int i=0; i<n; i++) mx+=max('z'-s[i],abs('a'-s[i]));
+    if(mx<k) cout<<"-1\n";
+    else {
+    	for(int i=0; i<n; i++) {
+            if('z'-s[i]>s[i]-'a') {
+                ans[i]=min(k,'z'-s[i]);
+            }else {
+                ans[i]=max(-k,'a'-s[i]);
+            }
+            k-=abs(ans[i]);
+            // cout<<i<<" "<<ans[i]<<"\n";
+        }
+        for(int i=0; i<n; i++) {
+            cout<<char(s[i]+ans[i]);
+        }
+        cout<<"\n";
+        
     }
-    memset(dp,-1,sizeof(dp));
-    cout<<dfs(1,1,n,0)<<"\n";
 }
 int main() {
     #ifdef ASHDR

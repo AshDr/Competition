@@ -11,6 +11,7 @@
 　　　▀██▅▇▀▎▇
 
 */
+#include <algorithm>
 #include <bits/stdc++.h>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
@@ -20,6 +21,7 @@ typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
 typedef unsigned int ui;
 typedef unsigned long long ull;
+typedef pair<double,double> pdd;
 template <class T>
 istream& operator>>(istream& is, vector<T>& v) {
   for (T& x : v)
@@ -62,38 +64,70 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 40 + 10;
+const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 998244353;
+const ll MOD = 1e9 + 7;
 int TT = 1;
-int n,m;
-ll dp[N][N][N][N];//dp[d][l][r][val] 考虑d~m位,当前在d位,,l~r的所有串满足第一段的第d位都相同,且值至少为val 且 l~r满足<关系的方案数
-char s[N][N];
-ll dfs(int d, int l, int r, int val) {
-	if(val>9) {
-		return 0;
-	}
-	if(d==m+1) {
-		return dp[d][l][r][val]=(l<r?0:1);
-	}
-	if(dp[d][l][r][val]!=-1) return dp[d][l][r][val];
-	dp[d][l][r][val]=0;
-	dp[d][l][r][val]+=dfs(d,l,r,val+1)%MOD;
-	for(int i=l; i<=r; i++) {
-		if(s[i][d]!='?'&&s[i][d]!='0'+val) break;
-		dp[d][l][r][val]+=dfs(d+1,l,i,0)*(i==r?1:dfs(d,i+1,r,val+1));
-		dp[d][l][r][val]%=MOD;
-	}
-	return dp[d][l][r][val];
+string L,R;
+string s,quer;
+ll memo[20][20][20][2][2];
+int len,digit;
+int nxt[20];
+void init(string ss) {
+    nxt[1]=0;
+    int j=0;
+    for(int i=2; i<sz(ss); i++) {
+        while(j&&ss[j+1]!=ss[i]) j=nxt[j];
+        if(ss[j+1]==ss[i]) ++j;
+        nxt[i]=j;
+    }
+}
+ll dfs(int cur, int oknum, int matchpos, int f, int g) {
+    if(cur>=len) return oknum;
+    if(memo[cur][oknum][matchpos][f][g]!=-1) return memo[cur][oknum][matchpos][f][g];
+    int limit=9;
+    if(f==1) limit=s[cur]-'0';
+    ll res=0;
+    for(int i=0; i<=limit; i++) {
+        int tmp=matchpos,pp=0;
+        if(!g||i!=0) {
+            while(tmp&&i!=quer[tmp+1]-'0') tmp=nxt[tmp];
+            if(quer[tmp+1]-'0'==i) ++tmp;
+            if(tmp==sz(quer)-1) {
+                tmp=nxt[tmp];
+                pp=1;
+                // cout<<"?\n";
+            }
+        }
+        res+=dfs(cur+1,oknum+pp,tmp,f&&(i==s[cur]-'0'),g&&(i==0));
+    }
+    return memo[cur][oknum][matchpos][f][g]=res;
+}
+ll gao(string x) {
+    s=x;
+    len=sz(s);
+    memset(memo,-1,sizeof memo);
+    return dfs(0,0,0,1,1);
 }
 void solve() {
-    cin>>n>>m;
-    for(int i=1; i<=n; i++) {
-    	cin>>(s[i]+1);
-    }
-    memset(dp,-1,sizeof(dp));
-    cout<<dfs(1,1,n,0)<<"\n";
+	cin>>quer>>L>>R;
+    int tmp=0;
+    auto check = [&](string s) {
+       int pos=0,cnt=0;
+       while((pos=s.find(quer,pos))!=string::npos) {
+            pos++;
+            ++cnt;
+       }
+       return cnt;
+    };
+	tmp=check(L);
+    quer="#"+quer;
+    init(quer);
+    // cout<<gao(R)<<" "<<gao(L)<<"\n";
+    cout<<gao(R)-gao(L)+tmp<<"\n";
+    //2 2 x
+    //1 2 2
 }
 int main() {
     #ifdef ASHDR
@@ -104,7 +138,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

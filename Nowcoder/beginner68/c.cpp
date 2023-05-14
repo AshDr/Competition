@@ -62,38 +62,35 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 40 + 10;
+const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 998244353;
+const ll MOD = 1e9 + 7;
 int TT = 1;
-int n,m;
-ll dp[N][N][N][N];//dp[d][l][r][val] 考虑d~m位,当前在d位,,l~r的所有串满足第一段的第d位都相同,且值至少为val 且 l~r满足<关系的方案数
-char s[N][N];
-ll dfs(int d, int l, int r, int val) {
-	if(val>9) {
-		return 0;
-	}
-	if(d==m+1) {
-		return dp[d][l][r][val]=(l<r?0:1);
-	}
-	if(dp[d][l][r][val]!=-1) return dp[d][l][r][val];
-	dp[d][l][r][val]=0;
-	dp[d][l][r][val]+=dfs(d,l,r,val+1)%MOD;
-	for(int i=l; i<=r; i++) {
-		if(s[i][d]!='?'&&s[i][d]!='0'+val) break;
-		dp[d][l][r][val]+=dfs(d+1,l,i,0)*(i==r?1:dfs(d,i+1,r,val+1));
-		dp[d][l][r][val]%=MOD;
-	}
-	return dp[d][l][r][val];
-}
+char s[N];
+int n;
 void solve() {
-    cin>>n>>m;
-    for(int i=1; i<=n; i++) {
-    	cin>>(s[i]+1);
-    }
-    memset(dp,-1,sizeof(dp));
-    cout<<dfs(1,1,n,0)<<"\n";
+	cin>>n;
+	cin>>(s+1);
+	vector<vector<int>> num(n+1,vector<int>(26,0));
+	for(int i=1; i<=n; i++) {
+		for(int j=0; j<26; j++) {
+			num[i][j]=num[i-1][j];
+		}
+		num[i][s[i]-'a']++;
+	}
+	double ans=0;
+	for(int i=1; i<=n; i++) {
+		for(int j=i; j<=n; j++) {
+			ll sum=0;
+			for(int k=0; k<26; k++) {
+				ll x=num[j][k]-num[i-1][k];
+				sum+=x*(x-1)/2;
+			}
+			ans=max(ans,1.0*sum/(j-i+1));
+		}
+	}    
+	cout<<ans<<"\n";
 }
 int main() {
     #ifdef ASHDR
@@ -104,7 +101,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

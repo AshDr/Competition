@@ -12,6 +12,7 @@
 
 */
 #include <bits/stdc++.h>
+#include <queue>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -62,38 +63,66 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 40 + 10;
+const int N = 1e3 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 998244353;
+const ll MOD = 1e9 + 7;
 int TT = 1;
-int n,m;
-ll dp[N][N][N][N];//dp[d][l][r][val] 考虑d~m位,当前在d位,,l~r的所有串满足第一段的第d位都相同,且值至少为val 且 l~r满足<关系的方案数
 char s[N][N];
-ll dfs(int d, int l, int r, int val) {
-	if(val>9) {
-		return 0;
-	}
-	if(d==m+1) {
-		return dp[d][l][r][val]=(l<r?0:1);
-	}
-	if(dp[d][l][r][val]!=-1) return dp[d][l][r][val];
-	dp[d][l][r][val]=0;
-	dp[d][l][r][val]+=dfs(d,l,r,val+1)%MOD;
-	for(int i=l; i<=r; i++) {
-		if(s[i][d]!='?'&&s[i][d]!='0'+val) break;
-		dp[d][l][r][val]+=dfs(d+1,l,i,0)*(i==r?1:dfs(d,i+1,r,val+1));
-		dp[d][l][r][val]%=MOD;
-	}
-	return dp[d][l][r][val];
+int n,m;
+int col_cnt,col[N][N],siz[N*N];
+const int dx[] = {-1,1,0,0};
+const int dy[] = {0,0,1,-1};
+bool check(int x, int y) {
+	if(x<1||x>n||y<1||y>m) return false;
+	return true;
 }
 void solve() {
     cin>>n>>m;
     for(int i=1; i<=n; i++) {
     	cin>>(s[i]+1);
     }
-    memset(dp,-1,sizeof(dp));
-    cout<<dfs(1,1,n,0)<<"\n";
+    for(int i=1; i<=n; i++) {
+    	for(int j=1; j<=m; j++) {
+    	   	if(!col[i][j]&&s[i][j]=='.') {
+                ++col_cnt;
+                queue<pii> q;
+                q.push({i,j});
+                col[i][j]=col_cnt;
+                while(!q.empty()) {
+                    auto [x,y]=q.front();q.pop();
+                    siz[col_cnt]++;
+                    for(int k=0; k<4; k++) {
+                        int xx=x+dx[k],yy=y+dy[k];
+                        if(check(xx, yy)&&!col[xx][yy]&&s[xx][yy]=='.') {
+                            col[xx][yy]=col_cnt;
+                            q.push({xx,yy});
+                        }
+                    }
+                }
+            }
+        }
+    }
+    for(int i=1; i<=n; i++) {
+        for(int j=1; j<=m; j++) {
+            if(s[i][j]=='*') {
+                set<int> st;
+                for(int k=0; k<4; k++) {
+                    int x=i+dx[k],y=j+dy[k];
+                    if(check(x, y)&&s[x][y]=='.') {
+                        st.insert(col[x][y]);
+                    }
+                }
+                int ans=1;
+                for(auto c:st) {
+                    ans+=siz[c];
+                }
+                cout<<ans%10;
+            }
+            else cout<<".";
+        }
+        cout<<"\n";
+    }
 }
 int main() {
     #ifdef ASHDR

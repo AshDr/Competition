@@ -11,7 +11,9 @@
 　　　▀██▅▇▀▎▇
 
 */
+#include <algorithm>
 #include <bits/stdc++.h>
+#include <set>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -62,38 +64,47 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 40 + 10;
+const int N = 5e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 998244353;
+const ll MOD = 1e9 + 7;
 int TT = 1;
-int n,m;
-ll dp[N][N][N][N];//dp[d][l][r][val] 考虑d~m位,当前在d位,,l~r的所有串满足第一段的第d位都相同,且值至少为val 且 l~r满足<关系的方案数
-char s[N][N];
-ll dfs(int d, int l, int r, int val) {
-	if(val>9) {
-		return 0;
-	}
-	if(d==m+1) {
-		return dp[d][l][r][val]=(l<r?0:1);
-	}
-	if(dp[d][l][r][val]!=-1) return dp[d][l][r][val];
-	dp[d][l][r][val]=0;
-	dp[d][l][r][val]+=dfs(d,l,r,val+1)%MOD;
-	for(int i=l; i<=r; i++) {
-		if(s[i][d]!='?'&&s[i][d]!='0'+val) break;
-		dp[d][l][r][val]+=dfs(d+1,l,i,0)*(i==r?1:dfs(d,i+1,r,val+1));
-		dp[d][l][r][val]%=MOD;
-	}
-	return dp[d][l][r][val];
-}
+int n;
+pii a[N];
+int ans;
 void solve() {
-    cin>>n>>m;
-    for(int i=1; i<=n; i++) {
-    	cin>>(s[i]+1);
+    ans=INF;
+    cin>>n;
+    vector<int> suf(n+1);
+    for(int i=1; i<=n; i++) cin>>a[i].first>>a[i].second;
+    sort(a+1,a+1+n);
+    for(int i=n; i>=1; i--) {
+        if(i==n) suf[i]=a[i].second;
+        else suf[i]=max(suf[i+1],a[i].second);
     }
-    memset(dp,-1,sizeof(dp));
-    cout<<dfs(1,1,n,0)<<"\n";
+    set<int> st;
+    ans=min(ans,abs(a[1].first-suf[2]));
+    st.insert(a[1].second);
+    for(int i=2; i<=n; i++) {
+        if(i<n) ans=min(ans,abs(suf[i+1]-a[i].first));
+        if(i==n||suf[i+1]<a[i].first) {
+            auto it=st.lower_bound(a[i].first);
+            if(it!=st.end()) {
+                ans=min(ans,*it-a[i].first);
+                if(it!=st.begin()) {
+                    --it;
+                    ans=min(ans,abs(*it-a[i].first));
+                }
+            }
+            else ans=min(ans,a[i].first-(*st.rbegin()));
+            
+        }
+        else ans=min(ans,suf[i+1]-a[i].first);
+        st.insert(a[i].second);
+    }
+    cout<<ans<<"\n";
+    //5 5 7 3 10
+    //1 2 2 3 4
 }
 int main() {
     #ifdef ASHDR
@@ -104,7 +115,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

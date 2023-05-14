@@ -20,6 +20,7 @@ typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
 typedef unsigned int ui;
 typedef unsigned long long ull;
+typedef pair<double,double> pdd;
 template <class T>
 istream& operator>>(istream& is, vector<T>& v) {
   for (T& x : v)
@@ -62,38 +63,53 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 40 + 10;
+const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 998244353;
+const ll MOD = 1e9 + 7;
 int TT = 1;
-int n,m;
-ll dp[N][N][N][N];//dp[d][l][r][val] 考虑d~m位,当前在d位,,l~r的所有串满足第一段的第d位都相同,且值至少为val 且 l~r满足<关系的方案数
-char s[N][N];
-ll dfs(int d, int l, int r, int val) {
-	if(val>9) {
-		return 0;
-	}
-	if(d==m+1) {
-		return dp[d][l][r][val]=(l<r?0:1);
-	}
-	if(dp[d][l][r][val]!=-1) return dp[d][l][r][val];
-	dp[d][l][r][val]=0;
-	dp[d][l][r][val]+=dfs(d,l,r,val+1)%MOD;
-	for(int i=l; i<=r; i++) {
-		if(s[i][d]!='?'&&s[i][d]!='0'+val) break;
-		dp[d][l][r][val]+=dfs(d+1,l,i,0)*(i==r?1:dfs(d,i+1,r,val+1));
-		dp[d][l][r][val]%=MOD;
-	}
-	return dp[d][l][r][val];
-}
+struct node {
+	ll x,y;
+	int id;
+}a[N];
+int n;
 void solve() {
-    cin>>n>>m;
+    cin>>n;
     for(int i=1; i<=n; i++) {
-    	cin>>(s[i]+1);
+    	cin>>a[i].x>>a[i].y;
+    	a[i].id=i;
     }
-    memset(dp,-1,sizeof(dp));
-    cout<<dfs(1,1,n,0)<<"\n";
+    sort(a+1,a+1+n,[&](node p, node q){
+    	if(p.x==q.x) return p.y<q.y;
+    	return p.x<q.x;
+    });
+	for(int i=2; i<n; i++) {
+		if(a[i].x==a[i+1].x) {
+			if(a[i-1].x!=a[i].x){
+              cout<<a[i-1].id<<" "<<a[i].id<<" "<<a[i+1].id<<"\n";
+              return ;  
+            } 
+		}
+		if(a[i-1].y==a[i].y&&a[i].y==a[i+1].y) continue;
+    
+		if(a[i].y==a[i+1].y) {
+            if(a[i-1].y!=a[i].y) {
+                cout<<a[i-1].id<<" "<<a[i].id<<" "<<a[i+1].id<<"\n";
+                return ;
+            }
+        }else {
+            double k=1.0*(a[i+1].y-a[i].y)/(1.0*a[i+1].x-a[i].x);
+                double b=1.0*a[i].y-1.0*a[i].x*k;
+                // cout<<k<<" "<<b<<"\n";
+                if(fabs(a[i-1].x*k+b-a[i-1].y)>1e-8) {
+                    cout<<a[i-1].id<<" "<<a[i].id<<" "<<a[i+1].id<<"\n";
+                    return ;
+                }
+        }
+	}
+    // assert(0);
+    cout<<-1<<"\n";
+    
 }
 int main() {
     #ifdef ASHDR

@@ -67,7 +67,7 @@ struct static_mint {
     return mint(lhs) /= rhs;
   }
   friend mint operator % (const mint & lhs,
-    const LL & rhs) {
+    const ll & rhs) {
     return mint(lhs.val % rhs);
   }
   friend bool operator == (const mint & lhs,

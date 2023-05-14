@@ -12,6 +12,8 @@
 
 */
 #include <bits/stdc++.h>
+#include <random>
+#include <set>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -20,6 +22,7 @@ typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
 typedef unsigned int ui;
 typedef unsigned long long ull;
+typedef pair<double,double> pdd;
 template <class T>
 istream& operator>>(istream& is, vector<T>& v) {
   for (T& x : v)
@@ -39,7 +42,8 @@ void dbg_out() { cerr << "\b\b )" << endl; }
 template <typename Head, typename... Tail>
 void dbg_out(Head H, Tail... T){cerr << H << ", ";dbg_out(T...);}
 #define debug(...) cerr << "( " << #__VA_ARGS__ << " ) = ( ", dbg_out(__VA_ARGS__)
-mt19937 myrand(chrono::steady_clock::now().time_since_epoch().count());
+mt19937_64 myrand(chrono::steady_clock::now().time_since_epoch().count());
+ll myRand(ll B) {return (ull)myrand()%B;}
 ll gcd(ll x, ll y) {return y == 0 ? x : gcd(y, x % y);}
 ll qpow(ll base, ll x, ll mod) {
     ll res = 1;
@@ -62,38 +66,65 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 40 + 10;
+const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 998244353;
+const ll MOD = 1e9 + 7;
 int TT = 1;
-int n,m;
-ll dp[N][N][N][N];//dp[d][l][r][val] 考虑d~m位,当前在d位,,l~r的所有串满足第一段的第d位都相同,且值至少为val 且 l~r满足<关系的方案数
-char s[N][N];
-ll dfs(int d, int l, int r, int val) {
-	if(val>9) {
-		return 0;
-	}
-	if(d==m+1) {
-		return dp[d][l][r][val]=(l<r?0:1);
-	}
-	if(dp[d][l][r][val]!=-1) return dp[d][l][r][val];
-	dp[d][l][r][val]=0;
-	dp[d][l][r][val]+=dfs(d,l,r,val+1)%MOD;
-	for(int i=l; i<=r; i++) {
-		if(s[i][d]!='?'&&s[i][d]!='0'+val) break;
-		dp[d][l][r][val]+=dfs(d+1,l,i,0)*(i==r?1:dfs(d,i+1,r,val+1));
-		dp[d][l][r][val]%=MOD;
-	}
-	return dp[d][l][r][val];
-}
+ll fx[101],fy[101];
+int n;
+int a[N];
 void solve() {
-    cin>>n>>m;
+    unordered_map<ll,int> mp;
+    cin>>n;
+    int ans=0;
     for(int i=1; i<=n; i++) {
-    	cin>>(s[i]+1);
+        cin>>a[i];
+        mp[a[i]]++;
+        if(a[i]==0) ++ans; 
     }
-    memset(dp,-1,sizeof(dp));
-    cout<<dfs(1,1,n,0)<<"\n";
+    fx[1]=1;fx[2]=0;
+    fy[1]=0;fy[2]=1;
+    for(int i=3; i<=100; i++) {
+        fx[i]=fx[i-1]+fx[i-2];
+    	fy[i]=fy[i-1]+fy[i-2];
+    }
+    
+    for(int i=1; i<=n; i++) {
+        for(int j=1; j<=n; j++) {
+            if(i==j) continue;
+            if(a[i]==0&&a[j]==0) continue;
+            // if(ans>0&&!mp[fx[ans]*a[i]+fy[ans]*a[j]]) continue;
+            queue<ll> q;
+            q.push(a[i]);
+            q.push(a[j]);
+            mp[a[i]]--;
+            mp[a[j]]--;
+            for(int k=3; k<=n+1; k++) {
+                if(k==n+1) {
+                    cout<<n<<"\n";
+                    return ;
+                }
+                ll x=fx[k]*a[i]+fy[k]*a[j];
+                if(mp[x]) {
+                    --mp[x];
+                    q.push(x);
+                }else {
+                    ans=max(ans,k-1);
+                    break;
+                }
+            }
+            while(!q.empty()) {
+                int x=q.front();q.pop();
+                mp[x]++;
+            }
+        }
+    }
+    cout<<ans<<"\n";
+    //1e6*500
+    //5e8
+    //len<=50
+
 }
 int main() {
     #ifdef ASHDR

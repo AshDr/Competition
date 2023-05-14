@@ -62,38 +62,71 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 40 + 10;
+const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 998244353;
+const ll MOD = 1e9 + 7;
 int TT = 1;
-int n,m;
-ll dp[N][N][N][N];//dp[d][l][r][val] 考虑d~m位,当前在d位,,l~r的所有串满足第一段的第d位都相同,且值至少为val 且 l~r满足<关系的方案数
-char s[N][N];
-ll dfs(int d, int l, int r, int val) {
-	if(val>9) {
-		return 0;
-	}
-	if(d==m+1) {
-		return dp[d][l][r][val]=(l<r?0:1);
-	}
-	if(dp[d][l][r][val]!=-1) return dp[d][l][r][val];
-	dp[d][l][r][val]=0;
-	dp[d][l][r][val]+=dfs(d,l,r,val+1)%MOD;
-	for(int i=l; i<=r; i++) {
-		if(s[i][d]!='?'&&s[i][d]!='0'+val) break;
-		dp[d][l][r][val]+=dfs(d+1,l,i,0)*(i==r?1:dfs(d,i+1,r,val+1));
-		dp[d][l][r][val]%=MOD;
-	}
-	return dp[d][l][r][val];
+ll a,n,mod;
+struct matrix {
+    ll a[3][3];
+    matrix() {
+        for(int i=1;i<=2;i++) {
+            for(int j=1;j<=2;j++) {
+                a[i][j]=0;
+            }
+        }
+    }
+    friend matrix operator * (const matrix& lhs,const matrix& rhs) {
+        matrix res;
+        for(int i=1;i<=2;i++) {
+            for(int j=1;j<=2;j++) {
+                for(int k=1; k<=2; k++) {
+                    res.a[i][j]+=(lhs.a[i][k]*rhs.a[k][j])%mod;
+                    res.a[i][j]%=mod;
+                }
+            }
+        }
+        return res;
+    };
+};
+matrix qpow(matrix base,ll x) {
+    matrix res;
+    for(int i=1;i<=2;i++) {
+        for(int j=1;j<=2;j++) {
+            if(i==j) res.a[i][j]=1;
+            else res.a[i][j]=0;
+        }
+    }
+    while(x) {
+        if(x&1) {
+            res=res*base;
+        }
+        base=base*base;
+        x>>=1;
+    }
+    return res;
 }
 void solve() {
-    cin>>n>>m;
-    for(int i=1; i<=n; i++) {
-    	cin>>(s[i]+1);
+    cin>>a>>n>>mod;
+    if(n==0) {
+        cout<<0<<"\n";
+        return ;
     }
-    memset(dp,-1,sizeof(dp));
-    cout<<dfs(1,1,n,0)<<"\n";
+    if(a==1) {
+    	cout<<n%mod<<"\n";
+    }
+    else {
+    	matrix b;
+        b.a[1][1]=1;
+        b.a[2][1]=0;
+        matrix trans;
+        trans.a[1][1]=a;
+        trans.a[2][1]=1;trans.a[2][2]=1;
+        matrix res=qpow(trans,n);
+        res=res*b;
+        cout<<res.a[2][1]<<"\n";
+    }
 }
 int main() {
     #ifdef ASHDR

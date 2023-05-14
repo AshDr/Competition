@@ -11,6 +11,7 @@
 　　　▀██▅▇▀▎▇
 
 */
+#include <algorithm>
 #include <bits/stdc++.h>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
@@ -20,6 +21,7 @@ typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
 typedef unsigned int ui;
 typedef unsigned long long ull;
+typedef pair<double,double> pdd;
 template <class T>
 istream& operator>>(istream& is, vector<T>& v) {
   for (T& x : v)
@@ -62,38 +64,69 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 40 + 10;
+const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 998244353;
+const ll MOD = 1e9 + 7;
+const double pi=acos(-1);
 int TT = 1;
-int n,m;
-ll dp[N][N][N][N];//dp[d][l][r][val] 考虑d~m位,当前在d位,,l~r的所有串满足第一段的第d位都相同,且值至少为val 且 l~r满足<关系的方案数
-char s[N][N];
-ll dfs(int d, int l, int r, int val) {
-	if(val>9) {
-		return 0;
-	}
-	if(d==m+1) {
-		return dp[d][l][r][val]=(l<r?0:1);
-	}
-	if(dp[d][l][r][val]!=-1) return dp[d][l][r][val];
-	dp[d][l][r][val]=0;
-	dp[d][l][r][val]+=dfs(d,l,r,val+1)%MOD;
-	for(int i=l; i<=r; i++) {
-		if(s[i][d]!='?'&&s[i][d]!='0'+val) break;
-		dp[d][l][r][val]+=dfs(d+1,l,i,0)*(i==r?1:dfs(d,i+1,r,val+1));
-		dp[d][l][r][val]%=MOD;
-	}
-	return dp[d][l][r][val];
-}
-void solve() {
-    cin>>n>>m;
-    for(int i=1; i<=n; i++) {
-    	cin>>(s[i]+1);
+template <typename T>
+struct Fenwick {
+    const int n;
+    std::vector<T> a;
+    Fenwick(int n) : n(n), a(n) {}
+    void add(int x, T v) {
+        for (int i = x; i < n; i += i & -i) {
+            a[i] = max(a[i],v);
+        }
     }
-    memset(dp,-1,sizeof(dp));
-    cout<<dfs(1,1,n,0)<<"\n";
+    T sum(int x) {
+        T ans = 0;
+        if(x <= 0) return ans;
+        for (int i = x; i > 0; i -= i & -i) {
+            ans = max(ans,a[i]);
+        }
+        return ans;
+    }
+    T rangeSum(int l, int r) {
+        return sum(r) - sum(l - 1);
+    }
+    int find_kth(int k) {
+        int ans = 0,cnt = 0;
+        for (int i = 1 << __lg(n);i >= 0;i--)  //这里的20适当的取值，与MAX_VAL有关，一般取lg(MAX_VAL)
+        {
+            ans += (1 << i);
+            if (ans >= n || cnt + a[ans] >= k)
+                ans -= (1 << i);
+            else
+                cnt += a[ans];
+        }
+        return ans + 1;
+    }//注意k不能太大
+};
+pll a[N];
+int n;
+ll dp[N];
+void solve() {
+    cin>>n;
+    vector<ll> V;
+    for(int i=1; i<=n; i++) {
+    	cin>>a[i].first>>a[i].second;
+    	V.push_back(a[i].first*a[i].first*a[i].second);
+    }
+    Fenwick<ll> fw(n+1);
+    sort(V.begin(),V.end());
+    V.erase(unique(V.begin(),V.end()),V.end());
+    ll ans=0;
+    for(int i=1; i<=n; i++) {
+    	ll v=a[i].first*a[i].first*a[i].second;
+    	int rk=lower_bound(V.begin(),V.end(),v)-V.begin()+1;
+    	dp[i]=fw.sum(rk-1)+v;
+    	fw.add(rk, dp[i]);
+    	ans=max(ans,dp[i]);
+    }
+    cout<<ans*pi<<"\n";
+
 }
 int main() {
     #ifdef ASHDR

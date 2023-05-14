@@ -62,38 +62,91 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 40 + 10;
+const int N = 5e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 998244353;
+const ll MOD = 1e9 + 7;
 int TT = 1;
-int n,m;
-ll dp[N][N][N][N];//dp[d][l][r][val] 考虑d~m位,当前在d位,,l~r的所有串满足第一段的第d位都相同,且值至少为val 且 l~r满足<关系的方案数
-char s[N][N];
-ll dfs(int d, int l, int r, int val) {
-	if(val>9) {
-		return 0;
+struct node {
+	ll tag,mx;	
+}tr[N<<2];
+int n,b,q;
+ll s[N],a[N];
+#define lt idx<<1
+#define rt idx<<1|1
+void push_up(int idx) {
+	tr[idx].mx=max(tr[lt].mx,tr[rt].mx);
+}
+void push_down(int idx) {
+	tr[lt].tag+=tr[idx].tag;
+	tr[lt].mx+=tr[idx].tag;
+	tr[rt].tag+=tr[idx].tag;
+	tr[rt].mx+=tr[idx].tag;
+	tr[idx].tag=0;
+}
+void build(int idx, int L, int R) {
+	if(L==R) {
+		tr[idx].mx=s[L];
+		return;
 	}
-	if(d==m+1) {
-		return dp[d][l][r][val]=(l<r?0:1);
+	int mid=(L+R)>>1;
+	build(lt, L, mid);
+	build(rt, mid+1, R);
+	push_up(idx);
+}
+void modify(int idx, int l, int r, ll val, int L, int R) {
+	if(l<=L&&r>=R) {
+		tr[idx].tag+=val;
+		tr[idx].mx+=val;
+		return ;
 	}
-	if(dp[d][l][r][val]!=-1) return dp[d][l][r][val];
-	dp[d][l][r][val]=0;
-	dp[d][l][r][val]+=dfs(d,l,r,val+1)%MOD;
-	for(int i=l; i<=r; i++) {
-		if(s[i][d]!='?'&&s[i][d]!='0'+val) break;
-		dp[d][l][r][val]+=dfs(d+1,l,i,0)*(i==r?1:dfs(d,i+1,r,val+1));
-		dp[d][l][r][val]%=MOD;
+	push_down(idx);
+	int mid=(L+R)>>1;
+	if(l<=mid) modify(lt, l, r, val, L, mid);
+	if(r>mid) modify(rt, l, r, val, mid+1, R);
+	push_up(idx);
+}
+int search(int idx, int L, int R) {
+	if(tr[idx].mx<0) {
+		return -1;
 	}
-	return dp[d][l][r][val];
+	if(L==R) {
+		return L;
+	}
+	push_down(idx);
+	int mid=(L+R)>>1;
+	int res=search(lt, L, mid);
+	if(res==-1) return search(rt, mid+1, R);
+	return res;
+}
+ll query(int idx, int pos, int L, int R) {
+	if(L==R) {
+		return tr[idx].mx;
+	}
+	push_down(idx);
+	int mid=(L+R)>>1;
+	if(pos<=mid) return query(lt, pos, L, mid);
+	else return query(rt, pos, mid+1, R);
 }
 void solve() {
-    cin>>n>>m;
-    for(int i=1; i<=n; i++) {
-    	cin>>(s[i]+1);
-    }
-    memset(dp,-1,sizeof(dp));
-    cout<<dfs(1,1,n,0)<<"\n";
+	cin>>n>>b>>q;
+	for(int i=1; i<=n; i++) {
+		cin>>a[i];
+		a[i]-=b;
+		s[i]=s[i-1]+a[i];
+	}
+	build(1, 1, n);
+	for(int i=1; i<=q; i++) {
+		int c;
+		ll x;
+		cin>>c>>x;
+		x-=b;
+		modify(1, c, n, x-a[c], 1, n);
+		a[c]=x;
+		int p=search(1,1,n);
+		if(p==-1) p=n;
+		cout<<1.0*query(1, p, 1, n)/p+b<<"\n";
+	}
 }
 int main() {
     #ifdef ASHDR
@@ -103,7 +156,7 @@ int main() {
     #endif
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
-    cout<<fixed<<setprecision(8);
+    cout<<fixed<<setprecision(10);
     //cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR

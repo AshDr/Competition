@@ -62,38 +62,103 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 40 + 10;
+const int N = 4e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 998244353;
+const ll MOD = 1e9 + 7;
 int TT = 1;
-int n,m;
-ll dp[N][N][N][N];//dp[d][l][r][val] 考虑d~m位,当前在d位,,l~r的所有串满足第一段的第d位都相同,且值至少为val 且 l~r满足<关系的方案数
-char s[N][N];
-ll dfs(int d, int l, int r, int val) {
-	if(val>9) {
-		return 0;
+struct node {
+	// bool have[61];
+	bitset<61> bt;
+	bitset<61> lz;
+}tr[N<<2];
+#define lt idx<<1
+#define rt idx<<1|1
+int siz[N],dfn[N],id[N];
+int a[N];
+void push_up(int idx) {
+	tr[idx].bt=tr[lt].bt|tr[rt].bt;
+}
+void push_down(int idx) {
+	if(tr[idx].lz.any()) {
+		tr[lt].bt = tr[idx].lz;
+		tr[lt].lz = tr[idx].lz;
+		tr[rt].bt = tr[idx].lz;
+		tr[rt].lz = tr[idx].lz;
+		tr[idx].lz=0;
 	}
-	if(d==m+1) {
-		return dp[d][l][r][val]=(l<r?0:1);
+}
+void build(int idx, int L, int R) {
+	if(L==R) {
+		tr[idx].bt[a[id[L]]]=1;
+		return ;
 	}
-	if(dp[d][l][r][val]!=-1) return dp[d][l][r][val];
-	dp[d][l][r][val]=0;
-	dp[d][l][r][val]+=dfs(d,l,r,val+1)%MOD;
-	for(int i=l; i<=r; i++) {
-		if(s[i][d]!='?'&&s[i][d]!='0'+val) break;
-		dp[d][l][r][val]+=dfs(d+1,l,i,0)*(i==r?1:dfs(d,i+1,r,val+1));
-		dp[d][l][r][val]%=MOD;
+	int mid=(L+R)>>1;
+	build(lt,L,mid);
+	build(rt, mid+1, R);
+	push_up(idx);
+}
+void modify(int idx, int l, int r, int L, int R,int val) {
+	// cout<<idx<<" "<<l<<" "<<r<<" "<<L<<" "<<R<<"\n";
+	if(l<=L&&r>=R) {
+		tr[idx].bt=0;
+		tr[idx].lz=0;
+		tr[idx].bt[val]=1;
+		tr[idx].lz[val]=1;
+		return ;
 	}
-	return dp[d][l][r][val];
+	push_down(idx);
+	int mid=(L+R)>>1;
+	if(l<=mid) modify(lt, l, r, L, mid, val);
+	if(r>mid) modify(rt, l, r, mid+1, R, val);
+	push_up(idx);
+}
+bitset<61> query(int idx, int l, int r, int L, int R) {
+	if(l<=L&&r>=R) {
+		return tr[idx].bt;
+	}
+	push_down(idx);
+	int mid=(L+R)>>1;
+	bitset<61>res=0;
+	if(l<=mid) res|=query(lt, l, r, L, mid);
+	if(r>mid) res|=query(rt, l, r, mid+1, R);
+	push_up(idx);
+	return res;
+}
+int n,m,cnt;
+vector<int> G[N];
+void dfs(int u, int fa) {
+	siz[u]=1;
+	dfn[u]=++cnt;
+	id[cnt]=u;
+	for(auto v:G[u]) {
+		if(v==fa) continue;
+		dfs(v,u);
+		siz[u]+=siz[v];
+	}
 }
 void solve() {
     cin>>n>>m;
-    for(int i=1; i<=n; i++) {
-    	cin>>(s[i]+1);
+    for(int i=1; i<=n; i++) cin>>a[i];
+    for(int i=1; i<=n-1; i++) {
+    	int u,v;
+    	cin>>u>>v;
+    	G[u].push_back(v);
+    	G[v].push_back(u);
     }
-    memset(dp,-1,sizeof(dp));
-    cout<<dfs(1,1,n,0)<<"\n";
+    dfs(1,0);
+    build(1,1,n);
+    for(int i=1; i<=m; i++) {
+    	int op,x,c;
+    	cin>>op;
+    	if(op==1) {
+    		cin>>x>>c;
+    		modify(1,dfn[x],dfn[x]+siz[x]-1,1,n,c);
+    	}else {
+    		cin>>x;
+    		cout<<query(1,dfn[x],dfn[x]+siz[x]-1,1,n).count()<<"\n";
+    	}	
+    }
 }
 int main() {
     #ifdef ASHDR

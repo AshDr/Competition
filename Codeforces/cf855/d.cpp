@@ -62,38 +62,39 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 40 + 10;
+const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 998244353;
+const ll MOD = 1e9 + 7;
+const int base=1331;
 int TT = 1;
-int n,m;
-ll dp[N][N][N][N];//dp[d][l][r][val] 考虑d~m位,当前在d位,,l~r的所有串满足第一段的第d位都相同,且值至少为val 且 l~r满足<关系的方案数
-char s[N][N];
-ll dfs(int d, int l, int r, int val) {
-	if(val>9) {
-		return 0;
-	}
-	if(d==m+1) {
-		return dp[d][l][r][val]=(l<r?0:1);
-	}
-	if(dp[d][l][r][val]!=-1) return dp[d][l][r][val];
-	dp[d][l][r][val]=0;
-	dp[d][l][r][val]+=dfs(d,l,r,val+1)%MOD;
-	for(int i=l; i<=r; i++) {
-		if(s[i][d]!='?'&&s[i][d]!='0'+val) break;
-		dp[d][l][r][val]+=dfs(d+1,l,i,0)*(i==r?1:dfs(d,i+1,r,val+1));
-		dp[d][l][r][val]%=MOD;
-	}
-	return dp[d][l][r][val];
+ull h[N],pw[N];
+ull get_hash(int l, int r) {
+	if(l>r) return 0;
+	return h[r]-h[l-1]*pw[r-l+1];
 }
+int n;
+char s[N];
 void solve() {
-    cin>>n>>m;
-    for(int i=1; i<=n; i++) {
-    	cin>>(s[i]+1);
-    }
-    memset(dp,-1,sizeof(dp));
-    cout<<dfs(1,1,n,0)<<"\n";
+	cin>>n;
+	cin>>(s+1);
+	pw[0]=1;
+	for(int i=1; i<=n; i++) {
+		h[i]=h[i-1]*base+s[i]-'a'+1;
+		pw[i]=pw[i-1]*base;
+	}
+	set<ull> st;
+	for(int i=1; i<=n-1; i++) {
+		ull t1=get_hash(1,i-1),t2=get_hash(i+2,n);
+        // cout<<t1<<" "<<t2<<"\n";
+        //aaibfprdokxvipsq
+		int len=n-(i+2)+1;
+		t1*=pw[len];
+		ull res=t1+t2;
+        // cout<<res<<"\n";
+		st.insert(res);
+	}
+	cout<<sz(st)<<"\n";
 }
 int main() {
     #ifdef ASHDR
@@ -104,7 +105,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

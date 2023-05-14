@@ -62,38 +62,54 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 40 + 10;
+const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 998244353;
+const ll MOD = 1e9 + 7;
 int TT = 1;
-int n,m;
-ll dp[N][N][N][N];//dp[d][l][r][val] 考虑d~m位,当前在d位,,l~r的所有串满足第一段的第d位都相同,且值至少为val 且 l~r满足<关系的方案数
-char s[N][N];
-ll dfs(int d, int l, int r, int val) {
-	if(val>9) {
-		return 0;
-	}
-	if(d==m+1) {
-		return dp[d][l][r][val]=(l<r?0:1);
-	}
-	if(dp[d][l][r][val]!=-1) return dp[d][l][r][val];
-	dp[d][l][r][val]=0;
-	dp[d][l][r][val]+=dfs(d,l,r,val+1)%MOD;
-	for(int i=l; i<=r; i++) {
-		if(s[i][d]!='?'&&s[i][d]!='0'+val) break;
-		dp[d][l][r][val]+=dfs(d+1,l,i,0)*(i==r?1:dfs(d,i+1,r,val+1));
-		dp[d][l][r][val]%=MOD;
-	}
-	return dp[d][l][r][val];
-}
-void solve() {
-    cin>>n>>m;
-    for(int i=1; i<=n; i++) {
-    	cin>>(s[i]+1);
+vector<int> G[N];
+map<vector<int>,int> mp;
+int h[N],tot;
+bool sym[N];
+void dfs(int u, int fa) {
+    vector<int> tmp;
+    for(auto v: G[u]) {
+        if(v==fa) continue;
+        dfs(v,u);
+        tmp.push_back(h[v]);
     }
-    memset(dp,-1,sizeof(dp));
-    cout<<dfs(1,1,n,0)<<"\n";
+    sort(tmp.begin(),tmp.end());
+    map<int,int> cnt;
+    if(!mp.count(tmp)) mp[tmp]=++tot;
+    h[u]=mp[tmp];
+    for(auto val: tmp) cnt[val]++;
+    int num=0,p=0;
+    for(auto [key,val]: cnt) {
+        if(val&1) num++,p=key;
+    }
+    if(num==0) {
+        sym[u]=1;
+    }else if(num==1){
+        for(auto vv: G[u]) {
+            if(vv!=fa&&h[vv]==p) {
+                sym[u]|=sym[vv];
+            }
+        }
+    }
+}
+int n;
+void solve() {
+    cin>>n;
+    mp.clear();tot=0;
+    for(int i=1; i<=n; i++) G[i].clear(),sym[i]=h[i]=0;
+    for(int i=1; i<n; i++) {
+        int u,v;
+        cin>>u>>v;
+        G[u].push_back(v);
+        G[v].push_back(u);
+    }
+    dfs(1,0);
+    cout<<(sym[1]?"YES\n":"NO\n");
 }
 int main() {
     #ifdef ASHDR
@@ -104,7 +120,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

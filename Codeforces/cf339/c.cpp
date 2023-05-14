@@ -62,38 +62,50 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 40 + 10;
+const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 998244353;
+const ll MOD = 1e9 + 7;
+const double pi=acos(-1);
 int TT = 1;
-int n,m;
-ll dp[N][N][N][N];//dp[d][l][r][val] 考虑d~m位,当前在d位,,l~r的所有串满足第一段的第d位都相同,且值至少为val 且 l~r满足<关系的方案数
-char s[N][N];
-ll dfs(int d, int l, int r, int val) {
-	if(val>9) {
-		return 0;
-	}
-	if(d==m+1) {
-		return dp[d][l][r][val]=(l<r?0:1);
-	}
-	if(dp[d][l][r][val]!=-1) return dp[d][l][r][val];
-	dp[d][l][r][val]=0;
-	dp[d][l][r][val]+=dfs(d,l,r,val+1)%MOD;
-	for(int i=l; i<=r; i++) {
-		if(s[i][d]!='?'&&s[i][d]!='0'+val) break;
-		dp[d][l][r][val]+=dfs(d+1,l,i,0)*(i==r?1:dfs(d,i+1,r,val+1));
-		dp[d][l][r][val]%=MOD;
-	}
-	return dp[d][l][r][val];
+int n;
+typedef pair<double,double> pdd;
+pdd a[N];
+double get_dis(pdd p, pdd q) {
+	return (p.first-q.first)*(p.first-q.first)+(p.second-q.second)*(p.second-q.second);
 }
 void solve() {
-    cin>>n>>m;
-    for(int i=1; i<=n; i++) {
-    	cin>>(s[i]+1);
+    double x,y;
+    cin>>n>>x>>y;
+    for(int i=0; i<n; i++) {
+    	cin>>a[i].first>>a[i].second;
     }
-    memset(dp,-1,sizeof(dp));
-    cout<<dfs(1,1,n,0)<<"\n";
+    double rmx=0,rmn=1e18;
+    for(int i=0; i<n; i++) {
+    	rmn=min(rmn,get_dis({x,y},a[i]));
+    	rmx=max(rmx,get_dis({x,y},a[i]));
+    }
+    for(int i=0; i<n; i++) {
+        int pre=((i-1)%n+n)%n;
+        pdd pt;
+        if(a[pre].first==a[i].first) {
+            pt.first=a[i].first;pt.second=y;
+        }else if(a[pre].second==a[i].second) {
+            pt.first=x;pt.second=a[i].second;
+        }else {
+            double k1=(a[i].second-a[pre].second)*1.0/(a[i].first-a[pre].first);
+            double b1=a[i].second-k1*a[i].first;
+            double k2=-1.0/k1;
+            double b2=1.0*y-x*k2;
+            double x3=(b2-b1)/(k1-k2),y3=k2*x3+b2;
+            pt.first=x3;pt.second=y3;
+        }
+        if(pt.first>=min(a[i].first,a[pre].first)&&pt.first<=max(a[i].first,a[pre].first)&&pt.second>=min(a[i].second,a[pre].second)&&pt.second<=max(a[i].second,a[pre].second)) {
+            rmn=min(rmn,get_dis({x,y}, pt));
+            rmx=max(rmx,get_dis({x,y}, pt));
+        }
+    }
+    cout<<pi*(rmx-rmn)<<"\n";
 }
 int main() {
     #ifdef ASHDR
@@ -103,7 +115,7 @@ int main() {
     #endif
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
-    cout<<fixed<<setprecision(8);
+    cout<<fixed<<setprecision(12);
     //cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
