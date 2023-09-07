@@ -11,9 +11,9 @@
 　　　▀██▅▇▀▎▇
 
 */
+#include <algorithm>
 #include <bits/stdc++.h>
 #include <random>
-#include <stdio.h>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -66,13 +66,68 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 2e5 + 10;
-const int M = 1e5 + 10;
+const int N = 50 + 10;
+const int M = 1e3 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+int dp[N][N][M];
+char ans[N][N][M]; //50*50*1000
+int n,k,p;
+char s[N],res[N];
+ll b,P[N];
+void init() {
+    for(int i = 1; i <= n; i++) {
+        for(int j = 0; j <= k; j++) {
+            for(int o = 0; o < p; o++) dp[i][j][o] = 0;
+        }
+    }
+}
 void solve() {
+    cin >> n >> b >> p >> k;
+    cin >> (s + 1);
+    init();
+    dp[0][0][0] = 1;
+    P[0] = 1;
+    ll hash = 0;
+    for(int i = 1; i <= n; i++) P[i] = P[i - 1] * b % p;
+    for(int i = 1; i <= n; i++) hash += (s[i] - 'a' + 1) * 1ll * (P[n - i]) % p,hash %= p;  
+    for(int i = 1; i <= n; i++) {
+    	for(int j = 0; j <= k; j++) {
+    		for(int o = 0; o < p; o++) {
+    			for(char ch = 'a'; ch <= 'z'; ch++) {
+    				if(ch == s[i] && j == 0) continue;
+    				int x = dp[i][j][o];
+    				dp[i][j][o] |= dp[i - 1][j - (ch == s[i])][((o - (ch - 'a' + 1) *1ll* P[n - i] % p) % p + p) % p];
+    				int y = dp[i][j][o];
+                    if(x == 0 && y) ans[i][j][o] = ch;
+    			}
+    		}
+    	}
+    }
     
+    if(!dp[n][k][hash]) cout << -1 << "\n";
+    else {
+    	int x = hash, num = k;
+    	vector<char> tmp;
+        // cout << x << "\n";
+    	for(int i = n; i >= 1; i--) {
+    		char ch = ans[i][num][x];
+            tmp.push_back(ch);
+    		x = ((x - (ch - 'a' + 1) * 1ll * P[n - i]) % p + p) % p;
+    		num -= (ch == s[i]);
+    	}
+    	reverse(tmp.begin(), tmp.end());
+    	for(auto ch: tmp) cout << ch;
+        cout << "\n";
+        ll xx = 0;
+        for(int i = 0; i < n; i++) {
+            xx += ((tmp[i] - 'a' + 1) *1ll* P[n - i - 1])%p;
+            xx %=p;
+        }
+        assert(xx == hash);
+    }
+
 }
 int main() {
     #ifdef ASHDR
@@ -80,10 +135,10 @@ int main() {
     freopen("data.out","w",stdout);
     int nol_cl = clock();
     #endif
-    // ios::sync_with_stdio(0);
-    // cin.tie(nullptr);
+    ios::sync_with_stdio(0);
+    cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

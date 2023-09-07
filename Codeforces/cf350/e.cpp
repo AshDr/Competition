@@ -13,7 +13,6 @@
 */
 #include <bits/stdc++.h>
 #include <random>
-#include <stdio.h>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -66,13 +65,53 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 2e5 + 10;
+const int N = 5e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+int n, m, p;
+int match[N], L[N], R[N];
+char s[N];
 void solve() {
-    
+    cin >> n >> m >> p;
+    cin >> (s + 1);
+    vector<int> stk;
+    R[0] = 1;
+    for(int i = 1; i <= n; i++) {
+    	if(s[i] == '(') stk.push_back(i);
+    	else {
+    		match[i] = stk.back();
+    		stk.pop_back();
+    		match[match[i]] = i;
+    	}
+        L[i] = i - 1;
+        R[i] = i + 1;
+    }
+
+    for(int i = 1; i <= m; i++) {
+    	char ch;
+    	cin >> ch;
+        // cout << p << "\n";
+    	if(ch == 'R') {
+            p = R[p];
+    	}else if(ch == 'L') {
+            p = L[p];
+    	}else {
+            int l = p, r = match[p];
+            if(l > r) swap(l, r);
+            int nxt = R[r];
+            if(nxt == n + 1)  p = L[l];
+            else p = nxt;
+            R[L[l]] = R[r];
+            L[R[r]] = L[l];
+    	    
+        }
+    }
+    for(int i = 0; i <= n; i = R[i]) {
+        if(i == 0) continue;
+        cout << s[i];
+    }
 }
 int main() {
     #ifdef ASHDR
@@ -80,8 +119,8 @@ int main() {
     freopen("data.out","w",stdout);
     int nol_cl = clock();
     #endif
-    // ios::sync_with_stdio(0);
-    // cin.tie(nullptr);
+    ios::sync_with_stdio(0);
+    cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
     //cin>>TT;
     while(TT--) solve();

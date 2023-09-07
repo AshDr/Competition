@@ -13,7 +13,6 @@
 */
 #include <bits/stdc++.h>
 #include <random>
-#include <stdio.h>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -71,8 +70,34 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+pii a[N];
+int n, k;
 void solve() {
-    
+    cin >> n >> k;
+    for(int i = 1; i <= n; i++) {
+        int x;
+        cin >> x;
+        a[i].first = a[i].second = 0;
+        while(x % 2 == 0) a[i].first++,x /= 2;
+        while(x % 5 == 0) a[i].second++,x /= 5;
+    }   
+    // if(k == 0) {
+    //     cout << 1 << "\n";
+    //     return ;
+    // }
+    ll ans = 0;
+    pii t1 = {0,0},t2 = {0,0};
+    for(int i = 1,j = 0,p = 0; i <= n; i++) {
+        while(j < i || (j <= n && min(t1.first,t1.second) <= k)) ++j,t1.first += a[j].first,t1.second += a[j].second;
+        while(p < i || (p <= n && min(t2.first,t2.second) < k)) ++p,t2.first += a[p].first,t2.second += a[p].second;
+        if(min(t2.first,t2.second) == k && j >= p) ans += j - p; //()
+        t1.first -= a[i].first;
+        t2.first -= a[i].first;
+        t1.second -= a[i].second;
+        t2.second -= a[i].second;
+
+    }
+    cout << ans << "\n";
 }
 int main() {
     #ifdef ASHDR
@@ -80,10 +105,10 @@ int main() {
     freopen("data.out","w",stdout);
     int nol_cl = clock();
     #endif
-    // ios::sync_with_stdio(0);
-    // cin.tie(nullptr);
+    ios::sync_with_stdio(0);
+    cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

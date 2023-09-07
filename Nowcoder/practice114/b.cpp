@@ -13,7 +13,6 @@
 */
 #include <bits/stdc++.h>
 #include <random>
-#include <stdio.h>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -71,8 +70,32 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+
 void solve() {
-    
+    vector<double> a(3),b(3);
+    cin >> a >> b;
+    int f = 0;
+    double win_p = 0;
+    for(int i = 0; i < 3; i++) {
+        a[i] /= 10;
+        b[i] /= 10;
+    }
+    for(int i = 0; i < 3; i++) {
+    	if((a[i]&&b[(i+1)%3]) || (b[i]&&a[(i+1)%3])) f = 1;
+        win_p += a[i] * b[(i + 1) % 3];
+        win_p += b[i] * a[(i + 1) % 3];
+    }
+    if(!f) cout << "Sorry,NoBruteForce\n";
+    else {
+        double p1 = a[0]*b[0],p2=a[1]*b[1],p3=a[2]*b[2];
+        double sum = p1 + p2 + p3;
+        double ans = 0,pin = 1;
+        for(int i = 1; i <= 10000; i++) {
+            ans += i * win_p * pin;
+            pin *= sum;
+        }
+        cout << ans << "\n";
+    }
 }
 int main() {
     #ifdef ASHDR
@@ -80,10 +103,10 @@ int main() {
     freopen("data.out","w",stdout);
     int nol_cl = clock();
     #endif
-    // ios::sync_with_stdio(0);
-    // cin.tie(nullptr);
+    ios::sync_with_stdio(0);
+    cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

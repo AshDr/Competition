@@ -13,7 +13,6 @@
 */
 #include <bits/stdc++.h>
 #include <random>
-#include <stdio.h>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -71,8 +70,79 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+int n,m;
+pair<ll,char> a[N],b[N];
+int nxt[N];
+void gao() {
+	int nn = 0;
+	for(int i = 1; i <= n; i++) {
+		if(i == 1 || a[i].second != a[nn].second) {
+			a[++nn].first = a[i].first;
+			a[nn].second = a[i].second;
+		}
+		else {
+			a[nn].first += a[i].first;
+		}
+	}
+	n = nn;
+
+	int mm = 0;
+	for(int i = 1; i <= m; i++) {
+		if(i == 1 || b[i].second != b[mm].second) {
+			b[++mm].first = b[i].first;
+			b[mm].second = b[i].second;
+		}
+		else {
+			b[mm].first += b[i].first;
+		}
+	}
+	m = mm;
+}
 void solve() {
-    
+	scanf("%d %d",&n,&m);
+    for(int i = 1; i <= n; i++) {
+    	scanf("%lld-%c",&a[i].first,&a[i].second);
+    }
+    for(int i = 1; i <= m; i++) {
+    	scanf("%lld-%c",&b[i].first,&b[i].second);
+    }
+    gao();
+    ll ans = 0;
+    if(m == 1) {
+        for(int i = 1; i <= n; i++) {
+            if(a[i].second == b[1].second && a[i].first >= b[1].first) {
+                ans += a[i].first - b[1].first + 1;
+            }
+        }
+    }else if(m == 2) {
+        for(int i = 1; i < n; i++) {
+            if(a[i].second == b[1].second && a[i + 1].second == b[2].second) {
+                if(a[i].first >= b[1].first && a[i + 1].first >= b[2].first) ++ans;
+            }
+        }
+    }else {
+        nxt[2] = 1; 
+        int j = 1;
+        for(int i = 3; i <= m - 1; i++) {
+            while(j > 1 && !(b[j + 1].second == b[i].second && b[j + 1].first == b[i].first)) {
+                j = nxt[j];
+            }
+            if(b[j + 1].second == b[i].second && b[j + 1].first == b[i].first) ++j;
+            nxt[i] = j;
+        }     
+        j = 1;
+        for(int i = 2; i <= n - 1; i++) {
+            while(j > 1 && !(b[j + 1].second == a[i].second && b[j + 1].first == a[i].first)) j = nxt[j];
+            if(b[j + 1].second == a[i].second && b[j + 1].first == a[i].first) ++j;
+            if(j == m - 1) {
+                if(b[1].second == a[i - (m - 2)].second && b[m].second == a[i + 1].second) {
+                    if(b[1].first <= a[i - (m - 2)].first && b[m].first <= a[i + 1].first) ++ans;
+                }
+                j = nxt[j];
+            }
+        }
+    }
+    printf("%lld\n",ans);
 }
 int main() {
     #ifdef ASHDR
@@ -80,9 +150,6 @@ int main() {
     freopen("data.out","w",stdout);
     int nol_cl = clock();
     #endif
-    // ios::sync_with_stdio(0);
-    // cin.tie(nullptr);
-    cout<<fixed<<setprecision(8);
     //cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR

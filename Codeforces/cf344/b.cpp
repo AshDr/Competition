@@ -13,7 +13,6 @@
 */
 #include <bits/stdc++.h>
 #include <random>
-#include <stdio.h>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -71,8 +70,26 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+pii R[N],C[N];
+int n,m,k;
 void solve() {
-    
+    cin >> n >> m >> k;
+   	for(int i = 1; i <= k; i++) {
+   		int op,x,col;
+   		cin >> op >> x >> col;
+   		if(op==1) {
+   			R[x].first = i;
+   			R[x].second = col;
+   		}else {
+   			C[x].first = i;
+   			C[x].second = col;
+   		}
+   	}
+   	for(int i = 1; i <= n; i++) {
+   		for(int j = 1; j <= m; j++) {
+   			cout << (R[i].first >= C[j].first ? R[i].second : C[j].second)<<" \n"[j == m];
+   		}
+   	}
 }
 int main() {
     #ifdef ASHDR
@@ -80,8 +97,8 @@ int main() {
     freopen("data.out","w",stdout);
     int nol_cl = clock();
     #endif
-    // ios::sync_with_stdio(0);
-    // cin.tie(nullptr);
+    ios::sync_with_stdio(0);
+    cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
     //cin>>TT;
     while(TT--) solve();

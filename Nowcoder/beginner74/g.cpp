@@ -11,9 +11,11 @@
 　　　▀██▅▇▀▎▇
 
 */
+#include <algorithm>
 #include <bits/stdc++.h>
+#include <functional>
+#include <queue>
 #include <random>
-#include <stdio.h>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -71,8 +73,68 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+int n, m;
+ll a[N], pre[N], L[N], R[N];
+bool vis[N];
 void solve() {
-    
+    cin >> n >> m;
+    vector<int> stk;
+    for(int i = 1; i <= n; i++) {
+        cin >> a[i];
+    }
+    for(int i = 2; i <= n; i++)  pre[i] = pre[i - 1] + abs(a[i] - a[i - 1]);
+    for(int i = n; i >= 1; i--) {
+        while(!stk.empty() && a[stk.back()] <= a[i]) L[stk.back()] = i,stk.pop_back();   
+        stk.push_back(i);
+    }   
+    set<int> st; 
+    map<int,int> mp;
+    for(int i = 1; i <= n; i++) {
+        if(L[i] == 0) {
+            if(!sz(st)) L[i] = i;
+            else {
+                auto it = st.lower_bound(a[i]);
+                --it;
+                L[i] = mp[*it];
+            }
+        }
+        mp[a[i]] = i;
+        st.insert(a[i]);
+    }
+    // while(!stk.empty()) L[stk.back()] = ,stk.pop_back();
+    for(int i = 1; i <= n; i++) {
+        R[L[i]] = i;
+    } 
+    for(int i = 1; i <= n; i++) if(!R[i]) R[i] = i;
+    // for(int i = 1; i <= n; i++) cout << L[i] << "\n";
+    // for(int i = 1; i <= n; i++) cout << R[i] << "\n";
+    priority_queue<pair<ll,int>> heap;
+    for(int i = 1; i <= n;) {
+        ll val = pre[R[i]] - pre[i],t = abs(a[R[i]] - a[i]);
+        assert(val >= t);
+        if(i != R[i]) heap.push({val - t,i});
+        if(i == R[i]) i++;
+        else i = R[i];
+    }
+    while(!heap.empty() && m) {
+        ll val = heap.top().first,idx = heap.top().second;heap.pop();
+        vis[idx] = 1;
+        --m;
+    }
+    ll ans = 0;
+    for(int i = 1; i < n;) {
+        // cout << i << " " <<  ans <<"\n";
+        if(vis[i]) {
+            ans += abs(a[R[i]] - a[i]);
+            i = R[i];
+        }
+        else {
+            ans += abs(a[i + 1] - a[i]);
+            i++;
+        }
+    }
+    cout << ans << "\n";
+
 }
 int main() {
     #ifdef ASHDR
@@ -80,8 +142,8 @@ int main() {
     freopen("data.out","w",stdout);
     int nol_cl = clock();
     #endif
-    // ios::sync_with_stdio(0);
-    // cin.tie(nullptr);
+    ios::sync_with_stdio(0);
+    cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
     //cin>>TT;
     while(TT--) solve();

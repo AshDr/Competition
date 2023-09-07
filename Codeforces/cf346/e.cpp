@@ -13,7 +13,6 @@
 */
 #include <bits/stdc++.h>
 #include <random>
-#include <stdio.h>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -71,8 +70,41 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+int n, m;
+vector<int> G[N];
+int vis[N],last;
+int flag;
+void dfs(int u) {
+	vis[u] = 1;
+    int come = last;
+	for(auto v: G[u]) {
+        // cout << u << " " << v << " "<< come << "\n";
+		if(vis[v] == 1 && v != come) {
+			flag = 1;
+		}else if(!vis[v]) {
+			last = u;
+			dfs(v);
+		}
+	}
+	vis[u] = 2;
+}
 void solve() {
-    
+    cin >> n >> m;
+    for(int i = 1; i <= m; i++) {
+        int u, v;
+        cin >> u >> v;
+        G[u].push_back(v);
+        G[v].push_back(u);
+    }
+    int ans = 0;
+    for(int i = 1; i <= n; i++) {
+    	if(!vis[i]) {
+            flag = 0;
+            dfs(i);
+            ans += (flag == 0);
+        }
+    }
+    cout << ans << "\n";
 }
 int main() {
     #ifdef ASHDR
@@ -80,8 +112,8 @@ int main() {
     freopen("data.out","w",stdout);
     int nol_cl = clock();
     #endif
-    // ios::sync_with_stdio(0);
-    // cin.tie(nullptr);
+    ios::sync_with_stdio(0);
+    cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
     //cin>>TT;
     while(TT--) solve();

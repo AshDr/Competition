@@ -13,7 +13,6 @@
 */
 #include <bits/stdc++.h>
 #include <random>
-#include <stdio.h>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -66,22 +65,73 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 2e5 + 10;
+const int N = 5e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+int n,a,b,t;
+char s[N];
+ll suf[N],pre[N];
 void solve() {
-    
+    cin >> n >> a >> b >> t;
+    cin >> s;
+    for(int i = n - 1; i >= 0; i--) {
+        suf[i] = suf[i + 1] + (s[i] == 'w' ? b : 0) + a + 1;
+    }
+    for(int i = 0; i < n; i++) {
+        if(i == 0) pre[i] = (s[i] == 'w' ? b : 0);
+        else pre[i] = pre[i - 1] + (s[i] == 'w' ? b : 0) + a + 1;
+    }
+    auto check0 = [&](int curidx, ll rem, int goright) {
+        return 1ll * (n - curidx) * a + pre[goright] - pre[0] <= rem;
+    };
+    auto check = [&](int curidx, ll rem, int goleft) {
+        return 1ll * curidx * a + suf[n - goleft] <= rem; 
+    };
+    ll ans = 0,tmp = 0, res = 0;
+    for(int i = 0,f = 1; i != 0 || f; i = ((i - 1) % n + n) % n) {
+        if(s[i] == 'w') tmp += b;
+        if(tmp >= t) break;
+        ++tmp;++res;
+        f = 0;
+        int l = 0, r = i - 1;
+        while(l < r) {
+            int mid = (l + r + 1) >> 1;
+            if(check0(i, t - tmp, mid)) l = mid;
+            else r = mid - 1;
+        }
+        ans = max(ans, res + l);
+        tmp += a;
+    }
+    ans = max(ans, res);
+    tmp = 0, res = 0;
+    for(int i = 0; i < n; i++) {
+        int l = 0 ,r = n - i - 1;
+        if(s[i] == 'w') tmp += b;
+        if(tmp >= t) break;
+        ++tmp;++res;
+        while(l < r) {
+            int mid = (l + r + 1) >> 1;
+            if(check(i, t - tmp,mid)) l = mid;
+            else r = mid - 1;
+        }
+        // cout << i << " " << res << " " << l << "\n";
+        ans = max(ans,res + l);
+        tmp += a;
+    }
+
+    cout << ans << "\n";
 }
+
 int main() {
     #ifdef ASHDR
     freopen("data.in","r",stdin);
     freopen("data.out","w",stdout);
     int nol_cl = clock();
     #endif
-    // ios::sync_with_stdio(0);
-    // cin.tie(nullptr);
+    ios::sync_with_stdio(0);
+    cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
     //cin>>TT;
     while(TT--) solve();

@@ -13,7 +13,6 @@
 */
 #include <bits/stdc++.h>
 #include <random>
-#include <stdio.h>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -69,10 +68,35 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 1e9 + 7;
+const ll MOD = 1333333331;
 int TT = 1;
+int n, m;
+char s[N];
+ull base[N],H[N],F[N];
+int num[N];
 void solve() {
-    
+   cin >> n >> m;
+   cin >> (s + 1);
+   for(int i = 1; i <= n; i++) {
+        base[i] = myrand();
+        num[i] = num[i - 1] + (s[i] == '1');
+   }
+   for(int i = 1; i <= n; i++) {
+    H[i] = H[i - 1] + (s[i] == '1' ? base[i] : 0);
+    F[i] = F[i - 1] + base[i];
+   }
+   set<ull> st;
+   ull tot = H[n];
+   for(int i = 1; i <= m; i++) {
+        int l,r;
+        cin >> l >> r;
+        int num_1 = num[r] - num[l - 1];
+        ull tmp1 = tot - H[r] + H[l - 1];
+        ull tmp2 = tmp1 + F[r] - F[r - num_1];
+        st.insert(tmp2);
+   }
+   cout << sz(st) << "\n";
+
 }
 int main() {
     #ifdef ASHDR
@@ -80,10 +104,10 @@ int main() {
     freopen("data.out","w",stdout);
     int nol_cl = clock();
     #endif
-    // ios::sync_with_stdio(0);
-    // cin.tie(nullptr);
+    ios::sync_with_stdio(0);
+    cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

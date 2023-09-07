@@ -71,8 +71,17 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+char s[N];
 void solve() {
-    
+    while(getchar() != '\'') getchar();
+    scanf("%s",s);
+    int n = atoi(s), len = strlen(s), pass = 0;
+    int base_10 = 10;
+    for(int i = 1; i < len; i++) pass += base_10,base_10 *= 10;
+    while(n < 1989 + pass) {
+        n += base_10;
+    }
+    printf("%d\n",n);
 }
 int main() {
     #ifdef ASHDR
@@ -82,8 +91,8 @@ int main() {
     #endif
     // ios::sync_with_stdio(0);
     // cin.tie(nullptr);
-    cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    // cout<<fixed<<setprecision(8);
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

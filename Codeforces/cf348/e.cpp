@@ -11,9 +11,9 @@
 　　　▀██▅▇▀▎▇
 
 */
+#include <algorithm>
 #include <bits/stdc++.h>
 #include <random>
-#include <stdio.h>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -71,8 +71,88 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+int n;
+template <typename T>
+struct Fenwick {
+    const int n;
+    std::vector<T> a;
+    Fenwick(int n) : n(n), a(n) {}
+    void add(int x, T v) {
+        for (int i = x; i < n; i += i & -i) {
+            a[i] += v;
+        }
+    }
+    T sum(int x) {
+        T ans = 0;
+        if(x <= 0) return ans;
+        for (int i = x; i > 0; i -= i & -i) {
+            ans += a[i];
+        }
+        return ans;
+    }
+    T rangeSum(int l, int r) {
+        return sum(r) - sum(l - 1);
+    }
+    int find_kth(int k) {
+        int ans = 0,cnt = 0;
+        for (int i = 1 << __lg(n);i >= 0;i--)  //这里的20适当的取值，与MAX_VAL有关，一般取lg(MAX_VAL)
+        {
+            ans += (1 << i);
+            if (ans >= n || cnt + a[ans] >= k)
+                ans -= (1 << i);
+            else
+                cnt += a[ans];
+        }
+        return ans + 1;
+    }//注意k不能太大
+};
+struct node{
+  int op, t, x, id;
+  friend bool operator < (const node& lhs, const node& rhs) {
+    if(lhs.x == rhs.x) return lhs.id < rhs.id;
+    return lhs.x < rhs.x;
+  }
+}a[N];
+int ans[N];
 void solve() {
-    
+  cin >> n;
+  vector<int> b;
+  memset(ans, -1, sizeof ans);
+  for(int i = 1; i <= n; i++) {
+    cin >> a[i].op >> a[i].t >> a[i].x;
+    a[i].id = i;
+    b.push_back(a[i].t);
+  }
+  sort(b.begin(), b.end());
+  b.erase(unique(b.begin(), b.end()), b.end());
+  sort(a + 1, a + 1 + n);
+  int i = 1;
+  vector<pii> tmp;
+  Fenwick<int> fw(n + 10); 
+  while(i <= n) {
+    int curx = a[i].x;
+    while(i <= n && curx == a[i].x) {
+      int pos = lower_bound(b.begin(), b.end(), a[i].t) - b.begin() + 1;
+      if(a[i].op == 1) {
+        fw.add(pos, 1);
+        tmp.push_back({pos, 1});
+      }else if(a[i].op == 2) {
+        fw.add(pos, -1);
+        tmp.push_back({pos, -1});
+      }else {
+        ans[a[i].id] = fw.sum(pos);
+      }
+      ++i;
+    }
+    while(sz(tmp)) {
+      int pos = tmp.back().first, val = tmp.back().second;
+      fw.add(pos, -val);
+      tmp.pop_back();
+    }
+  }
+  for(int i = 1; i <= n; i++) {
+    if(ans[i] != -1) cout << ans[i] << "\n";
+  }
 }
 int main() {
     #ifdef ASHDR
@@ -80,8 +160,8 @@ int main() {
     freopen("data.out","w",stdout);
     int nol_cl = clock();
     #endif
-    // ios::sync_with_stdio(0);
-    // cin.tie(nullptr);
+    ios::sync_with_stdio(0);
+    cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
     //cin>>TT;
     while(TT--) solve();

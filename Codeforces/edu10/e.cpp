@@ -13,7 +13,6 @@
 */
 #include <bits/stdc++.h>
 #include <random>
-#include <stdio.h>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -66,13 +65,86 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 2e5 + 10;
+const int N = 3e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+int head[N], to[N << 1], nxt[N << 1], e[N << 1], tot;
+int stk[N],top,ts;
+int dfn[N], low[N], is_brideg[N << 1];
+int dcc_cnt,belong[N];
+int n, m;
+int st, ed, vis[N];
+vector<pii> graph[N];
+int newval[N];
+void add(int u, int v, int w) {
+	to[tot] = v;
+	e[tot] = w;
+	nxt[tot] = head[u];
+	head[u] = tot++;
+}
+void tarjan(int u, int from) {
+	dfn[u] = low[u] = ++ts;
+	stk[++top] = u;
+	for(int i = head[u]; ~i; i = nxt[i]) {
+		int v = to[i], w = e[i];
+		if(!dfn[v]) {
+			tarjan(v, i);
+			low[u] = min(low[u], low[v]);
+			if(low[v] > dfn[u]) {
+				is_brideg[i] = is_brideg[i ^ 1] = 1;
+			}
+		}else if(i ^ from ^ 1) {
+			low[u] = min(low[u], dfn[v]);
+		}
+	}
+	if(dfn[u] == low[u]) {
+		++dcc_cnt;
+		int x;
+		do {
+			x = stk[top--];
+			belong[x] = dcc_cnt;
+		}while(x != u);
+	}
+}
+void dfs(int u, int f) {
+	if(newval[u]) f = 1;
+	if(u == belong[ed]) {
+		if(f) cout << "YES\n";
+		else cout << "NO\n";
+		exit(0);
+	}
+	vis[u] = 1;
+	for(auto [v,w]: graph[u]) {
+		if(vis[v]) continue;
+		dfs(v, f | w);
+	}
+}
 void solve() {
-    
+    memset(head, -1, sizeof head);
+    cin >> n >> m;
+    for(int i = 1; i <= m; i++) {
+    	int u, v, w;
+    	cin >> u >> v >> w;
+    	add(u, v, w);add(v, u, w);
+    }
+    cin >> st >> ed;
+    tarjan(1, 0);
+    for(int i = 1; i <= n; i++) {
+    	for(int j = head[i]; ~j; j = nxt[j]) {
+    		if(belong[i] == belong[to[j]] && e[j]) {
+    			newval[belong[i]] = 1;
+    		} 
+    		else if(belong[i] != belong[to[j]]) {
+    			graph[belong[i]].push_back({belong[to[j]], e[j]});
+                // cout << belong[i] << " " << belong[to[j]] << "\n";
+    		}
+    	}
+    }
+    dfs(belong[st], 0);
+    // cout << dcc_cnt << "\n"; 
+
 }
 int main() {
     #ifdef ASHDR
@@ -80,8 +152,8 @@ int main() {
     freopen("data.out","w",stdout);
     int nol_cl = clock();
     #endif
-    // ios::sync_with_stdio(0);
-    // cin.tie(nullptr);
+    ios::sync_with_stdio(0);
+    cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
     //cin>>TT;
     while(TT--) solve();

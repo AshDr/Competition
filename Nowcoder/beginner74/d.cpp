@@ -12,8 +12,9 @@
 
 */
 #include <bits/stdc++.h>
+#include <numeric>
+#include <queue>
 #include <random>
-#include <stdio.h>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -71,8 +72,21 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+ll a[N], pre[N];
+int n, m;
 void solve() {
-    
+    cin >> n >> m;
+    priority_queue<ll> heap;
+    for(int i = 1; i <= n; i++) {
+    	cin >> a[i];
+    	if(a[i] > 0) heap.push(a[i] * (n - i + 1));
+    }
+    ll res = accumulate(a + 1, a + 1 + n, 0ll);
+    while(m && !heap.empty()) {
+    	res -= heap.top();heap.pop();
+        --m;
+    }
+    cout << res << "\n";
 }
 int main() {
     #ifdef ASHDR
@@ -80,10 +94,10 @@ int main() {
     freopen("data.out","w",stdout);
     int nol_cl = clock();
     #endif
-    // ios::sync_with_stdio(0);
-    // cin.tie(nullptr);
+    ios::sync_with_stdio(0);
+    cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

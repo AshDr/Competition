@@ -13,7 +13,6 @@
 */
 #include <bits/stdc++.h>
 #include <random>
-#include <stdio.h>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -71,8 +70,65 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+vector<int> S[N];
+vector<tuple<int,int,int>> edge;
+int n, m, k;
+struct DSU {
+    std::vector<int> f, siz;
+    DSU(int n) : f(n), siz(n, 1) { std::iota(f.begin(), f.end(), 0); }
+    int leader(int x) {
+        while (x != f[x]) x = f[x] = f[f[x]];
+        return x;
+    }
+    bool same(int x, int y) { return leader(x) == leader(y); }
+    bool merge(int x, int y) {
+        x = leader(x);
+        y = leader(y);
+        if (x == y) return false;
+        siz[x] += siz[y];
+        f[y] = x;
+        return true;
+    }
+    int size(int x) { return siz[leader(x)]; }
+};
+bool check(int x) {
+	DSU dsu(n + 1);
+	for(int i = 0; i <= x; i++) {
+		dsu.merge(get<1>(edge[i]), get<2>(edge[i]));
+    }
+	for(int i = 1; i <= k; i++) {
+		int f = dsu.leader(S[i][0]);
+		for(auto u: S[i]) {
+			if(dsu.leader(u) != f) return false;
+		}
+	}
+	return true;
+}
 void solve() {
-    
+   cin >> n >> m;
+   for(int i = 1; i <= m; i++) {
+   		int u, v, w;
+   		cin >> u >> v >> w;
+   		edge.push_back({w,u,v});
+   }
+   cin >> k;
+   for(int i = 1; i <= k; i++) {
+   		int num;
+   		cin >> num;
+   		for(int j = 1; j <= num; j++) {
+   			int x;
+   			cin >> x;
+   			S[i].push_back(x);
+   		}
+   }
+   sort(edge.begin(),edge.end());
+   int l = 0,r = m - 1;
+   while(l < r) {
+   		int mid = (l + r) >> 1;
+   		if(check(mid)) r = mid;
+   		else l = mid + 1;
+   }
+   cout << get<0>(edge[l]) << "\n";
 }
 int main() {
     #ifdef ASHDR
@@ -80,8 +136,8 @@ int main() {
     freopen("data.out","w",stdout);
     int nol_cl = clock();
     #endif
-    // ios::sync_with_stdio(0);
-    // cin.tie(nullptr);
+    ios::sync_with_stdio(0);
+    cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
     //cin>>TT;
     while(TT--) solve();

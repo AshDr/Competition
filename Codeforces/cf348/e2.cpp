@@ -11,9 +11,10 @@
 　　　▀██▅▇▀▎▇
 
 */
+#include <algorithm>
 #include <bits/stdc++.h>
 #include <random>
-#include <stdio.h>
+#include <unordered_map>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -71,8 +72,55 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+struct node {
+	int op,info1,info2,info3;
+}a[N],memo[N];
+bool cmp(node &x, node &y) {
+	if(x.info2 == y.info2) return x.op < y.op;
+	return x.info2 < y.info2;
+}
+int n;
+int ans[N],tong[N];
+void CDQ(int l, int r) {
+	if(l == r) return ;
+	int mid = (l + r) >> 1;
+	CDQ(l, mid);CDQ(mid + 1,r);
+	merge(a + l, a + mid + 1,a + mid + 1, a + r + 1, memo + l, cmp);
+	for(int i = l; i <= r; i++) a[i] = memo[i];
+	for(int i = l; i <= r; i++) {
+		if(a[i]. op == 1 && a[i].info1 <= mid) {
+			tong[a[i].info3]++;
+		}else if(a[i].op == 2 && a[i].info1 <= mid) {
+			tong[a[i].info3]--;
+		}else if(a[i].op == 3 && a[i].info1 > mid) {
+			if(ans[a[i].info1] == 0x3f3f3f3f) ans[a[i].info1] = 0;
+			ans[a[i].info1] += tong[a[i].info3];
+		}
+	} 
+	for(int i = l; i <= r; i++) {
+		if(a[i]. op == 1 && a[i].info1 <= mid) {
+			tong[a[i].info3]--;
+		}else if(a[i].op == 2 && a[i].info1 <= mid) {
+			tong[a[i].info3]++;
+		}
+	} 
+}
 void solve() {
-    
+	cin >> n;
+	vector<int> b;
+	for(int i = 1; i <= n; i++) {
+		a[i].info1 = i;
+		cin >> a[i].op >> a[i].info2 >> a[i].info3;
+		b.push_back(a[i].info3);
+	} 
+	sort(b.begin(), b.end());
+	b.erase(unique(b.begin(), b.end()), b.end());
+	for(int i = 1; i <= n; i++) {
+		a[i].info3 = lower_bound(b.begin(), b.end(), a[i].info3) - b.begin() + 1;
+	}
+	memset(ans, 0x3f, sizeof ans);
+	CDQ(1, n);
+	for(int i = 1; i <= n; i++) if(ans[i] != 0x3f3f3f3f) cout << ans[i] << "\n";
 }
 int main() {
     #ifdef ASHDR
@@ -80,8 +128,8 @@ int main() {
     freopen("data.out","w",stdout);
     int nol_cl = clock();
     #endif
-    // ios::sync_with_stdio(0);
-    // cin.tie(nullptr);
+    ios::sync_with_stdio(0);
+    cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
     //cin>>TT;
     while(TT--) solve();

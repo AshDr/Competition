@@ -71,8 +71,42 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+struct Time {
+  int hour, minute;
+  bool operator < (const Time& rhs) {
+    if(hour == rhs.hour) {
+      return minute < rhs.minute;
+    }else return hour < rhs.hour;
+  }
+  bool operator == (const Time& rhs) {
+    return hour == rhs.hour && minute == rhs.minute;
+  }
+  Time operator + (const int min) {
+    Time z;
+    z.hour = hour;z.minute = minute;
+    z.minute += min;
+    z.hour += z.minute / 60;
+    z.minute %= 60;
+    return z;
+  }
+};
+int a, ta, b, tb;
+int xh,xm;
 void solve() {
-    
+  scanf("%d%d%d%d",&a,&ta,&b,&tb);
+  scanf("%d:%d",&xh,&xm);
+  Time cur,dao;
+  dao.hour = xh;dao.minute = xm;
+  dao = dao + ta;
+  cur.hour = 5;cur.minute = 0;
+  int ans = 0;
+  while(cur.hour < 24) {
+    Time arr = cur + tb;
+    if(dao < cur || dao == cur) break;
+    if((arr.hour > xh || (arr.hour == xh) && (arr.minute > xm))) ++ ans;
+    cur = cur + b;
+  }
+  printf("%d\n",ans);
 }
 int main() {
     #ifdef ASHDR
@@ -80,9 +114,6 @@ int main() {
     freopen("data.out","w",stdout);
     int nol_cl = clock();
     #endif
-    // ios::sync_with_stdio(0);
-    // cin.tie(nullptr);
-    cout<<fixed<<setprecision(8);
     //cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR

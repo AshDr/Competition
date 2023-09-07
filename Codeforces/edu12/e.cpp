@@ -13,7 +13,6 @@
 */
 #include <bits/stdc++.h>
 #include <random>
-#include <stdio.h>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -66,13 +65,45 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 2e5 + 10;
+const int N = 1e6 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+int n, k, tot = 1;
+int trie[N * 31][2],num[N * 31];
+void insert(int val) {
+	int cur = 1;
+	for(int i = 30; i >= 0; i--) {
+		int x = (val >> i & 1);
+		if(!trie[cur][x]) trie[cur][x] = ++tot; 
+		cur = trie[cur][x];
+		++num[cur];
+	}
+}
+int query(int val) {
+	int cur = 1,res = 0;
+	for(int i = 30; i >= 0; i--) {
+		int x = (val >> i & 1);
+		if(k >> i & 1) cur = trie[cur][!x];
+		else res += num[trie[cur][!x]],cur = trie[cur][x];
+    }
+	res += num[cur];
+	return res;
+}
 void solve() {
-    
+	cin >> n >> k;
+	int val = 0;
+	ll ans = 0;
+    insert(0);
+	for(int i = 1; i <= n; i++) {
+		int x;
+		cin >> x;
+		val ^= x;
+		ans += query(val);
+        insert(val);
+	}    
+	cout << ans << "\n";
 }
 int main() {
     #ifdef ASHDR
@@ -80,8 +111,8 @@ int main() {
     freopen("data.out","w",stdout);
     int nol_cl = clock();
     #endif
-    // ios::sync_with_stdio(0);
-    // cin.tie(nullptr);
+    ios::sync_with_stdio(0);
+    cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
     //cin>>TT;
     while(TT--) solve();

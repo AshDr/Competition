@@ -11,9 +11,9 @@
 　　　▀██▅▇▀▎▇
 
 */
+#include <algorithm>
 #include <bits/stdc++.h>
 #include <random>
-#include <stdio.h>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -66,13 +66,48 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 2e5 + 10;
+const int N = 6e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+int n, m;
+int a[N], b[N], c[N];
+int cnt[N];
 void solve() {
-    
+    cin >> n;
+    vector<int> tmp;
+    for(int i = 1; i <= n; i++) cin >> a[i],tmp.push_back(a[i]);
+    cin >> m;
+	for(int i = 1; i <= m; i++) cin >> b[i], tmp.push_back(b[i]);
+	for(int i = 1; i <= m; i++) cin >> c[i], tmp.push_back(c[i]);
+	sort(tmp.begin(), tmp.end());
+	tmp.erase(unique(tmp.begin(), tmp.end()), tmp.end());
+	int mx = 0;
+	for(int i = 1; i <= n; i++) {
+		a[i] = lower_bound(tmp.begin(), tmp.end(), a[i]) - tmp.begin() + 1;
+		cnt[a[i]]++;
+	}
+	for(int i = 1; i <= m; i++) {
+		b[i] = lower_bound(tmp.begin(), tmp.end(), b[i]) - tmp.begin() + 1;
+		if(cnt[b[i]] > mx) mx = cnt[b[i]];
+	}
+	for(int i = 1; i <= m; i++) c[i] = lower_bound(tmp.begin(), tmp.end(), c[i]) - tmp.begin() + 1;
+	vector<int> Q;
+	for(int i = 1; i <= m; i++) {
+		if(cnt[b[i]] == mx) {
+			Q.push_back(i);
+		}
+	}
+	int ans = -1, chose = 0;;
+	for(auto idx: Q) {
+		if(cnt[c[idx]] > ans) {
+			ans = cnt[c[idx]];
+			chose = idx;
+		}
+	}	
+	cout << chose << "\n";
+
 }
 int main() {
     #ifdef ASHDR
@@ -80,8 +115,8 @@ int main() {
     freopen("data.out","w",stdout);
     int nol_cl = clock();
     #endif
-    // ios::sync_with_stdio(0);
-    // cin.tie(nullptr);
+    ios::sync_with_stdio(0);
+    cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
     //cin>>TT;
     while(TT--) solve();

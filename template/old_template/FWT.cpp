@@ -113,6 +113,46 @@ void FWT_xor(int *a,int opt)
                 if(opt==-1)a[j+k]=1ll*a[j+k]*inv2%MOD,a[i+j+k]=1ll*a[i+j+k]*inv2%MOD;
             }
 }
+/*
+New template(no module)
+
+void FWT_or(ll *a, int n, int opt) {
+    for(int o = 2; o <= n; o <<= 1) { // cur len 
+        for(int i = 0,k = o >> 1; i < n; i += o) {
+            for(int j = 0; j < k; j++) {
+                if(opt == 1) a[i + j + k] = (a[i + j + k] + a[i + j]);
+                else a[i + j + k] = (a[i + j + k] - a[i + j]);
+            }
+        }
+    }
+}
+void FWT_and(ll *a, int n, int opt) {
+    for(int o = 2; o <= n; o <<= 1) { // cur len 
+        for(int i = 0,k = o >> 1; i < n; i += o) {
+            for(int j = 0; j < k; j++) {
+                if(opt == 1) a[i + j] = (a[i + j] + a[i + j + k]);
+                else a[i + j] = (a[i + j] - a[i + j + k]);
+            }
+        }
+    }
+}
+void FWT_XOR(ll *a, int n, int opt) {
+    for(int o = 2; o <= n; o <<= 1) {
+        for(int i = 0, k = o >> 1; i < n; i += o) {
+            for(int j = 0; j < k; j++) {
+                ll tmp1 = a[i + j], tmp2 = a[i + j + k];
+                if(opt == 1) {
+                    a[i + j] = tmp1 + tmp2;
+                    a[i + j + k] = tmp1 - tmp2;
+                }else {
+                    a[i + j] = (tmp1 + tmp2) / 2;
+                    a[i + j + k] = (tmp1 - tmp2) / 2;
+                }
+            }
+        }
+    }
+}
+*/
 void solve() {
     cin>>n;
     N = (1 << n);

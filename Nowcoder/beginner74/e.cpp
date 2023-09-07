@@ -13,7 +13,6 @@
 */
 #include <bits/stdc++.h>
 #include <random>
-#include <stdio.h>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -71,8 +70,30 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+int n, m;
+ll k ,b;
+ll h[N],a[N];
 void solve() {
-    
+    cin >> n >> m >> k >> b;
+    for(int i = 1; i <= n; i++) cin >> h[i];
+    for(int i = 1; i <= n; i++) cin >> a[i];
+    --m;
+    for(int i = 1; i <= n; i++) {
+    	if(h[i] + a[i] * m <= k) cout << h[i] + a[i] * m << " \n"[i == n];
+    	else {
+    		ll cost = (k - h[i]) / a[i]; // at least 1
+    		++cost;
+            assert(m >= cost); 
+    		ll rem = m - cost,cycle = (k - b) / a[i];++cycle;
+    		rem %= cycle;
+    		cout << b + rem * a[i] << " \n"[i == n]; 
+    	}
+    }
+    //h[i] + t * a[i] > k
+    //t * a[i] > k - h[i]
+    //t > k - h[i] / a[i];
+    //a,a + a[i], a + 2 * a[i] ...
+    // b,b + a[i],b + 2 * a[i], ... (b + t * a[i] > k -> b), b + a[i] 
 }
 int main() {
     #ifdef ASHDR
@@ -80,10 +101,10 @@ int main() {
     freopen("data.out","w",stdout);
     int nol_cl = clock();
     #endif
-    // ios::sync_with_stdio(0);
-    // cin.tie(nullptr);
+    ios::sync_with_stdio(0);
+    cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()
