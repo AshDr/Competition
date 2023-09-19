@@ -57,6 +57,7 @@ void solve() {
     int n;
     cin >> n;
     vector<pii> a(n);
+    
     if(n == 1) cout << -1 << '\n';
     else if(n == 2) {
     	for(int i = 0; i < n; i++) cin >> a[i].first >> a[i].second;
