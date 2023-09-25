@@ -87,8 +87,8 @@ int main() {
   freopen("data.out", "w", stdout);
   int nol_cl = clock();
 #endif
-  // ios::sync_with_stdio(0);
-  // cin.tie(nullptr);
+  ios::sync_with_stdio(0);
+  cin.tie(nullptr);
   cout << fixed << setprecision(8);
   // cin>>TT;
   while (TT--)
