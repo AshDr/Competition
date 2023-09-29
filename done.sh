@@ -13,9 +13,11 @@ IFS=$(echo -en "\n\b")
 declare -a results=(`fd -t d`)
 
 #echo ${results}
-
-
-for file in ${results[@]};
+curpath=$(pwd)
+for subdir in ${results[@]};
 do
-  echo "${file}!"
+  cd $subdir;
+  res=$(find  )
+  echo $res
+  #cd $curpath;
 done
