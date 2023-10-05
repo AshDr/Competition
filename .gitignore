@@ -1,1 +1,3 @@
 !*.cpp
+*.exe
+*.cpp__tests
