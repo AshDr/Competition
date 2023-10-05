@@ -11,17 +11,8 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <algorithm>
-#include <cstdio>
-#include <deque>
-#include <iomanip>
-#include <iostream>
-#include <map>
-#include <queue>
-#include <random>
-#include <set>
-#include <unordered_map>
 #include <bits/stdc++.h>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -79,22 +70,18 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
-int n;
-int a[N],b[N];
+int n, k;
+ll x;
 void solve() {
-    cin >> n;
-    for(int i = 1; i <= n; i++) cin >> a[i];
-    //b[i] = (b[i - 1] + 1) or min(b[i - 1] + 1,a[i] - 1)
-    if(a[1] != 1) b[1] = 1;
-    else b[1] = 2;
-    for(int i = 2; i <= n; i++) {
-        if(b[i - 1] + 1 == a[i]) {
-            b[i] = a[i] + 1;
-        }else { 
-            b[i] = b[i - 1] + 1;
-        }
-    } 
-    cout << b[n] << "\n";
+    cin >> n >> k >> x;    
+    //n - k + 1
+    if(1ll*(n - k + 1 + n) * k / 2 < x) {
+        cout << "NO\n";
+    }else if(1ll*(1 + k) * k / 2 > x) {
+        cout << "NO\n";
+    }else {
+        cout << "YES\n";
+    }
 }
 int main() {
     #ifdef ASHDR

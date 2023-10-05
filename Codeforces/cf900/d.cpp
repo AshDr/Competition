@@ -12,16 +12,8 @@
 
 */
 #include <algorithm>
-#include <cstdio>
-#include <deque>
-#include <iomanip>
-#include <iostream>
-#include <map>
-#include <queue>
-#include <random>
-#include <set>
-#include <unordered_map>
 #include <bits/stdc++.h>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -79,23 +71,44 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
-int n;
-int a[N],b[N];
+int n, m, q;
+int a[N], b[N];
+char s[N];
 void solve() {
-    cin >> n;
-    for(int i = 1; i <= n; i++) cin >> a[i];
-    //b[i] = (b[i - 1] + 1) or min(b[i - 1] + 1,a[i] - 1)
-    if(a[1] != 1) b[1] = 1;
-    else b[1] = 2;
-    for(int i = 2; i <= n; i++) {
-        if(b[i - 1] + 1 == a[i]) {
-            b[i] = a[i] + 1;
-        }else { 
-            b[i] = b[i - 1] + 1;
+    cin >> n >> m;
+    vector<int> cnt(n + 1);
+    cin >> (s + 1);
+    for(int i = 1; i <= m; i++) cin >> a[i]; 
+    for(int i = 1; i <= m; i++) cin >> b[i];
+    cin >> q;
+    while(q--) {
+        int x;
+        cin >> x;
+        int idx = lower_bound(b + 1, b + 1 + m, x) - b;
+        int l = min(x, a[idx] + b[idx] - x),r = max(x, a[idx] + b[idx] - x);
+        int len = r - l + 1;
+        cnt[l]++;
+    }
+    for(int i = 1; i <= m; i++) {
+        int j = a[i];
+        int f = 1;
+        int l = a[i], r = b[i];
+        for(; j <= r;) {
+            if(cnt[j] & 1) {
+                int k = j;
+                if(f) swap(s[k], s[l + r - k]);
+                ++k;
+                while(k <= (r + l) / 2 && cnt[k] % 2 == 0) {
+                    if(f) swap(s[k], s[l + r - k]);
+                    ++k;
+                }
+                f ^= 1;
+                j = k;
+            }else ++j;
         }
-    } 
-    cout << b[n] << "\n";
-}
+    }
+    cout << (s + 1) << "\n";
+}   
 int main() {
     #ifdef ASHDR
     freopen("data.in","r",stdin);

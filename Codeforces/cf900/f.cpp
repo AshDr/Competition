@@ -11,17 +11,8 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <algorithm>
-#include <cstdio>
-#include <deque>
-#include <iomanip>
-#include <iostream>
-#include <map>
-#include <queue>
-#include <random>
-#include <set>
-#include <unordered_map>
 #include <bits/stdc++.h>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -74,27 +65,91 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 2e5 + 10;
+const int N = 1e6 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 int n;
-int a[N],b[N];
+int q;
 void solve() {
-    cin >> n;
-    for(int i = 1; i <= n; i++) cin >> a[i];
-    //b[i] = (b[i - 1] + 1) or min(b[i - 1] + 1,a[i] - 1)
-    if(a[1] != 1) b[1] = 1;
-    else b[1] = 2;
-    for(int i = 2; i <= n; i++) {
-        if(b[i - 1] + 1 == a[i]) {
-            b[i] = a[i] + 1;
-        }else { 
-            b[i] = b[i - 1] + 1;
-        }
-    } 
-    cout << b[n] << "\n";
+	cin >> n >> q;
+	map<int, int> init_n_fac,n_fac;
+	// init_prod_fac
+	// prod_fac
+	int tmp_n = n;
+	ll init_prod = 1;
+	for(int i = 2; i * i <= tmp_n; i++) {
+		if(tmp_n % i == 0) {
+			int num = 0;
+			while(tmp_n % i == 0) {
+				++num;
+				tmp_n /= i;
+			}
+			init_n_fac[i] += num;
+			init_prod *= (num + 1);
+		}
+	}
+	if(tmp_n > 1) {
+		init_prod *= 2;
+		init_n_fac[tmp_n]++;
+	}
+
+	n_fac = init_n_fac;
+
+	while(q--) {
+		int op, x;
+		cin >> op;
+		if(op == 1) {
+			cin >> x;
+			ll prod = 1;
+			for(int i = 2; i * i <= x; i++) {
+				if(x % i == 0) {
+					int num = 0;
+					while(x % i == 0) {
+						x /= i;
+						++num;
+					}
+					n_fac[i] += num;
+				}
+			}
+			if(x > 1) {
+				n_fac[x]++;
+			}
+			for(auto [k, v]: n_fac) {
+				prod *= (v + 1);
+			}
+			vector<pii> p;
+			for(ll i = 2; i * i <= prod; i++) {
+				if(prod % i == 0) {
+					int num = 0;
+					while(prod % i == 0) {
+						prod /= i;
+						++num;
+					}
+					p.push_back({i, num});
+				}
+			}
+			if(prod > 1) {
+				p.push_back({prod, 1});
+			}
+			int flag = 0;
+			for(auto val: p) {
+				if(n_fac[val.first] == 0) {
+					flag = 1;
+					break;
+				}
+				if(n_fac[val.first] < val.second) {
+					flag = 1;
+					break;
+				}
+			}
+			cout << (flag ? "NO\n": "YES\n");
+		}else {
+			n_fac = init_n_fac;
+		}
+	}    
+	cout << "\n";
 }
 int main() {
     #ifdef ASHDR

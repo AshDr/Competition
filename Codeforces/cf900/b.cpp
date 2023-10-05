@@ -11,17 +11,8 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <algorithm>
-#include <cstdio>
-#include <deque>
-#include <iomanip>
-#include <iostream>
-#include <map>
-#include <queue>
-#include <random>
-#include <set>
-#include <unordered_map>
 #include <bits/stdc++.h>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -80,21 +71,24 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 int n;
-int a[N],b[N];
+int a[N];
 void solve() {
     cin >> n;
-    for(int i = 1; i <= n; i++) cin >> a[i];
-    //b[i] = (b[i - 1] + 1) or min(b[i - 1] + 1,a[i] - 1)
-    if(a[1] != 1) b[1] = 1;
-    else b[1] = 2;
+    a[1] = 1;
     for(int i = 2; i <= n; i++) {
-        if(b[i - 1] + 1 == a[i]) {
-            b[i] = a[i] + 1;
-        }else { 
-            b[i] = b[i - 1] + 1;
-        }
+        //0 + 1  0 + 2
+        //0 1 0 1
+        //1 4 7
+        a[i] = a[i - 1] + 3;
     } 
-    cout << b[n] << "\n";
+    // for(int i = 3; i <= n; i++) {
+    //     if(a[i] * 3 % (a[i - 1] + a[i - 2]) == 0) {
+    //         cout << a[i - 2] << " " << a[i - 1] << " " << a[i] << "\n";
+    //     }
+    // }
+    for(int i = 1; i <= n; i++) {
+        cout << a[i] << " \n"[i == n];
+    }
 }
 int main() {
     #ifdef ASHDR

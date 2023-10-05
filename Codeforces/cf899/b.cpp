@@ -11,17 +11,8 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <algorithm>
-#include <cstdio>
-#include <deque>
-#include <iomanip>
-#include <iostream>
-#include <map>
-#include <queue>
-#include <random>
-#include <set>
-#include <unordered_map>
 #include <bits/stdc++.h>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -80,21 +71,49 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 int n;
-int a[N],b[N];
 void solve() {
     cin >> n;
-    for(int i = 1; i <= n; i++) cin >> a[i];
-    //b[i] = (b[i - 1] + 1) or min(b[i - 1] + 1,a[i] - 1)
-    if(a[1] != 1) b[1] = 1;
-    else b[1] = 2;
-    for(int i = 2; i <= n; i++) {
-        if(b[i - 1] + 1 == a[i]) {
-            b[i] = a[i] + 1;
-        }else { 
-            b[i] = b[i - 1] + 1;
-        }
-    } 
-    cout << b[n] << "\n";
+    vector<vector<int>> a(n),c(51);
+    vector<int> cnt(100);
+    for(int i = 0; i < n; i++) {
+    	int k;
+    	cin >> k;
+    	vector<int> b(k);
+    	for(int j = 0; j < k; j++) {
+    		cin >> b[j];
+    		cnt[b[j]]++;
+    		c[b[j]].push_back(i);
+    	}
+    	a[i] = b;
+    }
+    if(n == 1) {
+    	cout << 0 << "\n";
+    	return ;
+    }
+	int ans = 0;
+	for(int i = 1; i <= 50; i++) {
+		if(!cnt[i]) continue;
+		int f = 0;
+		for(auto idx: c[i]) {
+			for(auto val: a[idx]) {
+				cnt[val]--;
+				if(cnt[val] == 0) f = 1;
+			}
+		}
+		int res = 0;
+		for(int j = 1;  j <= 50; j++) {
+			if(cnt[j] > 0) ++res;
+		}
+		if(f) ans = max(res, ans);
+		for(auto idx: c[i]) {
+			for(auto val: a[idx]) {
+				cnt[val]++;
+			}
+		}
+	}
+	cout << ans << "\n";
+    //n * 
+	//2500
 }
 int main() {
     #ifdef ASHDR

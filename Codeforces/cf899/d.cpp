@@ -11,17 +11,9 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <algorithm>
-#include <cstdio>
-#include <deque>
-#include <iomanip>
-#include <iostream>
-#include <map>
-#include <queue>
-#include <random>
-#include <set>
-#include <unordered_map>
 #include <bits/stdc++.h>
+#include <functional>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -80,21 +72,41 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 int n;
-int a[N],b[N];
+ll a[N];
 void solve() {
-    cin >> n;
+	cin >> n;
+    vector<vector<int>> G(n + 1,vector<int>()); 
+    vector<ll> dp1(n + 1,0),dp2(n + 1, 0);
+    vector<int> siz(n + 1, 0);
+    function<void(int , int)> dfs1 =  [&](int u, int p) {
+    	siz[u] = 1;
+    	for(auto v: G[u]) {
+    		if(v == p) continue;
+    		dfs1(v, u);
+    		siz[u] += siz[v];
+    		dp1[u] += dp1[v];
+    	}
+    	if(u != 1) dp1[u] += (a[u] ^ a[p]) * siz[u];
+
+    };
+    function<void(int, int )> dfs2 = [&](int u, int p) {
+    	for(auto v: G[u]) {
+    		if(v == p) continue;
+    		dp2[v] = dp2[u] + (a[v] ^ a[u]) * 1ll * (n - 2 * siz[v]); 
+    		dfs2(v, u);	
+    	}
+    };
     for(int i = 1; i <= n; i++) cin >> a[i];
-    //b[i] = (b[i - 1] + 1) or min(b[i - 1] + 1,a[i] - 1)
-    if(a[1] != 1) b[1] = 1;
-    else b[1] = 2;
-    for(int i = 2; i <= n; i++) {
-        if(b[i - 1] + 1 == a[i]) {
-            b[i] = a[i] + 1;
-        }else { 
-            b[i] = b[i - 1] + 1;
-        }
-    } 
-    cout << b[n] << "\n";
+    for(int i = 1; i < n; i++) {
+    	int u, v;
+    	cin >> u >> v;
+    	G[u].push_back(v);
+    	G[v].push_back(u);
+    }
+    dfs1(1, 0);
+    dp2[1] = dp1[1];
+    dfs2(1, 0);
+    for(int i = 1; i <= n; i++) cout << dp2[i] << " \n"[i == n];
 }
 int main() {
     #ifdef ASHDR

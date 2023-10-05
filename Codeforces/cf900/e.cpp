@@ -12,16 +12,8 @@
 
 */
 #include <algorithm>
-#include <cstdio>
-#include <deque>
-#include <iomanip>
-#include <iostream>
-#include <map>
-#include <queue>
-#include <random>
-#include <set>
-#include <unordered_map>
 #include <bits/stdc++.h>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -79,22 +71,61 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
-int n;
-int a[N],b[N];
+int n, q;
+int a[N];
+struct node {
+    int val;
+}tr[N << 2];
+#define lt idx<<1
+#define rt idx<<1|1
+void push_up(int idx) {
+    tr[idx].val = tr[lt].val&tr[rt].val;
+}
+void build(int idx,int L, int R) {
+    if(L == R) {
+        tr[idx].val = a[L];
+        return ;
+    }
+    int mid = (L + R) >> 1;
+    build(lt, L, mid);
+    build(rt, mid + 1,R);
+    push_up(idx);
+}
+int query(int idx, int l, int r,int L, int R) {
+    if(l <= L && r >= R) {
+        return tr[idx].val;
+    }
+    int res = (1 << 30) - 1;
+    int mid = (L + R) >> 1;
+    if(l <= mid) {
+        res &= query(lt, l, r, L, mid);
+    }
+    if(r > mid) {
+        res &= query(rt, l, r, mid + 1, R);
+    }
+    return res;
+}
 void solve() {
     cin >> n;
     for(int i = 1; i <= n; i++) cin >> a[i];
-    //b[i] = (b[i - 1] + 1) or min(b[i - 1] + 1,a[i] - 1)
-    if(a[1] != 1) b[1] = 1;
-    else b[1] = 2;
-    for(int i = 2; i <= n; i++) {
-        if(b[i - 1] + 1 == a[i]) {
-            b[i] = a[i] + 1;
-        }else { 
-            b[i] = b[i - 1] + 1;
+    build(1, 1, n);
+    cin >> q;
+    while(q--) {
+        int l, k;
+        cin >> l >> k;
+        if(a[l] < k) {
+            cout << -1 << " ";
+        }else {
+            int L = l, R = n;
+            while(L < R) {
+                int mid = (L + R + 1) >> 1;
+                if(query(1, l, mid, 1, n) < k) R = mid - 1;
+                else L = mid;
+            }
+            cout << L << " ";
         }
-    } 
-    cout << b[n] << "\n";
+    }
+    cout << "\n";
 }
 int main() {
     #ifdef ASHDR

@@ -11,17 +11,8 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <algorithm>
-#include <cstdio>
-#include <deque>
-#include <iomanip>
-#include <iostream>
-#include <map>
-#include <queue>
-#include <random>
-#include <set>
-#include <unordered_map>
 #include <bits/stdc++.h>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -80,21 +71,38 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 int n;
-int a[N],b[N];
+int a[N],noneg[N];
+ll positive[N];
 void solve() {
     cin >> n;
-    for(int i = 1; i <= n; i++) cin >> a[i];
-    //b[i] = (b[i - 1] + 1) or min(b[i - 1] + 1,a[i] - 1)
-    if(a[1] != 1) b[1] = 1;
-    else b[1] = 2;
-    for(int i = 2; i <= n; i++) {
-        if(b[i - 1] + 1 == a[i]) {
-            b[i] = a[i] + 1;
-        }else { 
-            b[i] = b[i - 1] + 1;
-        }
-    } 
-    cout << b[n] << "\n";
+    for(int i = 1; i <= n; i++) {
+    	cin >> a[i];
+    	positive[i] = positive[i - 1];
+    	if(a[i] > 0) positive[i] += a[i]; 
+    }
+    ll ans = 0;
+    int ed = n + 1;
+    for(int i = 1; i <= n; i++) {
+    	if((a[i] <= 0 && i % 2 == 0) || (a[i] >= 0 && i % 2 == 1)) {
+    		ans += positive[n] - positive[i - 1];
+    		ed = i;
+    		break;
+    	}
+    }
+    if(ed == 1 || ed == 2) {
+    	cout << ans << "\n";
+    }else {
+    	assert(a[2] > 0);
+    	assert(a[1] < 0);
+		if(a[2] >= -a[1]) {
+			ans += a[1] + positive[ed - 1];
+    	}else {
+    		ans += positive[ed - 1] - positive[2];
+    	}
+
+    	ans = max(ans, 0ll);
+    	cout << ans << "\n";
+    }
 }
 int main() {
     #ifdef ASHDR
