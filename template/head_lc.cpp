@@ -1,30 +1,4 @@
-/*
-           ▃▆█▇▄▖
-       ▟◤▖　　　  ◥█
-   ◢◤ 　  ◢▐　　     ▐▉
- ▗◤　  　   ▂ ▗▖　 ▕ █▎
- ◤　▗▅▖ ◥▄　 ▀▀▀◣　█▊
-▐　▕▎  ◥▖◣◤　 　　◢██
-█◣　◥▅█▀　     　▐███◤
-▐█▙▂　　　      ◢███◤
-　◥██◣　　　　 ◢▄◤
-　　　▀██▅▇▀▎▇
-
-*/
-#include <algorithm>
-#include <cstdio>
-#include <deque>
-#include <iomanip>
-#include <iostream>
-#include <map>
-#include <queue>
-#include <random>
-#include <set>
-#include <unordered_map>
-#include <chrono>
-#define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
-using namespace std;
 typedef long long ll;
 typedef pair<int, int> pii;
 typedef pair<ll, ll> pll;
@@ -80,23 +54,3 @@ const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
-int TT = 1;
-void solve() {
-    
-}
-int main() {
-#ifdef ASHDR
-    freopen("data.in", "r", stdin);
-    freopen("data.out", "w", stdout);
-    int nol_cl = clock();
-#endif
-    ios::sync_with_stdio(0);
-    cin.tie(nullptr);
-    cout << fixed << setprecision(8);
-    // cin>>TT;
-    while (TT--) solve();
-#ifdef ASHDR
-    LOG("Time: %dms\n", int((clock() - nol_cl) / (double)CLOCKS_PER_SEC * 1000));
-#endif
-    return 0;
-}
