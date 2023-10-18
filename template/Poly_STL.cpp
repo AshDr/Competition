@@ -1,20 +1,16 @@
-#include <bits/stdc++.h>
-
-using i64 = long long;
-
-constexpr int P = 998244353;
-using i64 = long long;
-// assume -P <= x < 2P
+constexpr int MOD = 998244353;
+using ll = long long;
+// assume -MOD <= x < 2P
 int norm(int x) {
   if (x < 0) {
-    x += P;
+    x += MOD;
   }
-  if (x >= P) {
-    x -= P;
+  if (x >= MOD) {
+    x -= MOD;
   }
   return x;
 }
-template <class T> T power(T a, i64 b) {
+template <class T> T power(T a, ll b) {
   T res = 1;
   for (; b; b /= 2, a *= a) {
     if (b % 2) {
@@ -23,62 +19,119 @@ template <class T> T power(T a, i64 b) {
   }
   return res;
 }
-struct Z {
+struct mint {
   int x;
-  Z(int x = 0) : x(norm(x)) {}
-  Z(i64 x) : x(norm(x % P)) {}
+  mint(int x = 0) : x(norm(x)) {}
+  mint(ll x) : x(norm(x % MOD)) {}
+  mint(ull x) : x(x % MOD) {}
   int val() const { return x; }
-  Z operator-() const { return Z(norm(P - x)); }
-  Z inv() const {
-    assert(x != 0);
-    return power(*this, P - 2);
+  mint operator-() const { return mint(norm(MOD - x)); }
+  mint pow(long long n) const {
+    mint ans = 1, x( * this);
+        while (n) {
+           if (n & 1) ans *= x;
+           x *= x;
+           n /= 2;
+        }
+    return ans;
   }
-  Z &operator*=(const Z &rhs) {
-    x = i64(x) * rhs.x % P;
+  mint inv() const {
+    assert(x != 0);
+    return power(*this, MOD - 2);
+  }
+  mint &operator*=(const mint &rhs) {
+    x = ll(x) * rhs.x % MOD;
     return *this;
   }
-  Z &operator+=(const Z &rhs) {
+  mint &operator+=(const mint &rhs) {
     x = norm(x + rhs.x);
     return *this;
   }
-  Z &operator-=(const Z &rhs) {
+  mint &operator-=(const mint &rhs) {
     x = norm(x - rhs.x);
     return *this;
   }
-  Z &operator/=(const Z &rhs) { return *this *= rhs.inv(); }
-  friend Z operator*(const Z &lhs, const Z &rhs) {
-    Z res = lhs;
+  mint &operator/=(const mint &rhs) { return *this *= rhs.inv(); }
+  mint & operator++() {
+    return *this += 1;
+  }
+  mint & operator--() {
+    return *this -= 1;
+  }
+  friend bool operator != (const mint & lhs, const mint & rhs) {
+     return lhs.val() != rhs.val();
+  }
+  friend bool operator == (const mint & lhs, const mint & rhs) {
+    return lhs.val() == rhs.val();
+  }
+  bool sqrt(mint &res) const {
+    if (MOD == 2 || x == 0) {
+      res = *this;
+      return true;
+    }
+    if (pow((MOD - 1) / 2) != 1) return false;
+    if (MOD % 4 == 3) {
+      res = pow((MOD + 1) / 4);
+      return true;
+    }
+    int pw = (MOD - 1) / 2;
+    int K = 30;
+    while((1 << K) > pw) K--;
+    while(true) {
+      mint t = (ull)myrand() % MOD;
+      mint a = 0, b = 0, c = 1;
+      for (int k = K; k >= 0; k--) {
+        a = b * b;
+        b = b * c * 2;
+        c = c * c + a * *this;
+        if (((pw >> k) & 1) == 0) continue;
+        a = b;
+        b = b * t + c;
+        c = c * t + a * *this;
+      }
+      if (b == 0) continue;
+      c -= 1;
+      c *= mint() - b.inv();
+      if (c * c == *this) {
+        res = c;
+        return true;
+      }
+    }
+    assert(false);
+  }
+  friend mint operator*(const mint &lhs, const mint &rhs) {
+    mint res = lhs;
     res *= rhs;
     return res;
   }
-  friend Z operator+(const Z &lhs, const Z &rhs) {
-    Z res = lhs;
+  friend mint operator+(const mint &lhs, const mint &rhs) {
+    mint res = lhs;
     res += rhs;
     return res;
   }
-  friend Z operator-(const Z &lhs, const Z &rhs) {
-    Z res = lhs;
+  friend mint operator-(const mint &lhs, const mint &rhs) {
+    mint res = lhs;
     res -= rhs;
     return res;
   }
-  friend Z operator/(const Z &lhs, const Z &rhs) {
-    Z res = lhs;
+  friend mint operator/(const mint &lhs, const mint &rhs) {
+    mint res = lhs;
     res /= rhs;
     return res;
   }
-  friend std::istream &operator>>(std::istream &is, Z &a) {
-    i64 v;
+  friend std::istream &operator>>(std::istream &is, mint &a) {
+    ll v;
     is >> v;
-    a = Z(v);
+    a = mint(v);
     return is;
   }
-  friend std::ostream &operator<<(std::ostream &os, const Z &a) {
+  friend std::ostream &operator<<(std::ostream &os, const mint &a) {
     return os << a.val();
   }
 };
 std::vector<int> rev;
-std::vector<Z> roots{0, 1};
-void dft(std::vector<Z> &a) {
+std::vector<mint> roots{0, 1};
+void dft(std::vector<mint> &a) {
   int n = a.size();
 
   if (int(rev.size()) != n) {
@@ -98,7 +151,7 @@ void dft(std::vector<Z> &a) {
     int k = __builtin_ctz(roots.size());
     roots.resize(n);
     while ((1 << k) < n) {
-      Z e = power(Z(3), (P - 1) >> (k + 1));
+      mint e = power(mint(3), (MOD - 1) >> (k + 1));
       for (int i = 1 << (k - 1); i < (1 << k); i++) {
         roots[2 * i] = roots[i];
         roots[2 * i + 1] = roots[i] * e;
@@ -109,45 +162,45 @@ void dft(std::vector<Z> &a) {
   for (int k = 1; k < n; k *= 2) {
     for (int i = 0; i < n; i += 2 * k) {
       for (int j = 0; j < k; j++) {
-        Z u = a[i + j];
-        Z v = a[i + j + k] * roots[k + j];
+        mint u = a[i + j];
+        mint v = a[i + j + k] * roots[k + j];
         a[i + j] = u + v;
         a[i + j + k] = u - v;
       }
     }
   }
 }
-void idft(std::vector<Z> &a) {
+void idft(std::vector<mint> &a) {
   int n = a.size();
   std::reverse(a.begin() + 1, a.end());
   dft(a);
-  Z inv = (1 - P) / n;
+  mint inv = (1 - MOD) / n;
   for (int i = 0; i < n; i++) {
     a[i] *= inv;
   }
 }
 struct Poly {
-  std::vector<Z> a;
+  std::vector<mint> a;
   Poly() {}
   explicit Poly(
-      int size, std::function<Z(int)> f = [](int) { return 0; })
+      int size, std::function<mint(int)> f = [](int) { return 0; })
       : a(size) {
     for (int i = 0; i < size; i++) {
       a[i] = f(i);
     }
   }
-  Poly(const std::vector<Z> &a) : a(a) {}
-  Poly(const std::initializer_list<Z> &a) : a(a) {}
+  Poly(const std::vector<mint> &a) : a(a) {}
+  Poly(const std::initializer_list<mint> &a) : a(a) {}
   int size() const { return a.size(); }
   void resize(int n) { a.resize(n); }
-  Z operator[](int idx) const {
+  mint operator[](int idx) const {
     if (idx < size()) {
       return a[idx];
     } else {
       return 0;
     }
   }
-  Z &operator[](int idx) { return a[idx]; }
+  mint &operator[](int idx) { return a[idx]; }
   Poly mulxk(int k) const {
     auto b = a;
     b.insert(b.begin(), k, 0);
@@ -155,30 +208,30 @@ struct Poly {
   }
   Poly modxk(int k) const {
     k = std::min(k, size());
-    return Poly(std::vector<Z>(a.begin(), a.begin() + k));
+    return Poly(std::vector<mint>(a.begin(), a.begin() + k));
   }
   Poly divxk(int k) const {
     if (size() <= k) {
       return Poly();
     }
-    return Poly(std::vector<Z>(a.begin() + k, a.end()));
+    return Poly(std::vector<mint>(a.begin() + k, a.end()));
   }
   friend Poly operator+(const Poly &a, const Poly &b) {
-    std::vector<Z> res(std::max(a.size(), b.size()));
+    std::vector<mint> res(std::max(a.size(), b.size()));
     for (int i = 0; i < int(res.size()); i++) {
       res[i] = a[i] + b[i];
     }
     return Poly(res);
   }
   friend Poly operator-(const Poly &a, const Poly &b) {
-    std::vector<Z> res(std::max(a.size(), b.size()));
+    std::vector<mint> res(std::max(a.size(), b.size()));
     for (int i = 0; i < int(res.size()); i++) {
       res[i] = a[i] - b[i];
     }
     return Poly(res);
   }
   friend Poly operator-(const Poly &a) {
-    std::vector<Z> res(a.size());
+    std::vector<mint> res(a.size());
     for (int i = 0; i < int(res.size()); i++) {
       res[i] = -a[i];
     }
@@ -215,13 +268,13 @@ struct Poly {
     a.resize(tot);
     return a;
   }
-  friend Poly operator*(Z a, Poly b) {
+  friend Poly operator*(mint a, Poly b) {
     for (int i = 0; i < int(b.size()); i++) {
       b[i] *= a;
     }
     return b;
   }
-  friend Poly operator*(Poly a, Z b) {
+  friend Poly operator*(Poly a, mint b) {
     for (int i = 0; i < int(a.size()); i++) {
       a[i] *= b;
     }
@@ -230,19 +283,19 @@ struct Poly {
   Poly &operator+=(Poly b) { return (*this) = (*this) + b; }
   Poly &operator-=(Poly b) { return (*this) = (*this) - b; }
   Poly &operator*=(Poly b) { return (*this) = (*this) * b; }
-  Poly &operator*=(Z b) { return (*this) = (*this) * b; }
+  Poly &operator*=(mint b) { return (*this) = (*this) * b; }
   Poly deriv() const {
     if (a.empty()) {
       return Poly();
     }
-    std::vector<Z> res(size() - 1);
+    std::vector<mint> res(size() - 1);
     for (int i = 0; i < size() - 1; ++i) {
       res[i] = (i + 1) * a[i + 1];
     }
     return Poly(res);
   }
   Poly integr() const {
-    std::vector<Z> res(size() + 1);
+    std::vector<mint> res(size() + 1);
     for (int i = 0; i < size(); ++i) {
       res[i + 1] = a[i] / (i + 1);
     }
@@ -273,9 +326,9 @@ struct Poly {
       i++;
     }
     if (i == size() || 1LL * i * k >= m) {
-      return Poly(std::vector<Z>(m));
+      return Poly(std::vector<mint>(m));
     }
-    Z v = a[i];
+    mint v = a[i];
     auto f = divxk(i) * v.inv();
     return (f.log(m - i * k) * k).exp(m - i * k).mulxk(i * k) * power(v, k);
   }
@@ -284,7 +337,7 @@ struct Poly {
     int k = 1;
     while (k < m) {
       k *= 2;
-      x = (x + (modxk(k) * x.inv(k)).modxk(k)) * ((P + 1) / 2);
+      x = (x + (modxk(k) * x.inv(k)).modxk(k)) * ((MOD + 1) / 2);
     }
     return x.modxk(m);
   }
@@ -296,13 +349,13 @@ struct Poly {
     std::reverse(b.a.begin(), b.a.end());
     return ((*this) * b).divxk(n - 1);
   }
-  std::vector<Z> eval(std::vector<Z> x) const {
+  std::vector<mint> eval(std::vector<mint> x) const {
     if (size() == 0) {
-      return std::vector<Z>(x.size(), 0);
+      return std::vector<mint>(x.size(), 0);
     }
     const int n = std::max(int(x.size()), size());
     std::vector<Poly> q(4 * n);
-    std::vector<Z> ans(x.size());
+    std::vector<mint> ans(x.size());
     x.resize(n);
     std::function<void(int, int, int)> build = [&](int p, int l, int r) {
       if (r - l == 1) {
@@ -334,9 +387,9 @@ struct Poly {
 
 struct Comb {
   int n;
-  std::vector<Z> _fac;
-  std::vector<Z> _invfac;
-  std::vector<Z> _inv;
+  std::vector<mint> _fac;
+  std::vector<mint> _invfac;
+  std::vector<mint> _inv;
 
   Comb() : n{0}, _fac{1}, _invfac{1}, _inv{0} {}
   Comb(int n) : Comb() { init(n); }
@@ -359,105 +412,24 @@ struct Comb {
     n = m;
   }
 
-  Z fac(int m) {
+  mint fac(int m) {
     if (m > n)
       init(2 * m);
     return _fac[m];
   }
-  Z invfac(int m) {
+  mint invfac(int m) {
     if (m > n)
       init(2 * m);
     return _invfac[m];
   }
-  Z inv(int m) {
+  mint inv(int m) {
     if (m > n)
       init(2 * m);
     return _inv[m];
   }
-  Z binom(int n, int m) {
+  mint binom(int n, int m) {
     if (n < m || m < 0)
       return 0;
     return fac(n) * invfac(m) * invfac(n - m);
   }
 } comb;
-
-int main() {
-  std::ios::sync_with_stdio(false);
-  std::cin.tie(nullptr);
-
-  int n, m, x;
-  std::cin >> n >> m >> x;
-
-  std::vector<Z> f(n + 1), pw(n + 1);
-  pw[0] = 1;
-  for (int i = 1; i <= n; i++) {
-    pw[i] = pw[i - 1] * 2;
-  }
-  for (int i = 0; i <= n; i++) {
-    std::vector<Z> dp(i + 1);
-    dp[0] = 1;
-    for (int j = 29; j >= 0; j--) {
-      std::vector<Z> g(i + 1);
-      if (m >> j & 1) {
-        for (int a = 0; a <= i; a++) {
-          int b = i - a;
-          for (int c = 0; c <= b; c++) {
-            int k = (x >> j ^ c) & 1;
-            Z ways = comb.binom(b, c);
-            if (a == 0) {
-              ways *= (k == 0);
-            } else {
-              ways *= pw[a - 1];
-            }
-            g[a + b - c] += dp[a] * ways;
-          }
-        }
-      } else {
-        for (int a = 0; a <= i; a++) {
-          if (a == 0) {
-            if (~x >> j & 1) {
-              g[a] += dp[a];
-            }
-          } else {
-            g[a] += dp[a] * pw[a - 1];
-          }
-        }
-      }
-      std::swap(dp, g);
-    }
-
-    f[i] = std::accumulate(dp.begin(), dp.end(), Z(0));
-    f[i] *= comb.invfac(i);
-  }
-
-  Poly g = Poly(n + 1, [&](int k) -> Z {
-             return k % 2 == 0 ? comb.invfac(k) : 0;
-           }).pow(m + 1, n + 1);
-  for (int i = 0; i <= n; i++) {
-    if (i > 0) {
-      g = (g * Poly(n + 1,
-                    [&](int k) -> Z { return k % 2 == 0 ? comb.invfac(k) : 0; })
-                   .inv(n + 1))
-              .modxk(n + 1);
-      g = (g * Poly(n + 1, [&](int k) -> Z {
-             return k % 2 == 1 ? comb.invfac(k) : 0;
-           })).modxk(n + 1);
-    }
-    for (int j = i + 1; j <= n; j++) {
-      f[j] -= g[j] * f[i];
-    }
-  }
-
-  Z ans = 0;
-  Z bin = 1;
-  for (int i = n; i >= 0; i -= 2) {
-    if (i < n) {
-      bin *= m + (n - i) / 2;
-      bin *= comb.inv((n - i) / 2);
-    }
-    ans += bin * f[i];
-  }
-  std::cout << ans << "\n";
-
-  return 0;
-}

@@ -1,99 +1,71 @@
-template <int M>
-struct static_mint {
-  static_assert(0 < M, "Module must be positive");
-  using mint = static_mint;
-  int val;
-  static_mint(): val() {}
-  static_mint(long long x): val(x % M) { if (val < 0) val += M; }
+constexpr int MOD = 998244353;
+using ll = long long;
+// assume -MOD <= x < 2P
+int norm(int x) {
+  if (x < 0) {
+    x += MOD;
+  }
+  if (x >= MOD) {
+    x -= MOD;
+  }
+  return x;
+}
+template <class T> T power(T a, ll b) {
+  T res = 1;
+  for (; b; b /= 2, a *= a) {
+    if (b % 2) {
+      res *= a;
+    }
+  }
+  return res;
+}
+struct mint {
+  int x;
+  mint(int x = 0) : x(norm(x)) {}
+  mint(ll x) : x(norm(x % MOD)) {}
+  mint(ull x) : x(x % MOD) {}
+  int val() const { return x; }
+  mint operator-() const { return mint(norm(MOD - x)); }
   mint pow(long long n) const {
     mint ans = 1, x( * this);
-    while (n) {
-      if (n & 1) ans *= x;
-      x *= x;
-      n /= 2;
-    }
+        while (n) {
+           if (n & 1) ans *= x;
+           x *= x;
+           n /= 2;
+        }
     return ans;
   }
   mint inv() const {
-    return pow(M - 2);
+    assert(x != 0);
+    return power(*this, MOD - 2);
   }
-  friend mint mpow(const mint & m, long long n) {
-    return m.pow(n);
-  }//外部使用时 需要对arg1进行强制转换
-  friend mint inv(const mint & m) {
-    if(m == 0 || m == 1) return mint(1);
-    return m.inv();
-  }
-  mint operator + () const {
-    mint m;
-    m.val = val;
-    return m;
-  }
-  mint operator - () const {
-    mint m;
-    m.val = M - val;
-    return m;
-  }
-  mint & operator += (const mint & m) {
-    if ((val += m.val) >= M) val -= M;
+  mint &operator*=(const mint &rhs) {
+    x = ll(x) * rhs.x % MOD;
     return *this;
   }
-  mint & operator -= (const mint & m) {
-    if ((val -= m.val) < 0) val += M;
+  mint &operator+=(const mint &rhs) {
+    x = norm(x + rhs.x);
     return *this;
   }
-  mint & operator *= (const mint & m) {
-    val = (long long) val * m.val % M;
+  mint &operator-=(const mint &rhs) {
+    x = norm(x - rhs.x);
     return *this;
   }
-  mint & operator /= (const mint & m) {
-    val = (long long) val * m.inv().val % M;
-    return *this;
-  }
-  friend mint operator + (const mint & lhs,
-    const mint & rhs) {
-    return mint(lhs) += rhs;
-  }
-  friend mint operator - (const mint & lhs,
-    const mint & rhs) {
-    return mint(lhs) -= rhs;
-  }
-  friend mint operator * (const mint & lhs,
-    const mint & rhs) {
-    return mint(lhs) *= rhs;
-  }
-  friend mint operator / (const mint & lhs,
-    const mint & rhs) {
-    return mint(lhs) /= rhs;
-  }
-  friend mint operator % (const mint & lhs,
-    const ll & rhs) {
-    return mint(lhs.val % rhs);
-  }
-  friend bool operator == (const mint & lhs,
-    const mint & rhs) {
-    return lhs.val == rhs.val;
-  }
-  friend bool operator != (const mint & lhs,
-    const mint & rhs) {
-    return lhs.val != rhs.val;
-  }
+  mint &operator/=(const mint &rhs) { return *this *= rhs.inv(); }
   mint & operator++() {
     return *this += 1;
   }
   mint & operator--() {
     return *this -= 1;
   }
-  mint operator++(int) {
-    mint result( * this);* this += 1;
-    return result;
+  friend bool operator != (const mint & lhs, const mint & rhs) {
+     return lhs.val() != rhs.val();
   }
-  mint operator--(int) {
-    mint result( * this);* this -= 1;
-    return result;
+  friend bool operator == (const mint & lhs, const mint & rhs) {
+    return lhs.val() == rhs.val();
   }
   bool sqrt(mint &res) const {
-    if (MOD == 2 || val == 0) {
+    if (MOD == 2 || x == 0) {
       res = *this;
       return true;
     }
@@ -106,7 +78,7 @@ struct static_mint {
     int K = 30;
     while((1 << K) > pw) K--;
     while(true) {
-      mint t = (unsigned long long)myrand() % MOD;
+      mint t = (ull)myrand() % MOD;
       mint a = 0, b = 0, c = 1;
       for (int k = K; k >= 0; k--) {
         a = b * b;
@@ -127,30 +99,33 @@ struct static_mint {
     }
     assert(false);
   }
-  template <typename T> explicit operator T() const {
-    return T(val);
+  friend mint operator*(const mint &lhs, const mint &rhs) {
+    mint res = lhs;
+    res *= rhs;
+    return res;
   }
-  friend std::ostream & operator << (std::ostream & os,
-    const mint & m) {
-    return os << m.val;
+  friend mint operator+(const mint &lhs, const mint &rhs) {
+    mint res = lhs;
+    res += rhs;
+    return res;
   }
-  friend std::istream & operator >> (std::istream & is, mint & m) {
-    long long x;
-    is >> x;
-    m = x;
+  friend mint operator-(const mint &lhs, const mint &rhs) {
+    mint res = lhs;
+    res -= rhs;
+    return res;
+  }
+  friend mint operator/(const mint &lhs, const mint &rhs) {
+    mint res = lhs;
+    res /= rhs;
+    return res;
+  }
+  friend std::istream &operator>>(std::istream &is, mint &a) {
+    ll v;
+    is >> v;
+    a = mint(v);
     return is;
   }
+  friend std::ostream &operator<<(std::ostream &os, const mint &a) {
+    return os << a.val();
+  }
 };
-using mint = static_mint<MOD>;
-mint fac[N],invf[N];
-void init(int n) {
-    fac[0] = 1;
-    for(int i = 1; i <= n; i++) fac[i] = fac[i - 1] * i;
-    invf[n] = inv(fac[n]);
-    invf[0] = invf[1] = 1;
-    for(int i = n - 1; i >= 2; i--) invf[i] = invf[i + 1] * (i + 1); 
-}
-mint binom(int x, int y) {
-    if(y > x) return 0;
-    return fac[x] * invf[x - y] * invf[y];
-}
