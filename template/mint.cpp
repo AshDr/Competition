@@ -119,6 +119,9 @@ struct mint {
     res /= rhs;
     return res;
   }
+  friend mint operator % (const mint & lhs, const ll & rhs) {
+    return mint(lhs.val() % rhs);
+  }
   friend std::istream &operator>>(std::istream &is, mint &a) {
     ll v;
     is >> v;

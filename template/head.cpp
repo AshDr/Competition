@@ -21,7 +21,10 @@
 #include <random>
 #include <set>
 #include <unordered_map>
+#include <cassert>
+#include <functional>
 #include <chrono>
+#include <cstring>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;

@@ -1,3 +1,5 @@
+//let n be the size of poly,that n = deg + 1 
+//all operation is in mod x^(n + 1)
 constexpr int MOD = 998244353;
 using ll = long long;
 // assume -MOD <= x < 2P
