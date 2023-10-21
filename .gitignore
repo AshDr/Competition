@@ -2,3 +2,4 @@
 *.exe
 *.cpp__tests
 .DS_Store
+*.cpp:tests
