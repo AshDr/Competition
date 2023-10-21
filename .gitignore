@@ -1,4 +1,4 @@
-!*.cpp
+#!*.cpp
 *.exe
 *.cpp__tests
 .DS_Store
