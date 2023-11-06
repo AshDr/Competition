@@ -16,6 +16,7 @@
 #include <deque>
 #include <iomanip>
 #include <iostream>
+#include <iterator>
 #include <map>
 #include <queue>
 #include <random>
@@ -25,6 +26,7 @@
 #include <functional>
 #include <chrono>
 #include <cstring>
+#include <unordered_set>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 using namespace std;
@@ -77,40 +79,47 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 1e2 + 10;
-const int M = 1e3 + 10;
+const int N = 1e6 + 10;
+const int M = 1e6 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
-int dp[N][M];
-int d[N];
+int n, m, k;
+int a[N],b[N],cnta[M],cntb[N];
 void solve() {
-	int n;
-	cin >> n;
-	for(int i = 1; i <= n; i++) {
-		cin >> d[i];
-	}
-	int l1,c1,k1;
-	cin >> l1 >> c1 >> k1;
-	int l2,c2,k2;
-	cin >> l2 >> c2 >> k2;
-	memset(dp,0x3f,sizeof dp);
-	dp[0][0] = 0;
-	for(int i = 1; i <= n; i++) {
-		for(int j = 0; j <= k1; j++) {
-			for(int k = 0; k <= j; k++) {
-				dp[i][j] = min(dp[i][j], dp[i - 1][j - k] + max(0, ((d[i] - k * l1) + l2 - 1) / l2));
-			}
-		}
-	}
-	ll ans = 1e18;
-	for(int i = 0; i <= k1; i++) {
-		if(dp[n][i] != 0x3f3f3f3f && dp[n][i] <= k2) {
-			ans = min(ans, 1ll*i*c1+dp[n][i]*1ll*c2);
-		}
-	}
-	if(ans == 1e18) cout << -1 << "\n";
-	else cout << ans << "\n";
+    cin >> n >> m >> k;
+    unordered_set<int> sta,stb;
+    for(int i = 1; i <= n; i++) {
+        cin >> a[i];
+        cnta[a[i]]++;
+        sta.insert(a[i]);
+    }
+    for(int i = 1; i <= m; i++) {
+        cin >> b[i];
+        b[i] ^= k;
+        stb.insert(b[i]);
+        cntb[b[i]]++;
+    }
+    int numa = 0;
+    for(auto x: sta) {
+        if(!stb.count(x)) {
+            numa += cnta[x];
+        }
+    }    
+    int numb = 0;
+    for(auto x: stb) {
+        if(!sta.count(x)) {
+            numb += cntb[x];
+        }
+        else {
+            numb += cntb[x] - 1;
+        }
+    }
+    if(numa + 1 >= m || numa + 1 >= n) {
+        cout << "Alice\n";
+        return ;
+    }
+    cout << "Bob\n";
 }
 int main() {
     #ifdef ASHDR

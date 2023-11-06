@@ -77,40 +77,45 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 1e2 + 10;
-const int M = 1e3 + 10;
+const int N = 2e5 + 10;
+const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
-int dp[N][M];
-int d[N];
+int n;
+int a[N],b[N],vis[N],mat[N];
+vector<int> G[N];
+int clk;
+bool dfs(int u) {
+    for(auto &v:G[u]) {
+        if(vis[v] != clk) {
+            vis[v] = clk;
+            if(!mat[v] || dfs(mat[v])) {
+                mat[v] = u;
+                return true;
+            }
+        }
+    }
+    return false;
+}
 void solve() {
-	int n;
 	cin >> n;
+	for(int i = 1; i <= n; i++) cin >> a[i];
+	for(int i = 1; i <= n; i++) cin >> b[i];
 	for(int i = 1; i <= n; i++) {
-		cin >> d[i];
-	}
-	int l1,c1,k1;
-	cin >> l1 >> c1 >> k1;
-	int l2,c2,k2;
-	cin >> l2 >> c2 >> k2;
-	memset(dp,0x3f,sizeof dp);
-	dp[0][0] = 0;
-	for(int i = 1; i <= n; i++) {
-		for(int j = 0; j <= k1; j++) {
-			for(int k = 0; k <= j; k++) {
-				dp[i][j] = min(dp[i][j], dp[i - 1][j - k] + max(0, ((d[i] - k * l1) + l2 - 1) / l2));
+		for(int j = 1; j <= n; j++) {
+			if(gcd(a[i], b[j]) == 1) {
+				G[i].push_back(j);
 			}
 		}
 	}
-	ll ans = 1e18;
-	for(int i = 0; i <= k1; i++) {
-		if(dp[n][i] != 0x3f3f3f3f && dp[n][i] <= k2) {
-			ans = min(ans, 1ll*i*c1+dp[n][i]*1ll*c2);
-		}
+	int ans = 0;
+	for(int i = 1; i <= n; i++) {
+		++clk;
+		if(dfs(i)) ++ans;
 	}
-	if(ans == 1e18) cout << -1 << "\n";
-	else cout << ans << "\n";
+	if(ans == n) cout << "Bob\n";
+	else cout << "Alice\n";
 }
 int main() {
     #ifdef ASHDR

@@ -1,3 +1,6 @@
+int lg(int x) {
+    return static_cast<int>(std::log2(x));
+}
 template<class Info, class Tag>
 struct LazySegmentTree {
     int n;
@@ -17,8 +20,8 @@ struct LazySegmentTree {
     template<class T>
     void init(std::vector<T> init_) {
         n = init_.size();
-        info.assign(4 << std::__lg(n), Info());
-        tag.assign(4 << std::__lg(n), Tag());
+        info.assign(4 << __lg(n), Info());
+        tag.assign(4 << __lg(n), Tag());
         std::function<void(int, int, int)> build = [&](int p, int l, int r) {
             if (r - l == 1) {
                 info[p] = init_[l];
@@ -134,58 +137,23 @@ struct LazySegmentTree {
 };
  
 struct Tag {
-    int add = 0;
-    
+    //define tag
+
     void apply(const Tag &t) & {
-        add = (add + t.add) % 26;
+        //add tag to tag
     }
 };
  
 struct Info {
-    std::array<int, 2> l{-1, -1};
-    std::array<int, 2> r{-1, -1};
-    bool ok = true;
+    //define info
     
     void apply(const Tag &t) & {
-        for (auto &x : l) {
-            if (x != -1) {
-                x = (x + t.add) % 26;
-            }
-        }
-        for (auto &x : r) {
-            if (x != -1) {
-                x = (x + t.add) % 26;
-            }
-        }
+        //add tag to info
     }
 };
 Info operator+(const Info &a, const Info &b) {
     Info c;
-    c.ok = a.ok && b.ok;
-    if (a.r[0] == b.l[0] && a.r[0] != -1) {
-        c.ok = false;
-    }
-    if (a.r[0] == b.l[1] && a.r[0] != -1) {
-        c.ok = false;
-    }
-    if (a.r[1] == b.l[0] && a.r[1] != -1) {
-        c.ok = false;
-    }
-    if (a.l[0] == -1) {
-        c.l = b.l;
-    } else if (a.l[1] == -1) {
-        c.l[0] = a.l[0];
-        c.l[1] = b.l[0];
-    } else {
-        c.l = a.l;
-    }
-    if (b.r[0] == -1) {
-        c.r = a.r;
-    } else if (b.r[1] == -1) {
-        c.r[0] = b.r[0];
-        c.r[1] = a.r[0];
-    } else {
-        c.r = b.r;
-    }
+    //merge info
+    
     return c;
 }

@@ -77,40 +77,32 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 1e2 + 10;
-const int M = 1e3 + 10;
+const int N = 2e5 + 10;
+const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
-int dp[N][M];
-int d[N];
+int cnt[N];
+int n, m, k;
 void solve() {
-	int n;
-	cin >> n;
+	cin >> n >> m >> k;	    
 	for(int i = 1; i <= n; i++) {
-		cin >> d[i];
+		int x;
+		cin >> x;
+		cnt[x]++;
 	}
-	int l1,c1,k1;
-	cin >> l1 >> c1 >> k1;
-	int l2,c2,k2;
-	cin >> l2 >> c2 >> k2;
-	memset(dp,0x3f,sizeof dp);
-	dp[0][0] = 0;
-	for(int i = 1; i <= n; i++) {
-		for(int j = 0; j <= k1; j++) {
-			for(int k = 0; k <= j; k++) {
-				dp[i][j] = min(dp[i][j], dp[i - 1][j - k] + max(0, ((d[i] - k * l1) + l2 - 1) / l2));
-			}
-		}
+	vector<int> a;
+	for(int i = 1; i <= m; i++) {
+		a.push_back(cnt[i]);
 	}
-	ll ans = 1e18;
-	for(int i = 0; i <= k1; i++) {
-		if(dp[n][i] != 0x3f3f3f3f && dp[n][i] <= k2) {
-			ans = min(ans, 1ll*i*c1+dp[n][i]*1ll*c2);
-		}
+	sort(a.begin(), a.end());
+	for(int i = 0; i < m; i++) {
+		int t = min(k, a[i]);
+		k -= t;
+		a[i] -= t;
+		if(k == 0) break;
 	}
-	if(ans == 1e18) cout << -1 << "\n";
-	else cout << ans << "\n";
+	cout << a.back() << "\n";
 }
 int main() {
     #ifdef ASHDR

@@ -52,7 +52,6 @@ struct LinearBasis
         for (int i = 0; i <= MAXL; i++) res ^= a[i];
         return res;
     }
-
     void mergeFrom(const LinearBasis &other)
     {
         for (int i = 0; i <= MAXL; i++) insert(other.a[i]);

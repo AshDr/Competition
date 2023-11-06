@@ -77,40 +77,91 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-const int N = 1e2 + 10;
-const int M = 1e3 + 10;
+const int N = 2e5 + 10;
+const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
-int dp[N][M];
-int d[N];
+template <typename T>
+struct Fenwick {
+    const int n;
+    std::vector<T> a;
+    Fenwick(int n) : n(n), a(n) {}
+    void add(int x, T v) {
+        for (int i = x; i < n; i += i & -i) {
+            a[i] += v;
+        }
+    }
+    T sum(int x) {
+        T ans = 0;
+        if(x <= 0) return ans;
+        for (int i = x; i > 0; i -= i & -i) {
+            ans += a[i];
+        }
+        return ans;
+    }
+    T rangeSum(int l, int r) {
+        return sum(r) - sum(l - 1);
+    }
+    int find_kth(int k) {
+        int ans = 0,cnt = 0;
+        for (int i = 1 << __lg(n);i >= 0;i--)  //这里的20适当的取值，与MAX_VAL有关，一般取lg(MAX_VAL)
+        {
+            ans += (1 << i);
+            if (ans >= n || cnt + a[ans] >= k)
+                ans -= (1 << i);
+            else
+                cnt += a[ans];
+        }
+        return ans + 1;
+    }//注意k不能太大
+};
+int n, m, k;
 void solve() {
-	int n;
-	cin >> n;
-	for(int i = 1; i <= n; i++) {
-		cin >> d[i];
+	cin >> n >> m >> k;
+	vector<int> cnt(m + 2);
+	Fenwick<int> fw_val(n + 10),fw_num(n + 10);
+	for(int i = 0; i < n; i++) {
+		int x;
+		cin >> x;
+		cnt[x]++;
+	}	    
+	for(int i = 1; i <= m; i++) {
+		if(cnt[i]) {
+			fw_num.add(cnt[i], 1);
+			fw_val.add(cnt[i], cnt[i]);	
+		}
 	}
-	int l1,c1,k1;
-	cin >> l1 >> c1 >> k1;
-	int l2,c2,k2;
-	cin >> l2 >> c2 >> k2;
-	memset(dp,0x3f,sizeof dp);
-	dp[0][0] = 0;
-	for(int i = 1; i <= n; i++) {
-		for(int j = 0; j <= k1; j++) {
-			for(int k = 0; k <= j; k++) {
-				dp[i][j] = min(dp[i][j], dp[i - 1][j - k] + max(0, ((d[i] - k * l1) + l2 - 1) / l2));
+	auto check = [&](int val) {
+		int sum = fw_val.rangeSum(val + 1, n), ct = fw_num.rangeSum(val + 1, n);
+		// cout << val << " " << sum << " " << ct << "\n";
+		return sum - ct *1ll* val <= k;
+	};
+	for(int i = 1; i <= m; i++) {
+		if(cnt[i]) {
+			fw_num.add(cnt[i], -1);
+			fw_val.add(cnt[i], -cnt[i]);	
+		}
+		if(fw_val.rangeSum(1, n) < k) {
+			cout << -1 << " ";
+			if(cnt[i]) {
+				fw_num.add(cnt[i], 1);
+				fw_val.add(cnt[i], cnt[i]);	
 			}
+			continue;
+		}
+		int l = 0, r = n;
+		while(l < r) {
+			int mid = (l + r) >> 1;
+			if(check(mid)) r = mid;
+			else l = mid + 1;
+		}
+		cout << l << " \n"[i == m];
+		if(cnt[i]) {
+			fw_num.add(cnt[i], 1);
+			fw_val.add(cnt[i], cnt[i]);	
 		}
 	}
-	ll ans = 1e18;
-	for(int i = 0; i <= k1; i++) {
-		if(dp[n][i] != 0x3f3f3f3f && dp[n][i] <= k2) {
-			ans = min(ans, 1ll*i*c1+dp[n][i]*1ll*c2);
-		}
-	}
-	if(ans == 1e18) cout << -1 << "\n";
-	else cout << ans << "\n";
 }
 int main() {
     #ifdef ASHDR

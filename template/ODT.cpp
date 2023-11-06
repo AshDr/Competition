@@ -91,16 +91,16 @@ void solve() {
         s.erase(it);
         s.insert(node(l,pos - 1,val));
         return s.insert(node(pos,r,val)).first;        
-    };
+    };//将一个区间分成两半，[l,pos-1] [pos,r]
     auto assign = [&](int l, int r,LL val) {
         auto itr= split(r + 1),itl = split(l);
         s.erase(itl,itr);
         s.insert(node(l,r,val));
-    };
+    };//区间赋值
     auto add = [&](int l, int r, LL val) {
         auto it2 = split(r + 1),itl = split(l);
         for(;itl != it2; ++itl) itl->val += val;
-    };
+    };//区间加
     auto rank = [&](int l, int r, int k )-> LL {
         vector<pair<LL,int>> b;
         auto itr = split(r + 1),itl = split(l);
