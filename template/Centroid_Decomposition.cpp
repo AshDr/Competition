@@ -11,7 +11,9 @@ namespace CD {
 	        mx=max(mx,siz[v]);
 	    }
 	    mx=max(mx,S-siz[u]);
-	    if(mx<mxpart) mxpart=mx,rt=u;
+	    // if(mx<mxpart) mxpart=mx,rt=u;
+	    if(mx <= S / 2) rt = u;
+	    //哪个t了就换另一个
 	}
 	int get_siz(int u, int fa) {
 	    int val=1;
@@ -46,7 +48,7 @@ namespace CD {
 	    int tmp=S;
 	    for(auto [v,w]:G[rt]) {
 	        if(!vis[v]) {
-	            S=(siz[v]<siz[rt]?siz[v]:tmp-siz[rt]);
+	            // S=(siz[v]<siz[rt]?siz[v]:tmp-siz[rt]);
 	            calc(v);
 	        }
 	    }

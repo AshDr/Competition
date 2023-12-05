@@ -54,8 +54,8 @@ template <typename Head, typename... Tail> void dbg_out(Head H, Tail... T) {
 }
 #define debug(...)                                                             \
   cerr << "( " << #__VA_ARGS__ << " ) = ( ", dbg_out(__VA_ARGS__)
-mt19937_64 myrand(chrono::steady_clock::now().time_since_epoch().count());
-ll myRand(ll B) { return (ull)myrand() % B; }
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
+ll myRand(ll B) { return (ull)rng() % B; }
 ll gcd(ll x, ll y) { return y == 0 ? x : gcd(y, x % y); }
 ll qpow(ll base, ll x, ll mod) {
   ll res = 1;

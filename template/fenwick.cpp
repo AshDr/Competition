@@ -32,4 +32,49 @@ struct Fenwick {
         return ans + 1;
     }//注意k不能太大
 };
- 
+/*
+开区间版 fw.sum(r) 表示 [1~r)
+template <typename T>
+struct Fenwick {
+    int n;
+    std::vector<T> a;
+    
+    Fenwick(int n = 0) {
+        init(n);
+    }
+    
+    void init(int n) {
+        this->n = n;
+        a.assign(n, T());
+    }
+    
+    void add(int x, T v) {
+        for (int i = x + 1; i <= n; i += i & -i) {
+            a[i - 1] += v;
+        }
+    }
+    
+    T sum(int x) {
+        auto ans = T();
+        for (int i = x; i > 0; i -= i & -i) {
+            ans += a[i - 1];
+        }
+        return ans;
+    }//[1, x)
+    
+    T rangeSum(int l, int r) {
+        return sum(r) - sum(l);
+    }
+    
+    int kth(T k) {
+        int x = 0;
+        for (int i = 1 << std::__lg(n); i; i /= 2) {
+            if (x + i <= n && k >= a[x + i - 1]) {
+                x += i;
+                k -= a[x - 1];
+            }
+        }
+        return x;
+    }
+};
+*/

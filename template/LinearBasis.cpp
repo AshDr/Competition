@@ -34,6 +34,15 @@ struct LinearBasis
         }
         return false;
     }
+    bool query(long long t) {
+        for(int j = MAXL; j >= 0; j--) {
+            if(t & (1ll << j)) {
+                if(!a[i]) return false;
+                else t ^= a[i];
+            }
+        }
+        return true;
+    }
 
     // 数组 x 表示集合 S，下标范围 [1...n]
     void build(long long *x, int n)
@@ -102,6 +111,16 @@ struct LinearBasis
         for (int i = 0; i <= MAXL; i++) if (a[i]) v.push_back(a[i]);
     }
 
+    bool query(long long t) {
+        for(int j = MAXL; j >= 0; j--) {
+            if(t & (1ll << j)) {
+                if(!a[i]) return false;
+                else t ^= a[i];
+            }
+        }
+        return true;
+    }
+
     long long queryMax()
     {
         long long x = 0;
@@ -109,3 +128,65 @@ struct LinearBasis
         return x;
     }
 }linbis;
+//上面的都是主元为1，其他位为0的线性基
+ll tmp[N];
+struct Basis {
+    ll a[MAXL + 1];
+    
+    Basis() {
+
+    }
+    
+    bool add(ll x) {
+        for(int i = MAXL; i >= 0; i--) {
+            if(x & (1ll << i)) {
+                if(!a[i]) {
+                    a[i] = x;
+                    return true;
+                    break;
+                }else {
+                    x ^= a[i];
+                }
+            }
+        } 
+        return false; 
+    }
+    bool check(ll x) {
+        for(int i = MAXL; i >= 0; i--) {
+            if(x & (1ll << i)) {
+                if(!a[i]) return false;
+                else {
+                    x ^= a[i];
+                }
+            }
+        }
+        return true;
+        // return x == 0;
+    }
+    ll queryMax() {
+        ll ans = 0;
+        for(int i = MAXL; i >= 0; i--) {
+            if(!(ans >> i & 1)) {
+                ans ^= a[i];
+            }
+        }
+        return ans;
+    }
+    ll query_kmn(ll k) { //第k小
+        ll res = 0;
+        int cnt = 0;
+        k -= flag;
+        if(!k) return 0;
+        for(int i = 0; i <= MAXL; i++) {
+            for(int j = i - 1;j >= 0; j--) {
+                if(a[i] >> j & 1) a[i] ^= a[j];
+            }
+            if(a[i]) tmp[cnt++] = a[i];
+        }
+        if(k >= (1ll << cnt)) return -1;
+        for(int i = 0; i < cnt; i++) {
+            if(k >> i & 1) res ^= tmp[i];
+        }
+        return res;
+    }
+};
