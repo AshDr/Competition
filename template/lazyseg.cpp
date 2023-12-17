@@ -137,7 +137,7 @@ struct LazySegmentTree {
 };
  
 struct Tag {
-    //define tag
+    //define tag maybe need contructor to determine init val
 
     void apply(const Tag &t) & {
         //add tag to tag
@@ -145,7 +145,7 @@ struct Tag {
 };
  
 struct Info {
-    //define info
+    //define info maybe need contructor to determine init val
     
     void apply(const Tag &t) & {
         //add tag to info

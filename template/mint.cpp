@@ -78,7 +78,7 @@ struct mint {
     int K = 30;
     while((1 << K) > pw) K--;
     while(true) {
-      mint t = (ull)myrand() % MOD;
+      mint t = (ull)rng() % MOD;
       mint a = 0, b = 0, c = 1;
       for (int k = K; k >= 0; k--) {
         a = b * b;

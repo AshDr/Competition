@@ -27,6 +27,8 @@
 #include <cstring>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
+#define all(x) (x).begin(),(x).end()
+#define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
 typedef long long ll;
 typedef pair<int, int> pii;

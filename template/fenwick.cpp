@@ -33,7 +33,8 @@ struct Fenwick {
     }//注意k不能太大
 };
 /*
-开区间版 fw.sum(r) 表示 [1~r)
+开区间版 fw.sum(r) 表示 [0~r)
+下标[0,n-1]
 template <typename T>
 struct Fenwick {
     int n;
@@ -64,7 +65,8 @@ struct Fenwick {
     
     T rangeSum(int l, int r) {
         return sum(r) - sum(l);
-    }
+    }//[0~r)-[0~l)
+    
     
     int kth(T k) {
         int x = 0;
