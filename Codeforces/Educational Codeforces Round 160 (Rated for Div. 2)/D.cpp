@@ -1,3 +1,77 @@
+/*
+           ▃▆█▇▄▖
+       ▟◤▖　　　  ◥█  
+   ◢◤ 　  ◢▐　　     ▐▉
+ ▗◤　  　   ▂ ▗▖　 ▕ █▎
+ ◤　▗▅▖ ◥▄　 ▀▀▀◣　█▊
+▐　▕▎  ◥▖◣◤　 　　◢██
+█◣　◥▅█▀　     　▐███◤
+▐█▙▂　　　      ◢███◤
+　◥██◣　　　　 ◢▄◤
+　　　▀██▅▇▀▎▇
+
+*/
+#include <bits/stdc++.h>
+#include <numeric>
+#include <random>
+#define LOG(FMT...) fprintf(stderr, FMT)
+#define sz(x) (int)x.size()
+#define all(x) (x).begin(),(x).end()
+#define rall(x) (x).rbegin(),(x).rend()
+using namespace std;
+typedef long long ll;
+typedef pair<int,int> pii;
+typedef pair<ll,ll> pll;
+typedef unsigned int ui;
+typedef unsigned long long ull;
+typedef pair<double,double> pdd;
+template <class T>
+istream& operator>>(istream& is, vector<T>& v) {
+  for (T& x : v)
+    is >> x;
+  return is;
+}
+template <class T>
+ostream& operator<<(ostream& os, const vector<T>& v) {
+  if (!v.empty()) {
+    os << v.front();
+    for (int i = 1; i < (int)v.size(); ++i)
+    os << ' ' << v[i];
+  }
+  return os;
+}
+void dbg_out() { cerr << "\b\b )" << endl; }
+template <typename Head, typename... Tail>
+void dbg_out(Head H, Tail... T){cerr << H << ", ";dbg_out(T...);}
+#define debug(...) cerr << "( " << #__VA_ARGS__ << " ) = ( ", dbg_out(__VA_ARGS__)
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
+ll myRand(ll B) {return (ull)rng()%B;}
+ll gcd(ll x, ll y) {return y == 0 ? x : gcd(y, x % y);}
+ll qpow(ll base, ll x, ll mod) {
+    ll res = 1;
+    base %= mod;
+    while(x) {
+       if(x & 1) res = (res * base) % mod;
+       base = (base * base) % mod;
+       x >>= 1;
+    } 
+    return res;
+}
+ll exgcd(ll a,ll b,ll &x,ll &y) {
+    if(b == 0) {
+        x = 1;
+        y = 0;
+        return a;
+    }
+    ll d = exgcd(b,a % b,y,x);
+    y -= a / b * x;
+    return d;
+}// (get inv) gcd(a,p) = 1 
+
+const int N = 2e5 + 10;
+const int M = 1e5 + 10;
+const int INF = 2147483647;
+int TT = 1;
 using ll = long long;
 template<class T>
 constexpr T power(T a, ll b) {
@@ -212,6 +286,41 @@ struct MInt {
         a = MInt(v);
         return is;
     }
+    bool sqrt(MInt &res) const {
+        if (P == 2 || x == 0) {
+          res = *this;
+          return true;
+        }
+        if (pow(*this, (P - 1) / 2) != 1) return false;
+        if (P % 4 == 3) {
+          res = pow(*this, (P + 1) / 4);
+          return true;
+        }
+        int pw = (P - 1) / 2;
+        int K = 30;
+        while((1 << K) > pw) K--;
+        while(true) {
+          MInt t = (ull)rng() % P;
+          MInt a = 0, b = 0, c = 1;
+          for (int k = K; k >= 0; k--) {
+            a = b * b;
+            b = b * c * 2;
+            c = c * c + a * *this;
+            if (((pw >> k) & 1) == 0) continue;
+            a = b;
+            b = b * t + c;
+            c = c * t + a * *this;
+          }
+          if (b == 0) continue;
+          c -= 1;
+          c *= MInt() - b.inv();
+          if (c * c == *this) {
+            res = c;
+            return true;
+          }
+        }
+        assert(false);
+    }
     friend constexpr std::ostream &operator<<(std::ostream &os, const MInt &a) {
         return os << a.val();
     }
@@ -222,12 +331,50 @@ struct MInt {
         return lhs.val() != rhs.val();
     }
 };
- 
 template<>
 int MInt<0>::Mod = 998244353;
- 
 template<int V, int P>
 constexpr MInt<P> CInv = MInt<P>(V).inv();
- 
-constexpr int P = 998244353;
-using mint = MInt<P>;
+constexpr int MOD = 998244353;
+using mint = MInt<MOD>;
+void solve() {
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    cin >> a;
+    vector<int> stk;
+    vector<mint> dp(n),pref(n + 1);
+    mint stksum = 0;
+    for(int i = 0; i < n; i++) {
+        while(!stk.empty() && a[stk.back()] > a[i]) {
+            stksum -= dp[stk.back()];
+            stk.pop_back();
+        }
+        int l;
+        if(stk.empty()) dp[i] = 1,l = 0;
+        else {
+            l = stk.back() + 1;
+        }
+        dp[i] += pref[i] - pref[l] + stksum;
+        stk.push_back(i);stksum += dp[i];
+        pref[i + 1] = pref[i] + dp[i];
+    }
+    cout << stksum << "\n";
+}
+int main() {
+    #ifdef ASHDR
+    freopen("data.in","r",stdin);
+    freopen("data.out","w",stdout);
+    int nol_cl = clock();
+    #endif
+    ios::sync_with_stdio(0);
+    cin.tie(nullptr);
+    cout<<fixed<<setprecision(8);
+    cin>>TT;
+    while(TT--) solve();
+    #ifdef ASHDR
+    LOG("Time: %dms\n", int ((clock()
+            -nol_cl) / (double)CLOCKS_PER_SEC * 1000));
+    #endif
+    return 0;
+}

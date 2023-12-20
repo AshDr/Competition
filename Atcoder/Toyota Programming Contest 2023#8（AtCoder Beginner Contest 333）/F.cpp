@@ -70,7 +70,6 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 1e9 + 7;
 int TT = 1;
 using ll = long long;
 template<class T>
@@ -286,6 +285,41 @@ struct MInt {
         a = MInt(v);
         return is;
     }
+    bool sqrt(MInt &res) const {
+        if (P == 2 || x == 0) {
+          res = *this;
+          return true;
+        }
+        if (pow(*this, (P - 1) / 2) != 1) return false;
+        if (P % 4 == 3) {
+          res = pow(*this, (P + 1) / 4);
+          return true;
+        }
+        int pw = (P - 1) / 2;
+        int K = 30;
+        while((1 << K) > pw) K--;
+        while(true) {
+          MInt t = (ull)rng() % P;
+          MInt a = 0, b = 0, c = 1;
+          for (int k = K; k >= 0; k--) {
+            a = b * b;
+            b = b * c * 2;
+            c = c * c + a * *this;
+            if (((pw >> k) & 1) == 0) continue;
+            a = b;
+            b = b * t + c;
+            c = c * t + a * *this;
+          }
+          if (b == 0) continue;
+          c -= 1;
+          c *= MInt(0) - b.inv();
+          if (c * c == *this) {
+            res = c;
+            return true;
+          }
+        }
+        assert(false);
+    }
     friend constexpr std::ostream &operator<<(std::ostream &os, const MInt &a) {
         return os << a.val();
     }
@@ -303,10 +337,26 @@ int MInt<0>::Mod = 998244353;
 template<int V, int P>
 constexpr MInt<P> CInv = MInt<P>(V).inv();
  
-constexpr int P = 998244353;
-using mint = MInt<P>;
+constexpr int MOD = 998244353;
+using mint = MInt<MOD>;
 void solve() {
-	
+    int n;
+    cin >> n;
+    vector<vector<mint>> dp(n + 1, vector<mint>(n + 1));
+    vector<mint> pw(n + 1);
+    pw[0] = 1;
+    for(int i = 1; i <= n; i++) pw[i] = pw[i - 1] * 2;
+    dp[1][1] = 1;
+    mint inv2 = mint(2).inv();
+    for(int i = 2; i <= n; i++) {
+        mint sum = 0;
+        for(int j = 1; j < i; j++) sum += dp[i - 1][j] * pw[i - j].inv();
+        mint p = pw[i];
+        dp[i][i] = p * sum / (p - 1);
+        dp[i][1] = dp[i][i] * inv2;
+        for(int j = 2; j < i; j++) dp[i][j] = (dp[i][j - 1] + dp[i - 1][j - 1]) * inv2;
+    }
+    for(int i = 1; i <= n; i++) cout << dp[n][i] << " ";
 }
 int main() {
     #ifdef ASHDR
