@@ -12,20 +12,12 @@
 
 */
 #include <algorithm>
-#include <cstdio>
-#include <deque>
-#include <iomanip>
-#include <iostream>
-#include <map>
-#include <queue>
+#include <bits/stdc++.h>
 #include <random>
-#include <set>
-#include <unordered_map>
-#include <cassert>
-#include <functional>
-#include <chrono>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
+#define all(x) (x).begin(),(x).end()
+#define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
 typedef long long ll;
 typedef pair<int,int> pii;
@@ -52,8 +44,8 @@ void dbg_out() { cerr << "\b\b )" << endl; }
 template <typename Head, typename... Tail>
 void dbg_out(Head H, Tail... T){cerr << H << ", ";dbg_out(T...);}
 #define debug(...) cerr << "( " << #__VA_ARGS__ << " ) = ( ", dbg_out(__VA_ARGS__)
-mt19937_64 myrand(chrono::steady_clock::now().time_since_epoch().count());
-ll myRand(ll B) {return (ull)myrand()%B;}
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
+ll myRand(ll B) {return (ull)rng()%B;}
 ll gcd(ll x, ll y) {return y == 0 ? x : gcd(y, x % y);}
 ll qpow(ll base, ll x, ll mod) {
     ll res = 1;
@@ -83,35 +75,25 @@ const ll MOD = 1e9 + 7;
 int TT = 1;
 
 void solve() {
-	int n, m;
-    cin >> n >> m;
-    vector<vector<int>> G(n + 1);  
-    for(int i = 0; i < m; i++) {
-        int u, v;
-        cin >> u >> v;
-        G[u].push_back(v);
-    }
-    vector<vector<double>> g(n + 1, vector<double>(n + 1));
-    g[1][1] = 1;
-    g[2][1] = 0.5;
-    for(int i = 3; i <= n; i++) {
-        g[i][1] = 1.0 / i;
-        for(int j = 2; j <= i; j++) {
-            g[i][j] = 1.0*(j-2)/i*g[i - 2][j - 2] + 1.0*(i - j)/i*g[i - 2][j - 1]; 
+    int n, k;
+    cin >> n >> k;
+    vector<int> a(n);
+    vector<int> b(n);
+    cin >> a >> b;
+    ll ans = 0;
+    vector<ll> dp(n);
+    int mx = 0;
+    ll sum = 0;
+    for(int i = 0; i < n; i++) {
+        sum += a[i];
+        mx = max(b[i], mx);
+        if(k <= i) break;
+        else {
+            int t = k - i - 1;
+            dp[i] = sum + 1ll*t * mx;
         }
     }
-    vector<double> dp(n + 1);
-    dp[n] = 1;
-    for(int i = n - 1; i >= 1; i--) {
-        sort(G[i].begin(), G[i].end(), [&](int x, int y){
-            return dp[x] > dp[y]; 
-        });
-        int tot = sz(G[i]);
-        for(int j = 1; j <= tot; j++) {
-            dp[i] += dp[G[i][j - 1]] * g[tot][j];
-        }
-    }
-    cout << dp[1] << "\n";
+    cout << *max_element(dp.begin(), dp.end()) << "\n";
 }
 int main() {
     #ifdef ASHDR
@@ -121,7 +103,7 @@ int main() {
     #endif
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
-    cout<<fixed<<setprecision(12);
+    cout<<fixed<<setprecision(8);
     cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
