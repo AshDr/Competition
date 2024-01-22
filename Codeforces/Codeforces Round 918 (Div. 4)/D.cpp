@@ -12,16 +12,12 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -80,8 +76,34 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+
 void solve() {
-    
+    int n;
+    cin >> n;
+    string s;
+    cin >> s;
+    auto yuanyin = [&](char ch) {
+    	return ((ch == 'a') || (ch == 'e'));
+    };
+    vector<string> ans;
+    for(int i = 0; i < n; i++) {
+    	if(yuanyin(s[i])) {
+    		assert(i > 0 && (!yuanyin(s[i - 1])));
+    		if(i < n - 1 && !yuanyin(s[i + 1])) {
+    			if((i <= n - 2 && !yuanyin(s[i + 2]))) {
+    				ans.push_back(s.substr(i - 1, 3));
+    			}else {
+    				ans.push_back(s.substr(i - 1, 2));
+    			}
+    		}else {
+    			ans.push_back(s.substr(i - 1, 2));
+    		}
+    	}
+    }
+    for(int i = 0; i < sz(ans); i++) {
+    	if(i != sz(ans) - 1) cout << ans[i] << ".";
+    	else cout << ans[i] << "\n";
+    }
 }
 int main() {
     #ifdef ASHDR
@@ -92,7 +114,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

@@ -11,8 +11,8 @@
 　　　▀██▅▇▀▎▇
 
 */
+#include <algorithm>
 #include <bits/stdc++.h>
-#include <functional>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
@@ -68,6 +68,10 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
+ll floor(ll x, ll m) {
+    ll r = (x % m + m) % m;
+    return (x - r) / m;
+}// neg floor (-1, 3) = -1
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
@@ -340,20 +344,32 @@ constexpr MInt<P> CInv = MInt<P>(V).inv();
 constexpr int MOD = 998244353;
 using mint = MInt<MOD>;
 void solve() {
-	ll n;
-	cin >> n;
-	unordered_map<ll, mint> f, g;
-	f[1] = 1;g[1] = 0;
-	function<void(ll)>gao = [&](ll n) {
-		if(f[n] != 0) return ;
-		ll r = (n >> 1),l = n - r;
-		gao(l);gao(r);
-		f[n] = 2 * f[l] + 2 * f[r] + (power(mint(2), l) - 1) * (power(mint(2), r) - 1);
-		g[n] = f[r] + g[l] + g[r];
-	};
-	gao(n);
-	cout << f[n] + g[n] << "\n";
-
+    int n;
+    cin >> n;
+    vector<int> a(n + 1);
+    for(int i = 1; i <= n; i++) cin >> a[i];
+    if(a.back() != n) {
+        cout << 0 << "\n";
+        return ;
+    }
+    mint ans = 1;
+    for(int i = 1; i <= n; i++) {
+        int d = a[i] - a[i - 1];
+        if(d < 0) {
+            cout << 0 << "\n";
+            return ;
+        }
+        if(d > 2) {
+            cout << 0 << "\n";
+            return ;
+        }
+        if(d == 1) {
+            ans *= 2 * (i - a[i - 1]) - 1;
+        }else if(d == 2) {
+            ans *= 1ll*(i - a[i - 1] - 1)*(i - a[i - 1] - 1);
+        }
+    }
+    cout << ans << "\n";
 }
 int main() {
     #ifdef ASHDR

@@ -12,16 +12,12 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -75,12 +71,40 @@ ll floor(ll x, ll m) {
     ll r = (x % m + m) % m;
     return (x - r) / m;
 }// neg floor (-1, 3) = -1
-const int N = 2e5 + 10;
+const int N = 1e3 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+char s[N];
 void solve() {
+    int n;
+    cin >> n;
+    int t = 32 - __builtin_clz(n - 1);
+    cout << t << endl;
+    vector<vector<int>> res(t);
+    for(int i = 1; i <= n - 1; i++) {
+    	int tmp = i;
+    	int p = 0;
+    	while(tmp) {
+    		if(tmp & 1) res[p].push_back(i);
+    		tmp /= 2;
+    		++p;
+    	}
+    }
+    for(auto vec: res) {
+    	cout << sz(vec) << " " << vec << endl;
+    }
+    string s;
+    cin >> s;
+    int ans = 0;
+    for(int i = 0; i < sz(s); i++) {
+    	ans += ((s[i] - '0') << i);
+    }
+    if(ans == 0) cout << n << endl;
+    else {
+    	cout << ans << endl;
+    }
     
 }
 int main() {

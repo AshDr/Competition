@@ -12,16 +12,12 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -80,8 +76,30 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+ll a[N],suf[N];
 void solve() {
-    
+    int n, m;
+    cin >> n >> m;
+    for(int i = 1; i <= n; i++) cin >> a[i];
+    for(int i = n; i >= 1; i--) suf[i] = suf[i + 1] + a[i];
+    int t = m;
+	ll ans = 0;
+	for(int i = 1; i <= n; i++) {
+		if(a[i] == 0) {
+			ans += m - t;
+			t = m;
+		}else {
+			t -= a[i];
+			if(t <= 0) {
+				cout << "NO\n";
+				return ;
+			}
+		}
+		if(t > suf[i + 1]) {
+			cout << ans + n - 1 << "\n";
+			return;
+		}
+	}
 }
 int main() {
     #ifdef ASHDR

@@ -12,16 +12,12 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -80,8 +76,52 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+const int SQRT = 200;
+ll a[N];
+ll pre[N][SQRT],ppre[N][SQRT];
+int cnt[N][SQRT];
 void solve() {
-    
+    int n, q;
+    cin >> n >> q;
+    vector<ll> ans(q);
+    for(int i = 1; i <= n; i++) cin >> a[i];
+    for(int d = 1; d < SQRT; d++) {
+        for(int i = 1; i <= n; i++) {
+            if(i <= d) pre[i][d] = a[i],ppre[i][d] = a[i],cnt[i][d] = 1;
+            else {
+                pre[i][d] = pre[i - d][d] + a[i];
+                cnt[i][d] = cnt[i - d][d] + 1;
+                ppre[i][d] = ppre[i - d][d] + a[i] * cnt[i][d];
+            }
+        }
+    }
+    vector<vector<tuple<int,int,int>>> Q(n + 1);
+    for(int i = 0; i < q; i++) {
+    	int s, d, k;
+    	cin >> s >> d >> k;
+    	Q[d].push_back({i, s, k});
+    }
+    for(int d = 1; d <= n; d++) {
+    	for(auto [id, s, k]: Q[d]) {
+            if(d < SQRT) {
+                int ed = s + (k - 1) * d;
+                ll val = ppre[ed][d] - (s - d >= 0 ? ppre[s - d][d] : 0),tmp = pre[ed][d] - (s - d >= 0 ? pre[s - d][d] : 0);
+                ll num = (s - 1) / d;
+                val -= tmp * num;
+                //k <= (s - 1) / d;
+                // cout << s<< " " << ed<< "!\n";
+                ans[id] = val; 
+            }else {
+                ll sum = 0;
+                int cnt = 1;
+                for(int i = s; i <= n && cnt <= k; i += d,++cnt) {
+                    sum += a[i] * cnt;
+                }
+                ans[id] = sum;
+            }
+    	}
+    }
+    cout << ans << "\n";
 }
 int main() {
     #ifdef ASHDR
@@ -92,7 +132,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

@@ -12,16 +12,14 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
+#include <functional>
+#include <queue>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -81,7 +79,58 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 void solve() {
-    
+    int n, m;
+    cin >> n >> m;
+    vector<int> a(n);
+    vector<vector<pii>> G(n);
+    for(int i = 0; i < m; i++) {
+    	int u, v, w;
+    	cin >> u >> v >>w;
+    	--u;--v;
+    	G[u].push_back({v, w});
+    	G[v].push_back({u, w});
+    }
+    cin >> a;
+    vector<vector<ll>> dis0(n, vector<ll>(n, 1e9));
+    auto dijkstra = [&](int st)->void {
+    	vector<int> vis(n);
+    	priority_queue<pii,vector<pii>, greater<pii>> heap;
+    	dis0[st][st] = 0;
+    	heap.push({0 ,st});
+    	while(!heap.empty()) {
+    		auto [d, u] = heap.top();heap.pop();
+    		if(vis[u]) continue;
+    		vis[u] = 1;
+    		for(auto [v, w]: G[u]) {
+    			if(dis0[st][v] > dis0[st][u] + w) {
+    				dis0[st][v] = dis0[st][u] + w;
+    				heap.push({dis0[st][v], v});
+    			}
+    		}
+    	}
+    };
+    for(int i = 0; i < n; i++) {
+    	dijkstra(i);
+    }
+    priority_queue<pair<ll,int>,vector<pair<ll,int>>, greater<pair<ll,int>>> heap;
+    heap.push({0, 0});
+    vector<ll> dis(n,1e18);
+    vector<int> vis(n);
+    dis[0] = 0;
+    while(!heap.empty()) {
+    	auto [d, u] = heap.top();heap.pop();
+    	if(vis[u]) continue;
+    	vis[u] = 1;
+    	for(int i = 0; i < n; i++) {
+    		if(!vis[i]) {
+    			if(dis[u] + dis0[u][i] * a[u] < dis[i]) {
+    				dis[i] = dis[u] + dis0[u][i] * a[u];
+    				heap.push({dis[i], i});
+    			}
+    		}
+    	}
+    }
+    cout << dis[n - 1] << "\n";
 }
 int main() {
     #ifdef ASHDR
@@ -92,7 +141,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

@@ -12,16 +12,12 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -80,8 +76,36 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+
 void solve() {
-    
+    int n, m;
+    cin >> n >> m;
+    vector<pii> pre(m + 1);
+    int cnt = 0;
+    pre[0].first = 1;
+    for(int i = 1; i <= m; i++) {
+    	int op;
+    	cin >> op;
+    	if(op == 1) {
+    		char ch;
+    		cin >> ch;
+    		++cnt;
+    		pre[cnt] = pre[cnt - 1];
+    		if(ch == 'U') pre[cnt].second += 1;
+    		if(ch == 'D') pre[cnt].second -= 1; 
+    		if(ch == 'L') pre[cnt].first -= 1;
+    		if(ch == 'R') pre[cnt].first += 1;
+    	}else {
+    		int p;
+    		cin >> p;
+    		if(p > cnt) {
+    			cout << p - cnt << " " << 0 << "\n";
+    		}else {
+    			cout << pre[cnt - p + 1].first << " " << pre[cnt - p + 1].second << "\n";
+    		}
+    	}
+    }
+
 }
 int main() {
     #ifdef ASHDR

@@ -12,16 +12,12 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -79,9 +75,31 @@ const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
+const double eps = 1e-10;
 int TT = 1;
 void solve() {
-    
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    cin >> a;
+    double ans = a[0];
+    double l = 0,r = 1.0;
+    while(r - l > eps) {
+    	double mid = (l + r) / 2;
+    	double x = a[0] + mid;
+    	double pre = 0;
+    	int f = 1;
+    	for(int i = 0; i < n; i++) {
+    		pre += x;
+    		if(int(pre) > a[i]) {
+    			f = 0;
+    			break;
+    		}
+    	}
+    	if(f) l = mid;
+    	else r = mid;
+    }
+    cout << a[0] + l << "\n";
 }
 int main() {
     #ifdef ASHDR
@@ -91,7 +109,7 @@ int main() {
     #endif
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
-    cout<<fixed<<setprecision(8);
+    cout<<fixed<<setprecision(10);
     //cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR

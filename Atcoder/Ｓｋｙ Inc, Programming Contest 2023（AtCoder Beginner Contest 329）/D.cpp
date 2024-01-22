@@ -12,16 +12,13 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
+#include <queue>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -80,8 +77,23 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+
 void solve() {
-    
+	int n, m;
+	cin>>n>>m;
+    vector<int> cnt(n);
+    int ans=0;
+    set<pii> st;
+    for(int i=0; i<m; i++){
+    	int x;
+    	cin>>x;
+    	--x;
+    	if(st.count({-cnt[x],x})) st.erase({-cnt[x],x});
+    	cnt[x]++;
+    	st.insert({-cnt[x],x});
+    	auto it=st.begin();
+    	cout<<(*it).second+1<<"\n";
+    }
 }
 int main() {
     #ifdef ASHDR

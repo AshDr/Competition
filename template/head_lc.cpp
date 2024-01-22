@@ -51,7 +51,10 @@ ll exgcd(ll a, ll b, ll &x, ll &y) {
   y -= a / b * x;
   return d;
 } // (get inv) gcd(a,p) = 1
-
+ll floor(ll x, ll m) {
+    ll r = (x % m + m) % m;
+    return (x - r) / m;
+}
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;

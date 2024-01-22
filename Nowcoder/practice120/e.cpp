@@ -12,16 +12,12 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -75,13 +71,55 @@ ll floor(ll x, ll m) {
     ll r = (x % m + m) % m;
     return (x - r) / m;
 }// neg floor (-1, 3) = -1
-const int N = 2e5 + 10;
+const int N = 1e6 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+struct node {
+	int childs[2];
+	ll sum;
+}trie[N];
+int tot;
+void insert(string s, int num) {
+	int curpos = 0;
+	for(int i = 0; i < sz(s); i++) {
+		int x = s[i] - '0';
+		if(!trie[curpos].childs[x]) trie[curpos].childs[x] = ++tot;
+		curpos = trie[curpos].childs[x];
+	}
+	trie[curpos].sum += num;
+}
+ll ans = 0;
+void dfs(int u) {
+	vector<ll> vec;
+	for(int i = 0; i < 2; i++) {
+		int v = trie[u].childs[i]; 
+		if(v) {
+			dfs(v);
+			trie[u].sum += trie[v].sum; 
+			vec.push_back(trie[v].sum);
+		}
+	}
+	if(trie[u].childs[0] && trie[u].childs[1]) {
+		sort(all(vec));
+		ans += vec[0];
+	}
+}
 void solve() {
-    
+    int n, m;
+    cin >> n >> m;
+    ans = 0;tot = 0;
+    for(int i = 0; i < n; i++) {
+    	string s;int c;
+    	cin >> s >> c;
+    	insert(s, c);
+    }
+    dfs(0);
+    cout << ans << "\n";
+    for(int i = 0; i <= tot; i++) {
+    	trie[i].childs[0] = trie[i].childs[1] = trie[i].sum = 0;
+    }
 }
 int main() {
     #ifdef ASHDR
@@ -92,7 +130,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

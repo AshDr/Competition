@@ -11,17 +11,24 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
+#include <algorithm>
+#include <cstdio>
+#include <deque>
+#include <iomanip>
+#include <iostream>
+#include <iterator>
+#include <map>
+#include <queue>
 #include <random>
+#include <set>
+#include <unordered_map>
+#include <cassert>
+#include <functional>
+#include <chrono>
+#include <cstring>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
-#define all(x) (x).begin(),(x).end()
-#define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -47,8 +54,8 @@ void dbg_out() { cerr << "\b\b )" << endl; }
 template <typename Head, typename... Tail>
 void dbg_out(Head H, Tail... T){cerr << H << ", ";dbg_out(T...);}
 #define debug(...) cerr << "( " << #__VA_ARGS__ << " ) = ( ", dbg_out(__VA_ARGS__)
-mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
-ll myRand(ll B) {return (ull)rng()%B;}
+mt19937_64 myrand(chrono::steady_clock::now().time_since_epoch().count());
+ll myRand(ll B) {return (ull)myrand()%B;}
 ll gcd(ll x, ll y) {return y == 0 ? x : gcd(y, x % y);}
 ll qpow(ll base, ll x, ll mod) {
     ll res = 1;
@@ -71,17 +78,35 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-ll floor(ll x, ll m) {
-    ll r = (x % m + m) % m;
-    return (x - r) / m;
-}// neg floor (-1, 3) = -1
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+
 void solve() {
-    
+    int n;
+    cin >> n;
+    vector<int> l(n), r(n), c(n);
+    for(int i = 0; i < n; i++) cin >> l[i];
+    for(int i = 0; i < n; i++) cin >> r[i];
+    for(int i = 0; i < n; i++) cin >> c[i];
+    set<int> s(l.begin(), l.end());
+    sort(r.begin(), r.end());
+    vector<ll> seg;
+    for(int i = 0; i < n; i++){
+        auto it = s.lower_bound(r[i]);
+        l[i] = *prev(it);
+        seg.push_back(r[i]-l[i]);
+        s.erase(prev(it));
+    }
+    sort(c.begin(), c.end());
+    sort(seg.rbegin(), seg.rend());
+    ll ans = 0;
+    for(int i = 0; i < n; i++){
+        ans += 1LL * c[i] * seg[i];
+    }
+    cout << ans << '\n';
 }
 int main() {
     #ifdef ASHDR
@@ -92,7 +117,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

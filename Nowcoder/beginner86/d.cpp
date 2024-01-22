@@ -12,16 +12,12 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -75,13 +71,55 @@ ll floor(ll x, ll m) {
     ll r = (x % m + m) % m;
     return (x - r) / m;
 }// neg floor (-1, 3) = -1
-const int N = 2e5 + 10;
+const int N = 1e3 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+int pre[N][N],vis[N][N];
+char s[N][N];
+int n, m;
+const int dx[] = {-1,1,0,0};
+const int dy[] = {0,0,1,-1};
+int mnx,mny,mxx,mxy;
+void dfs(int x, int y) {
+	mnx = min(mnx, x);
+	mny = min(mny, y);
+	mxx = max(mxx, x);
+	mxy = max(mxy, y);
+	vis[x][y] = 1; 
+	for(int i = 0; i < 4; i++) {
+		int xx = x + dx[i],yy = y + dy[i];
+		if(xx < 1 || xx > n || yy < 1 || yy > m) continue;
+		if(!vis[xx][yy] && s[xx][yy] == '.') {
+			dfs(xx, yy);
+		}
+	}
+}
 void solve() {
-    
+    cin >> n >> m;
+    for(int i = 1; i <= n; i++) {
+    	cin >> (s[i] + 1);
+    	for(int j = 1; j <= m; j++) {
+    		pre[i][j] = pre[i - 1][j] + pre[i][j - 1] - pre[i - 1][j - 1] + (s[i][j] == '.');
+    	}
+    }
+    int ans = 0;
+    for(int i = 1; i <= n; i++) {
+    	for(int j = 1; j <= m; j++) {
+    		if(s[i][j] == '.' && !vis[i][j]) {
+    			mnx = mxx = i;
+    			mny = mxy = j;
+    			dfs(i, j);
+    			int val = (mxx - mnx + 1) * (mxy - mny + 1);
+    			if(val == pre[mxx][mxy] - pre[mxx][mny - 1] - pre[mnx - 1][mxy] + pre[mnx - 1][mny - 1]) {
+    				++ans;
+    			}
+    		}
+    	}
+    }
+    cout << ans << "\n";
+
 }
 int main() {
     #ifdef ASHDR

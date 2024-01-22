@@ -11,17 +11,14 @@
 　　　▀██▅▇▀▎▇
 
 */
+#include <array>
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -80,8 +77,29 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+
 void solve() {
-    
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    cin >> a;
+    vector<array<ll, 2>> pre(n + 1);
+    map<ll,int> mp;
+    int f = 0;
+    for(int i = 0; i < n; i++) {
+    	if(mp[pre[i][0]-pre[i][1]]) {
+    		f = 1;
+    	}
+    	pre[i + 1][0] = pre[i][0];
+    	pre[i + 1][1] = pre[i][1];
+    	pre[i + 1][i & 1] += a[i];
+    	mp[pre[i][0]-pre[i][1]] = 1;
+    }
+    if(mp[pre[n][0]-pre[n][1]]) f = 1;
+    cout << (f ? "YES\n":"NO\n");
+    //pre[r + 1][0] - pre[l][0] = pre[r + 1][1] - pre[l][1]
+    //pre[r + 1][0] -pre[r + 1][1]  =  + pre[l][0] - pre[l][1]
+
 }
 int main() {
     #ifdef ASHDR
@@ -92,7 +110,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

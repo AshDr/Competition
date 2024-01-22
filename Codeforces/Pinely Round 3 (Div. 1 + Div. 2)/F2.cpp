@@ -11,8 +11,8 @@
 　　　▀██▅▇▀▎▇
 
 */
+#include <algorithm>
 #include <bits/stdc++.h>
-#include <functional>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
@@ -68,6 +68,10 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
+ll floor(ll x, ll m) {
+    ll r = (x % m + m) % m;
+    return (x - r) / m;
+}// neg floor (-1, 3) = -1
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
@@ -339,21 +343,84 @@ constexpr MInt<P> CInv = MInt<P>(V).inv();
  
 constexpr int MOD = 998244353;
 using mint = MInt<MOD>;
-void solve() {
-	ll n;
-	cin >> n;
-	unordered_map<ll, mint> f, g;
-	f[1] = 1;g[1] = 0;
-	function<void(ll)>gao = [&](ll n) {
-		if(f[n] != 0) return ;
-		ll r = (n >> 1),l = n - r;
-		gao(l);gao(r);
-		f[n] = 2 * f[l] + 2 * f[r] + (power(mint(2), l) - 1) * (power(mint(2), r) - 1);
-		g[n] = f[r] + g[l] + g[r];
-	};
-	gao(n);
-	cout << f[n] + g[n] << "\n";
+struct Comb {
+  int n;
+  std::vector<mint> _fac;
+  std::vector<mint> _invfac;
+  std::vector<mint> _inv;
 
+  Comb() : n{0}, _fac{1}, _invfac{1}, _inv{0} {}
+  Comb(int n) : Comb() { init(n); }
+
+  void init(int m) {
+    if (m <= n)
+      return;
+    _fac.resize(m + 1);
+    _invfac.resize(m + 1);
+    _inv.resize(m + 1);
+
+    for (int i = n + 1; i <= m; i++) {
+      _fac[i] = _fac[i - 1] * i;
+    }
+    _invfac[m] = _fac[m].inv();
+    for (int i = m; i > n; i--) {
+      _invfac[i - 1] = _invfac[i] * i;
+      _inv[i] = _invfac[i] * _fac[i - 1];
+    }
+    n = m;
+  }
+
+  mint fac(int m) {
+    if (m > n)
+      init(2 * m);
+    return _fac[m];
+  }
+  mint invfac(int m) {
+    if (m > n)
+      init(2 * m);
+    return _invfac[m];
+  }
+  mint inv(int m) {
+    if (m > n)
+      init(2 * m);
+    return _inv[m];
+  }
+  mint binom(int n, int m) {
+    if (n < m || m < 0)
+      return 0;
+    return fac(n) * invfac(m) * invfac(n - m);
+  }
+} comb;
+void solve() {
+    int n;
+    cin >> n;
+    vector<int> a(n + 1);
+    comb.init(n);
+    for(int i = 1; i <= n; i++) cin >> a[i];
+    if(a.back() != n && a.back() != -1) {
+        cout << 0 << "\n";
+        return ;
+    }
+    a.back() = n;
+    mint ans = 1;
+    int j = 0;
+    for(int i = 1; i <= n; i++) {
+    	if(a[i] == -1) continue;
+    	int d = a[i] - a[j];
+    	if(d < 0) {
+    		cout << 0 << "\n";
+    		return ;
+    	}
+    	mint res = 0;
+    	for(int k = 0; k <= d; k++) {
+    		mint tmp =  comb.binom(i - j, k) * comb.binom(j - a[j], k) * comb.fac(k);
+    		tmp *= comb.binom(i - a[j] - k, d - k) * comb.binom(i - j, d - k) * comb.fac(d - k);
+    		res += tmp;
+    	}
+    	ans *= res;
+    	j = i;
+    }
+    cout << ans << "\n";
 }
 int main() {
     #ifdef ASHDR

@@ -96,3 +96,51 @@ int main()
 //     }
 //     cout<<ans1<<endl<<ans2<<endl;
 // }
+/*
+另一种用障碍计算最大子矩形
+int n, m;
+void solve() {
+    cin >> n >> m;
+    int k;
+    cin >> k;
+    vector<pii> a;
+    for(int i = 0; i < k; i++) {
+        int x, y;
+        cin >> x >> y;
+        a.push_back({x, y});
+    }
+    a.push_back({0, 0});
+    a.push_back({0, m});
+    a.push_back({n, 0});
+    a.push_back({n, m});
+    sort(a.begin(), a.end());
+    k = sz(a);
+    int ans = 0;
+    for(int i = 0; i < k; i++) {
+        int x1 = a[i].first, y1 = 0,y2 = m;
+        for(int j = i + 1; j < k; j++) {
+            int x2 = a[j].first;
+            ans = max(ans, (x2 - x1) * (y2 - y1));
+            if(a[j].second < a[i].second) y1 = max(y1, a[j].second);
+            else y2 = min(y2, a[j].second);
+        }
+    }
+    for(int i = k - 1; i >= 0; i--) {
+        int x1 = a[i].first, y1 = 0,y2 = m;
+        for(int j = i - 1; j >= 0; j--) {
+            int x2 = a[j].first;
+            ans = max(ans, (x1 - x2) * (y2 - y1));
+            if(a[j].second < a[i].second) y1 = max(y1, a[j].second);
+            else y2 = min(y2, a[j].second);
+        }
+    }
+    sort(a.begin(), a.end(), [&](pii x, pii y){
+        if(x.second == y.second) return x.first < y.first;
+        return x.second < y.second;
+    });
+    for(int i = 1; i < k - 1; i++) {
+        ans = max(ans, n * (a[i + 1].second - a[i].second));
+    }//边界为左右边的情况
+    cout << ans << "\n";
+}
+*/

@@ -1,4 +1,3 @@
-/*
 struct HLD {
     int n;
     std::vector<int> siz, top, dep, parent, in, out, seq;
@@ -118,7 +117,8 @@ struct HLD {
         return lca(a, b) ^ lca(b, c) ^ lca(c, a);
     }
 };
-*/
+
+/*
 //轻重链剖分 边权 注意query和modify有可能会l>r 要判一下
 #include <bits/stdc++.h>
 #include <vector>
@@ -325,3 +325,4 @@ int main() {
     #endif
     return 0;
 }
+*/

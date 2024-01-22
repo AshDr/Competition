@@ -12,16 +12,12 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -80,8 +76,48 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+
 void solve() {
-    
+    int n ,m ,xa, ya, xb, yb;
+    cin >> n >> m >> xa >> ya >> xb >> yb;
+    if(xa >= xb) {
+    	cout << "Draw\n";
+    	return ;
+    }
+    if(ya == yb) {
+    	if(abs(xa - xb) & 1) {
+    		cout << "Alice\n";
+    	}else {
+    		cout << "Bob\n";
+    	}
+    	return ;
+    }
+    int len = (xb - xa - 1);
+    if((xb - xa) & 1) {
+    	if(yb > ya) {
+    		int t1 = min(m, yb + len / 2),t2 = min(m, ya + len / 2 + 1);
+    		if(t2 >= t1) {
+    			cout << "Alice\n";
+    		}else cout << "Draw\n";
+    	}else {
+    		int t1 = max(1, yb - len / 2),t2 = max(1, ya - len / 2 - 1);
+    		if(t2 <= t1) {
+    			cout << "Alice\n";
+    		}else cout <<"Draw\n";
+    	}
+    }else {
+    	if(ya > yb) {
+    		int t1 = min(m, yb + len / 2 + 1),t2 = min(m, ya + len / 2 + 1);
+    		if(t1 >= t2) {
+    			cout << "Bob\n";
+    		}else cout << "Draw\n";
+    	}else {
+    		int t1 = max(1, yb - len / 2 - 1),t2 = max(1, ya - len / 2 - 1);
+    		if(t1 <= t2) {
+    			cout << "Bob\n";
+    		}else cout <<"Draw\n";
+    	}
+    }
 }
 int main() {
     #ifdef ASHDR
@@ -92,7 +128,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

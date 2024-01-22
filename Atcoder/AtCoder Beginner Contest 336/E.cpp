@@ -12,16 +12,12 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -80,8 +76,50 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+ll memo[20][200][200][2][2];
+int len;
+string s;
+int val;
+//15*9=13
+ll dfs(int cur,int digsum, int mod, int f, int g) {
+	// cerr << cur << " " << digsum << " " << f << " " << g << endl;
+	if(digsum > val) return 0;
+	if(cur >= len) {
+		if(digsum == val) {
+			return (mod == 0);
+		}else {
+			return 0;
+		}
+	}
+	if(memo[cur][digsum][mod][f][g] != -1) return memo[cur][digsum][mod][f][g];
+	int lim = 9;
+	if(f == 1) lim = s[cur] - '0';
+	ll res = 0;
+	for(int i = 0; i <= lim; i++) {
+		res += dfs(cur + 1, digsum + i, (mod * 10 + i) % val, f && (i == s[cur] - '0'), g && (i == 0));
+	}
+	return memo[cur][digsum][mod][f][g] = res;
+}
+void gao(string s) {
+
+}
 void solve() {
-    
+    //好整数的个数 <= n ,好整数位数不超过14位
+    cin >> s;
+    memset(memo, -1, sizeof memo);
+    len = sz(s);
+    int mx = 0;
+    for(int i = 0; i < len; i++) {
+    	mx += s[i] - '0';
+    }
+    mx = max(mx, s[0] - '0' - 1 + (len - 1) * 9);
+    ll res = 0;
+    for(int i = 1; i <= mx; i++) {
+    	val = i;
+    	res += dfs(0,0,0,1,1);
+    	memset(memo, -1, sizeof memo);
+    }
+    cout << res << "\n";
 }
 int main() {
     #ifdef ASHDR

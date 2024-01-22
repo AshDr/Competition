@@ -12,16 +12,13 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
+#include <ostream>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -80,6 +77,55 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+const ll M1 = 998244353;
+const ll M2 = 1e9 + 7;
+struct hsh{
+    ll w1,w2;
+    hsh operator * (const int w){
+        return {1ll*w1*w%M1,1ll*w2*w%M2};
+    }
+    hsh operator * (const hsh w){
+        return {1ll*w1*w.w1%M1,1ll*w2*w.w2%M2};
+    }
+    hsh operator + (const hsh w){
+        return {(w1+w.w1)%M1,(w2+w.w2)%M2};
+    }
+    hsh operator - (const hsh w){
+        return {(w1+M1-w.w1)%M1,(w2+M2-w.w2)%M2};
+    }
+    bool operator == (const hsh w){
+        return (w1==w.w1)&&(w2==w.w2);
+    }
+    ll wt(){
+        return M2*w1+w2;
+    }
+    friend ostream operator << (ostream &os, hsh& x) {
+    	os << x.w1 << " " << x.w2;
+    }
+}pw[N+50],inv[N+50],h[N+50],h2[N+50];
+int n;
+void init(int n) {
+	ll b1 = myRand(M1) + 1, b2 = myRand(M2) + 1;
+	pw[0] = inv[0] = {1, 1};
+	pw[1] = {b1, b2};
+	inv[1] = {qpow(b1, M1 - 2, M1), qpow(b2, M2 - 2, M2)};
+	for(int i = 2; i <= n; i++) {
+		pw[i] = pw[i - 1] * pw[1];
+		inv[i] = inv[i - 1] * inv[1];
+ 	}
+}
+/*
+h[i]=h[i-1]+pw[i]*s[i];
+h2[i]=h2[i-1]+pw[i]*s[n+1-i];
+*/
+hsh get(int l,int r){
+    return (h[r]-h[l-1])*inv[l-1];
+}
+hsh get2(int l,int r){
+    swap(l,r);
+    l=n+1-l; r=n+1-r;
+    return (h2[r]-h2[l-1])*inv[l-1];
+}
 void solve() {
     
 }

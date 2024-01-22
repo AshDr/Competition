@@ -12,16 +12,13 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
+#include <queue>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -80,7 +77,54 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+
 void solve() {
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    cin >> a;
+    vector<int> L(n),R(n),ok(n);
+    auto check = [&](int idx) {
+        if(ok[idx]) return false;
+        if(L[idx] >= 0 && a[L[idx]] == a[idx] - 1) return true;
+        if(R[idx] < n && a[R[idx]] == a[idx] - 1) return true;
+        return false;
+    };
+    priority_queue<pii> heap;
+    for(int i = 0; i < n; i++) {
+        L[i] = i - 1;
+        R[i] = i + 1;
+        ok[i] = 0;
+        if(check(i)) {
+            ok[i] = 1;
+            heap.push({a[i], i});
+        }
+    }
+    while(!heap.empty()) {
+        auto [_, u] = heap.top();heap.pop();
+        if(L[u] >= 0) R[L[u]] = R[u];
+        if(R[u] < n) L[R[u]] = L[u];
+        if(L[u] >= 0 && check(L[u])) {
+            ok[L[u]] = 1;
+            heap.push({a[L[u]], L[u]});
+        }
+        if(R[u] < n && check(R[u])) {
+            ok[R[u]] = 1;
+            heap.push({a[R[u]], R[u]});
+        }
+    }
+    int cnt = 0,f = 0;
+    for(int i = 0; i < n; i++) {
+        if(!ok[i]) {
+            if(a[i] > 0) f = 1; 
+            ++cnt;
+        }
+    }
+    if(cnt > 1 || f) {
+        cout << "NO\n";
+    }else {
+        cout << "YES\n";
+    }
     
 }
 int main() {
@@ -92,7 +136,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

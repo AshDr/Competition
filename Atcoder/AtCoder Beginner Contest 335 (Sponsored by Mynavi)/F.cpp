@@ -12,8 +12,9 @@
 
 */
 #include <bits/stdc++.h>
-#include <functional>
+#include <numeric>
 #include <random>
+#include <vector>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -68,6 +69,10 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
+ll floor(ll x, ll m) {
+    ll r = (x % m + m) % m;
+    return (x - r) / m;
+}// neg floor (-1, 3) = -1
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
@@ -340,20 +345,25 @@ constexpr MInt<P> CInv = MInt<P>(V).inv();
 constexpr int MOD = 998244353;
 using mint = MInt<MOD>;
 void solve() {
-	ll n;
-	cin >> n;
-	unordered_map<ll, mint> f, g;
-	f[1] = 1;g[1] = 0;
-	function<void(ll)>gao = [&](ll n) {
-		if(f[n] != 0) return ;
-		ll r = (n >> 1),l = n - r;
-		gao(l);gao(r);
-		f[n] = 2 * f[l] + 2 * f[r] + (power(mint(2), l) - 1) * (power(mint(2), r) - 1);
-		g[n] = f[r] + g[l] + g[r];
-	};
-	gao(n);
-	cout << f[n] + g[n] << "\n";
-
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    cin >> a;
+    vector<mint> dp(n);
+    int p = sqrt(N);
+    vector<vector<mint>> sum(p, vector<mint>(p));
+    dp[0] = 1;
+    for(int i = 0; i < n; i++) {
+        for(int j = 1; j < p; j++) dp[i] += sum[i % j][j];
+        if(a[i] >= p) {
+            for(int j = i + a[i]; j < n; j += a[i]) {
+                dp[j] += dp[i];
+            }
+        }else {
+            sum[i % a[i]][a[i]] += dp[i];
+        }
+    }
+    cout << accumulate(dp.begin(), dp.end(), mint(0)) << "\n";
 }
 int main() {
     #ifdef ASHDR
@@ -364,7 +374,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    cin>>TT;
+    //cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

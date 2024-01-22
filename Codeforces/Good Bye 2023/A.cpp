@@ -12,16 +12,12 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -80,8 +76,51 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+
 void solve() {
-    
+	int n, k;
+	cin >> n >> k;
+	vector<int> a(n);
+    map<int,int> mp;
+    int t = 2023;
+    for(int i = 2; i <= t; i++) {
+    	if(t % i == 0) {
+    		int cnt = 0;
+    		while(t % i == 0) {
+    			t /= i;
+    			++cnt;
+    		}
+			mp[i] = cnt;
+    	}
+    }
+    if(t > 1) mp[t]++;
+   	cin >> a;
+   	int cnt7 = 0, cnt17 = 0;
+   	for(int i = 0; i < n; i++) {
+   		while(a[i] % 7 == 0) {
+   			a[i] /= 7;
+   			++cnt7;
+   		}
+   		while(a[i] % 17 == 0) {
+   			a[i] /= 17;
+   			++cnt17;
+   		}
+   		if(a[i] != 1) {
+   			cout << "NO\n";
+   			return ;
+   		}
+   	}
+   	if(cnt7 > mp[7] || cnt17 > mp[17]) {
+   		cout <<"NO\n";
+   		return ;
+   	}
+   	int ans = 1;
+   	cout << "YES\n";
+   	for(int i = 1; i <= mp[7] - cnt7; i++) ans *= 7;
+   	for(int i = 1; i <= mp[17] - cnt17; i++) ans *= 17;
+   	for(int i = 1; i < k; i++) cout << 1 << " ";
+   	cout << ans << "\n";
+
 }
 int main() {
     #ifdef ASHDR
@@ -92,7 +131,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

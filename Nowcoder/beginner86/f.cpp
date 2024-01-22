@@ -11,17 +11,14 @@
 　　　▀██▅▇▀▎▇
 
 */
+#include <algorithm>
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -80,8 +77,55 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+int n, m;
+ll a[N];
+set<pii> st;
+ll ans;
+ll pw(ll x) {return x * x;}
+void del(pii val) {
+	ans -= pw(val.second - val.first + 1);
+	st.erase(val);
+}
+void add(int l, int r) {
+	ans += pw(r - l + 1);
+	st.insert({l, r});
+}
+void modify(int p, int val) {
+	if(val == 0 || p > n) return ;
+	pii pi = *(--st.lower_bound({p, INF}));
+	del(pi);
+	a[p] += val;
+	if(pi.first == p) {
+		if(a[p] == 1) {
+			pii t = *(--st.lower_bound({p, p}));
+			del(t);
+			add(t.first, pi.second);
+		}else {
+			add(pi.first, pi.second);
+		}
+	}else {
+		add(pi.first, p - 1);
+		add(p, pi.second);
+	}
+}
 void solve() {
-    
+	cin >> n >> m;
+	for(int i = 1; i <= n; i++) cin >> a[i];
+	a[0] = 1e18;
+	for(int i = n; i >= 1; i--) a[i] -= a[i - 1];
+	int pre = 1;
+	for(int i = 2; i <= n + 1; i++) {
+		if(a[i] == 1) continue;
+		add(pre, i - 1);
+		pre = i;
+	}
+	for(int i = 0; i < m; i++) {
+		int l, r, w;
+		cin >> l >> r >> w;
+		modify(l, w);
+		modify(r + 1, -w);
+		cout << ans << "\n";
+	}
 }
 int main() {
     #ifdef ASHDR

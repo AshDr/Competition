@@ -12,16 +12,12 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -80,8 +76,42 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+
 void solve() {
-    
+    int a, b, c, m;
+    cin >> a >> b >> c >> m;
+    int g = gcd(gcd(a, b),c);
+    if(m % g == 0) {
+    	cout << "YES\n";
+    	// if(m < min({a, b, c})) cout << "NO\n";
+    	// else {
+    	// 	vector<int> use;
+    	// 	use.push_back(a);
+    	// 	use.push_back(b);
+    	// 	use.push_back(c);
+    	// 	sort(use.begin(), use.end());
+    	// 	int gg = gcd(use[0],use[1]);
+    	// 	for(int i = 0; i * use[2] < m; i++) {
+    	// 		int val = m - i * use[2];
+    	// 		if(val % gg) continue;
+    	// 		ll x,y;
+    	// 		exgcd(use[0],use[1],x,y);
+    	// 		x *= val / gg;y *= val / gg;
+    	// 		ll dx = use[1]/gg,dy=use[0]/gg;
+    	// 		ll k = ceil((0.0-x)/dx);
+    	// 		x += dx * k;
+    	// 		y -= dy * k;
+    	// 		if(y < 0) continue;
+    	// 		else {
+    	// 			cout << "YES\n";
+    	// 			return ;
+    	// 		}
+    	// 	}
+    	// }
+    	// cout << "NO\n";
+    }else {
+    	cout << "NO\n";
+    }
 }
 int main() {
     #ifdef ASHDR
@@ -92,7 +122,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

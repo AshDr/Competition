@@ -12,16 +12,12 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -80,8 +76,31 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+int a[N];
 void solve() {
-    
+    int n, k;
+    cin >> n >> k;
+    int c0 = 1,c1 = 0;
+    for(int i = 1; i <= n; i++) {
+        cin >> a[i];
+        a[i] %= 2;
+        a[i] += a[i - 1];
+        if(a[i] & 1) c1++;
+        else c0++;
+    }
+    ll ans = 1ll*c1*c0;
+    if(k == 0) {
+        cout << ans <<"\n";
+    }else {
+        int t0 = 0, t1 = 0;
+        for(int i = n; i >= 1; i--) {
+            if(a[i] & 1) t1++;
+            else t0++;
+            ans = max(ans, 1ll*(c1 - t1 + t0)*(c0 - t0 + t1));
+        }
+        cout << ans << "\n";
+    }
+
 }
 int main() {
     #ifdef ASHDR
@@ -92,7 +111,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

@@ -12,16 +12,12 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -80,8 +76,27 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+
 void solve() {
-    
+	int n,m;
+	cin>>n>>m;
+    string s,t;
+    cin>>s>>t;
+    vector<vector<int>> dp(n + 1,vector<int>(2));
+    s = " " + s;
+    t = " " + t;
+    dp[0][0] = 1;
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < m; j++) {
+            for(int k = 1; i + k <= n && j + k <= m; k++) {
+                if(s[i + k] != t[j + k]) break;
+                if(!j) dp[i + k][j + k == m] |= dp[i][0] | dp[i][1]; 
+                else dp[i + k][j + k == m] |= dp[i][1]; 
+            }
+        }
+    }
+    if(dp[n][1]) cout << "Yes\n";
+    else cout << "No\n";
 }
 int main() {
     #ifdef ASHDR

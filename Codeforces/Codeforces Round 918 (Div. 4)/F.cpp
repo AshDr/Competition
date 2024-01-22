@@ -11,17 +11,14 @@
 　　　▀██▅▇▀▎▇
 
 */
+#include <algorithm>
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -80,8 +77,74 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
-void solve() {
+template <typename T>
+struct Fenwick {
+    int n;
+    std::vector<T> a;
     
+    Fenwick(int n = 0) {
+        init(n);
+    }
+    
+    void init(int n) {
+        this->n = n;
+        a.assign(n, T());
+    }
+    
+    void add(int x, T v) {
+        for (int i = x + 1; i <= n; i += i & -i) {
+            a[i - 1] += v;
+        }
+    }
+    
+    T sum(int x) {
+        auto ans = T();
+        for (int i = x; i > 0; i -= i & -i) {
+            ans += a[i - 1];
+        }
+        return ans;
+    }//[1, x)
+    
+    T rangeSum(int l, int r) {
+        return sum(r) - sum(l);
+    }//[0~r)-[0~l)
+    
+    
+    int kth(T k) {
+        int x = 0;
+        for (int i = 1 << std::__lg(n); i; i /= 2) {
+            if (x + i <= n && k >= a[x + i - 1]) {
+                x += i;
+                k -= a[x - 1];
+            }
+        }
+        return x;
+    }
+};
+void solve() {
+    int n;
+    cin >> n;
+    vector<pii> a(n);
+    vector<int> b;
+    for(int i = 0; i < n; i++) {
+    	cin >> a[i].first >> a[i].second;
+    	b.push_back(a[i].first);
+    	b.push_back(a[i].second);
+    }
+    sort(b.begin(), b.end());
+    b.erase(unique(b.begin(), b.end()), b.end());
+    for(int i = 0; i < n; i++) {
+    	a[i].first = lower_bound(b.begin(), b.end(), a[i].first) - b.begin();
+    	a[i].second = lower_bound(b.begin(), b.end(), a[i].second) - b.begin();
+    }
+    sort(a.begin(), a.end());
+    ll ans = 0;
+    Fenwick<int> fw(2 * n + 1);
+    for(int i = 0; i < n; i++) {
+    	ans += i - fw.sum(a[i].second);
+    	fw.add(a[i].second, 1);
+    }
+    cout << ans << "\n";
 }
 int main() {
     #ifdef ASHDR
@@ -92,7 +155,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

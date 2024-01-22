@@ -12,16 +12,12 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -80,8 +76,58 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+vector<int> ans[20];
+void init() {
+    for(int i = 1; i <= 19; i++) {
+        for(int o = 1; o < (1 << i); o++) {
+            int res = 0;
+            for(int j = 1; j <= i; j++) {
+                if((o >> (j - 1) & 1)) {
+                    for(int k = j; k <= i; k += j) {
+                        res ^= (1 << (k - 1));
+                    }
+                }
+            }
+            if(__builtin_popcount(res) <= i / 5) {
+                ans[i].push_back(o);
+            }
+        }
+    } 
+}
 void solve() {
-    
+    int n, m;
+    cin >> n >> m;
+    vector<pii> a(m);
+    for(int i = 0; i < m; i++) {
+        cin >> a[i].first >> a[i].second;
+        --a[i].first;
+        --a[i].second;
+    }
+    if(n >= 20) {
+        cout << n << "\n";
+        for(int i = 1; i <= n; i++) cout << i << " \n"[i == n];
+        return ;
+    }
+    for(auto o: ans[n]) {
+        int f = 1;
+        for(auto [u ,v]: a) {
+            if((o >> u & 1) && !(o >> v & 1)) {
+                f = 0;
+                break;
+            }
+        }   
+        if(f) {
+            cout << __builtin_popcount(o) << "\n";
+            for(int i = 1; i <= n; i++) {
+                if(o >> (i - 1) & 1) {
+                    cout << i << " ";
+                }
+            }
+            cout << "\n";
+            return ;
+        } 
+    }
+    cout << "-1\n";
 }
 int main() {
     #ifdef ASHDR
@@ -92,7 +138,8 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    init();
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

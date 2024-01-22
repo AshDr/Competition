@@ -12,16 +12,12 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -80,8 +76,46 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+
 void solve() {
-    
+	int n;
+	cin >> n;
+    vector<vector<int>> a(n,vector<int> (n));
+    int cnt = 1;
+    int x = 0, y = 0;
+    int t = 0;
+    while(cnt <= n * n) {
+    	// cout << x << " " << y << "\n";
+    	a[x][y] = cnt++;
+    	if(x == t) ++y;
+    	else if(y == n - t - 1) ++x;
+    	else if(x == n - t - 1) --y;
+    	else if(y == t) --x;
+    	if(x == t && y == n - t) {
+    		++x;
+    		--y;
+    	}else if(y == n - t - 1 && x == n - t) {
+    		--x;
+    		--y;
+    	}else if(x == n - t - 1 && y == t - 1) {
+    		--x;
+    		++y;
+    	}else if(x == t && y == t) {
+    		++x;
+    		++y;
+    		++t;
+    	}
+    }	
+    for(int i = 0; i < n; i++) {
+    	for(int j = 0; j < n; j++) {
+    		if(i == n / 2 && j == n / 2) {
+    			cout << "T ";
+    		}else {
+    			cout << a[i][j] << " ";
+    		}
+    	}
+    	cout << "\n";
+    }
 }
 int main() {
     #ifdef ASHDR

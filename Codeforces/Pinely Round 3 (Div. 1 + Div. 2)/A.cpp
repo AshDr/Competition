@@ -11,17 +11,25 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
+#include <algorithm>
+#include <cstdio>
+#include <deque>
+#include <iomanip>
+#include <iostream>
+#include <map>
+#include <queue>
 #include <random>
+#include <set>
+#include <sstream>
+#include <unordered_map>
+#include <cassert>
+#include <functional>
+#include <chrono>
+#include <cstring>
+#include <vector>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
-#define all(x) (x).begin(),(x).end()
-#define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -71,17 +79,48 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     return d;
 }// (get inv) gcd(a,p) = 1 
 
-ll floor(ll x, ll m) {
-    ll r = (x % m + m) % m;
-    return (x - r) / m;
-}// neg floor (-1, 3) = -1
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 1e9 + 7;
+const int MOD = 1e9 + 7;
 int TT = 1;
+class Solution {
+public:
+    int maximizeSquareArea(int m, int n, vector<int>& a, vector<int>& b) {
+        if(n == m) {
+            return 1ll*(n-1)*(n-1)%MOD;
+        }
+        ll ans = 0;
+        for(int i = 0; i < sz(a); i++) {
+            if(a[i] == m || n - a[i] + 1 == m ){
+                ans = max(ans, 1ll*(m-1)*(m-1));
+            }
+        }
+        for(int i = 0; i < sz(b); i++) {
+            if(b[i] == n || m - b[i] + 1 == n){
+                ans = max(ans, 1ll*(n-1)*(n-1));
+            }
+        }
+        if(ans == 0) return -1;
+        return ans % MOD;
+        
+    }
+};
 void solve() {
-    
+    int n;
+    cin >> n;
+    int xneg = 0, xpos = 0;
+    int yneg = 0, ypos = 0;
+    for(int i = 0; i < n; i++) {
+        int x, y;
+        cin >> x >> y;
+        if(x < 0) xneg = 1;
+        if(x > 0) xpos = 1;
+        if(y < 0) yneg = 1;
+        if(y > 0) ypos = 1;
+    }
+    if(xneg&&xpos&&yneg&&ypos) cout << "NO\n";
+    else cout << "YES\n";
 }
 int main() {
     #ifdef ASHDR
@@ -92,7 +131,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

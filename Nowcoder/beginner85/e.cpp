@@ -11,17 +11,17 @@
 　　　▀██▅▇▀▎▇
 
 */
+#include <algorithm>
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
+#include <functional>
+#include <numeric>
+#include <queue>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -81,7 +81,53 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 void solve() {
-    
+    int n, m;
+    cin >> n >> m;
+    vector<ll> a(n);
+    cin >> a;
+    auto check = [&](ll mid) {
+    	ll cur = 0;
+    	int cnt = 1;
+    	for(int i = 0; i < n; i++) {
+    		if(a[i] + cur <= mid) {
+    			cur += a[i];
+    		}else {
+    			cur = cur + a[i] - mid;
+    			++cnt;
+    		}
+    	}
+    	return cnt <= m;
+    };
+    ll l = *max_element(a.begin(), a.end()), r = 1e14;
+    while(l < r) {
+    	ll mid = (l + r) >> 1;
+    	if(check(mid)) r = mid;
+    	else l = mid + 1;
+    }
+    // cout << l << "!\n";
+    vector<tuple<ll,ll,ll,ll>> res;
+    auto gao = [&](ll val) {
+    	ll cur = 0;
+    	int cnt = 1;
+    	for(int i = 0; i < n; i++) {
+    		if(cur + a[i] <= val) {
+    			res.push_back({i + 1, cnt, cur, cur + a[i]});
+    			cur += a[i];
+    			if(cur == val) {
+    				++cnt;
+    				cur = 0;
+    			}
+    		}else {
+    			res.push_back({i + 1, cnt, cur, val});
+    			++cnt;
+    			cur = cur + a[i] - val;
+    			res.push_back({i + 1, cnt, 0, cur});
+    		}
+    	}
+    };
+    gao(l);
+    cout << sz(res) << "\n";
+    for(auto[a,b,c,d]: res) cout << a << " " << b <<" " << c << " " << d << "\n";
 }
 int main() {
     #ifdef ASHDR

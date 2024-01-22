@@ -12,16 +12,12 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -81,7 +77,54 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 void solve() {
-    
+	int h, w, k;
+	cin >> h >> w >> k;
+	vector<vector<char>> s(h, vector<char>(w));
+	vector<vector<int>> countr(h+1, vector<int>(w+1)),countc(h+1,vector<int>(w+1));
+	for(int i = 0; i < h; i++) {
+		for(int j = 0; j < w; j++) {
+			cin >> s[i][j];
+		}
+	} 
+	int ans = 1e9;
+	for(int i = 0; i < h; i++) {
+		int cnt = 0,res = 0;
+		for(int j = 0; j < w; j++) {
+			if(s[i][j] == 'x') {
+				cnt = 0;
+				res = 0;
+			}
+			else {
+				if(cnt == k) {
+					--cnt;
+					res -= (s[i][j - k] == '.');
+				}
+				cnt++;
+				res += (s[i][j] == '.');
+				if(cnt == k) ans = min(ans, res);
+			}
+		}
+	} 
+	for(int i = 0; i < w; i++) {
+		int cnt = 0,res = 0;
+		for(int j = 0; j < h; j++) {
+			if(s[j][i] == 'x') {
+				cnt = 0;
+				res = 0;
+			}
+			else {
+				if(cnt == k) {
+					--cnt;
+					res -= (s[j - k][i] == '.');
+				}
+				cnt++;
+				res += (s[j][i] == '.');
+				if(cnt == k) ans = min(ans, res);
+			}
+		}
+	}
+	cout << (ans == 1000000000 ? -1 : ans) << "\n";
+
 }
 int main() {
     #ifdef ASHDR

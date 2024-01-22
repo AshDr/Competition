@@ -12,16 +12,13 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
+#include <numeric>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -81,6 +78,70 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 void solve() {
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    cin >> a;
+    if(n == 1) {
+        cout << "YES\n";
+        cout << "0\n";
+        return ;
+    }
+    vector<int> b = a;
+    sort(a.begin(), a.end());
+    int val = a[0] + a[n - 1];
+    for(int i = 0; i < n; i++) {
+        if(a[i] + a[n - i - 1] != val) {
+            cout << "NO\n";
+            return ;
+        }
+    }
+    vector<pii> ans;
+    map<int,set<int>> mp;
+    for(int i = 0; i < n; i++) {
+        mp[b[i]].insert(i);
+    }
+    for(auto [i, st]: mp) {
+        if(sz(st) != sz(mp[val - i])) {
+            cout << "NO\n";
+            return ;
+        }   
+    }
+    if(n & 1) {
+        int idx1 = *mp[a[n / 2]].begin(),idx2 = n / 2;
+        if(a[n / 2] != b[n / 2]) {
+            mp[a[n / 2]].erase(idx1);
+            mp[a[n / 2]].insert(idx2);
+            mp[b[idx2]].erase(idx2);
+            mp[b[idx2]].insert(idx1);
+            swap(b[idx1], b[idx2]);
+            // cout << idx1 << " " << idx2 << "!\n";
+
+            ans.push_back({idx1,idx2});
+        }
+    }
+    for(int i = 0; i < n; i++) {
+        mp[b[i]].erase(i);
+        if(b[n - i - 1] + b[i] != val) {
+            int curx = b[n - i - 1];
+            int idx1 = *mp[val - b[i]].begin(),idx2 = n - i - 1;
+            // cout << idx1 << " " << idx2 << "!\n";
+            mp[val - b[i]].erase(idx1);
+            mp[curx].erase(n - i - 1);
+            mp[curx].insert(idx1);
+            mp[val - b[i]].insert(idx2);
+            ans.push_back({idx1, idx2});
+            swap(b[idx1],b[idx2]);
+        }else {
+            if(n - i - 1 != i) mp[val - b[i]].erase(n - i - 1);
+        }
+    }
+    for(int i = 0; i < n; i++) assert(b[i] + b[n - i - 1] == val);
+    cout << "YES\n";
+    cout << sz(ans) << "\n";
+    for(auto [x, y]: ans) {
+        cout << x + 1 << " " << y + 1 << "\n";
+    }
     
 }
 int main() {
@@ -92,7 +153,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

@@ -12,7 +12,6 @@
 
 */
 #include <bits/stdc++.h>
-#include <functional>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
@@ -67,7 +66,10 @@ ll exgcd(ll a,ll b,ll &x,ll &y) {
     y -= a / b * x;
     return d;
 }// (get inv) gcd(a,p) = 1 
-
+ll floor(ll x, ll m) {
+    ll r = (x % m + m) % m;
+    return (x - r) / m;
+}
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
@@ -337,23 +339,135 @@ int MInt<0>::Mod = 998244353;
 template<int V, int P>
 constexpr MInt<P> CInv = MInt<P>(V).inv();
  
-constexpr int MOD = 998244353;
+constexpr int MOD = 1e9+7;
 using mint = MInt<MOD>;
 void solve() {
-	ll n;
-	cin >> n;
-	unordered_map<ll, mint> f, g;
-	f[1] = 1;g[1] = 0;
-	function<void(ll)>gao = [&](ll n) {
-		if(f[n] != 0) return ;
-		ll r = (n >> 1),l = n - r;
-		gao(l);gao(r);
-		f[n] = 2 * f[l] + 2 * f[r] + (power(mint(2), l) - 1) * (power(mint(2), r) - 1);
-		g[n] = f[r] + g[l] + g[r];
-	};
-	gao(n);
-	cout << f[n] + g[n] << "\n";
-
+    int n;
+    cin >> n;
+    vector<int> init(9);
+    auto get_id = [&](int x, int y) {
+        return x * 3 + y;
+    };
+    for(int i = 0; i < 3; i++) {
+        string s;
+        cin >> s;
+        int cntw = 0, cnti = 0, cntn = 0;
+        for(auto ch: s) {
+            if(ch == 'w') cntw++;
+            else if(ch == 'i') cnti++;
+            else cntn++;
+        }
+        init[get_id(0, i)] += cntw;
+        init[get_id(1, i)] += cnti;
+        init[get_id(2, i)] += cntn;
+    }
+    map<vector<int>,int> id;
+    map<int,vector<int>> revmp;
+    int cnt = 0;
+    auto check = [&](vector<int> vec) {
+        for(int i = 0; i < 9; i += 3) {
+            if(vec[i] + vec[i + 1] + vec[i + 2] != 3) return false;
+        }
+        for(int i = 0; i < 3; i++) {
+            if(vec[i] + vec[i + 3] + vec[i + 6] != 3) return false;
+        }
+        return true;
+    };
+    auto dfs = [&](auto self, int pos, vector<int> vec) {
+        if(pos == 9) {
+            if(check(vec) && !id[vec]) {
+                id[vec] = ++cnt;
+                revmp[cnt] = vec;
+            } 
+            return ;
+        };
+        vec.push_back(0);
+        self(self, pos + 1, vec);
+        vec.pop_back();
+        vec.push_back(1);
+        self(self, pos + 1, vec);
+        vec.pop_back();
+        vec.push_back(2);
+        self(self, pos + 1, vec);
+        vec.pop_back();
+        vec.push_back(3);
+        self(self, pos + 1, vec);
+    };
+    dfs(dfs, 0, {});
+    vector<vector<pair<int,mint>>> G(cnt + 1);
+    auto gao = [&](auto self, int who, vector<int>& u, vector<int> v,mint p) {
+        if(who == 3) {
+            G[id[u]].push_back({id[v], p});
+            return ;
+        }
+        if(who == 0) {
+            int f = 1;
+            for(int i = 0; i < 3; i++) {
+                if(u[get_id(i, who)] == 2) {
+                    f = 0;
+                    auto vec = v;
+                    vec[get_id(i, who)]--;
+                    vec[get_id(i, (who + 1) % 3)]++;
+                    self(self, who + 1, u, vec, p); // 概率为1
+                }
+            }
+            if(f) {
+                for(int i = 0; i < 3; i++) {
+                    if(u[get_id(i, who)]) {
+                        auto vec = v;
+                        vec[get_id(i, who)]--;
+                        vec[get_id(i, (who + 1) % 3)]++;
+                        self(self, who + 1, u, vec, p); //只能是三个相同的
+                    }
+                }
+            }
+        }else {
+            for(int i = 0; i < 3; i++) {
+                if(u[get_id(i, who)]) {
+                    auto vec = v;
+                    mint pp = mint(u[get_id(i, who)]) / 3;
+                    vec[get_id(i, who)]--;
+                    vec[get_id(i, (who + 1) % 3)]++;
+                    self(self, who + 1, u, vec, p * pp);
+                }
+            }
+        }
+    };
+    auto haswin = [&](vector<int> vec) {
+        for(int i = 0; i < 3; i++) {
+            if(vec[i] == 1 && vec[i + 3] == 1 && vec[i + 6] == 1) return true;
+        }
+        return false;
+    };//有人赢了就不连边
+    auto ningwin = [&](vector<int> vec) {
+        if(vec[0] == 1 && vec[3] == 1 && vec[6] == 1) return true;
+        return false;
+    };
+    for(int i = 1; i <= cnt; i++) {
+        auto u = revmp[i];
+        if(haswin(u)) continue;
+        gao(gao, 0, u, u, 1);
+    }
+    vector<vector<mint>> dp(n + 1, vector<mint>(cnt + 1));
+    dp[0][id[init]] = 1;
+    mint ans = 0;
+    for(int i = 0; i < n; i++) {
+        for(int j = 1; j <= cnt; j++) {
+            if(dp[i][j] != 0) {
+                for(auto [v, w]: G[j]) {
+                    // cout << i << " " << j << " " << v << "\n";
+                    // cout << revmp[v] << "\n";
+                    dp[i + 1][v] += dp[i][j] * w;
+                }
+            }
+        }
+    }
+    for(int i = 0; i <= n; i++) {
+        for(int j = 1; j <= cnt; j++) {
+            if(ningwin(revmp[j])) ans += dp[i][j];
+        }
+    }
+    cout << ans << "\n";
 }
 int main() {
     #ifdef ASHDR
@@ -364,7 +478,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    cin>>TT;
+    //cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

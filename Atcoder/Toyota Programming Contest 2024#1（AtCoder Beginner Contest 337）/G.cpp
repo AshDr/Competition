@@ -12,16 +12,17 @@
 
 */
 #include <bits/stdc++.h>
-//#include <ext/pb_ds/assoc_container.hpp>
-//#include <ext/pb_ds/tree_policy.hpp>
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+#include <functional>
 #include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
 #define rall(x) (x).rbegin(),(x).rend()
 using namespace std;
-// using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
+using namespace __gnu_pbds;
+typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> bst;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef pair<ll,ll> pll;
@@ -81,7 +82,54 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 void solve() {
-    
+    int n;
+    cin >> n;
+    vector<vector<int>> G(n + 1);
+    for(int i = 1; i <= n - 1; i++) {
+        int u, v;
+        cin >> u >> v;  
+        G[u].push_back(v);
+        G[v].push_back(u);
+    }
+    vector<bst> s(n + 1);
+    vector<ll> f(n + 1),F(n + 1),g(n + 1),ff(n + 1);
+    function<void(int,int)> dfs = [&](int u, int p) {
+        int mson = -1, mxsz = 0;
+        for(auto v: G[u]) {
+            if(v == p) continue;
+            dfs(v, u);
+            F[u] += F[v];
+            if(mson == -1 || sz(s[v]) > mxsz) {
+                mson = v;
+                mxsz = sz(s[v]);
+            }
+        }
+        if(mson != -1) s[u].swap(s[mson]);
+        for(auto v: G[u]) {
+            if(v == p || v == mson) continue;
+            for(auto val: s[v]) {
+                s[u].insert(val);
+            }
+        }
+        int x = s[u].order_of_key(u);
+        f[u] = x;
+        F[u] += f[u];
+        s[u].insert(u);
+        ff[u] = s[u].order_of_key(p);
+    };
+    function<void(int,int)> dfs2 = [&](int u, int p) {
+        if(u != 1) {
+            g[u] = (g[p] - (p - 1) - F[u]) + (p - 1 - ff[u]) + (F[u] - f[u] + u - 1);
+        }
+        for(auto v: G[u]) {
+            if(v == p) continue;
+            dfs2(v, u);
+        }
+    };
+    dfs(1, 0);
+    g[1] = F[1];
+    dfs2(1, 0);
+    for(int i = 1; i <= n; i++) cout << g[i] << " ";
 }
 int main() {
     #ifdef ASHDR
