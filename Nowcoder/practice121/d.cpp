@@ -11,23 +11,10 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -94,7 +81,29 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 void solve() {
-    
+    int x, y;
+    cin >> x >> y;
+    vector<tuple<int,ll,ll>> vec;
+    vec.push_back({1, x, y});
+    vec.push_back({1, x, y});
+    ll g = gcd(x, y), lcm = 1ll*x*y/g;
+    ll coef = lcm / g;
+    for(ll i = 2; i <= coef; i <<= 1) {
+    	vec.push_back({2, i * g / 2, i * g / 2});
+    	vec.push_back({2, i * g / 2, i * g / 2});
+    }
+    ll lst = 0;
+    for(int i = 0; i <= 60; i++) {
+    	if(coef >> i & 1) {
+    		if(lst > 0) vec.push_back({2, g * lst, g * (1ll << i)});
+    		lst += (1ll << i);
+    	}
+    }
+    cout << sz(vec) << "\n";
+    for(auto [o, x, y]: vec) {
+    	cout << o << " " << x <<" " << y <<"\n";
+    }
+
 }
 int main() {
     #ifdef ASHDR
@@ -105,7 +114,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

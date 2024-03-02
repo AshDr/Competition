@@ -11,23 +11,10 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -94,7 +81,28 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 void solve() {
-    
+    int n, m, k;
+    cin >> n >> m >> k;
+    vector<int> a(n),b(m);
+    cin >> a >> b;
+    set<int> sa(a.begin(), a.end()),sb(b.begin(), b.end());
+    int na = 0, nb = 0, t = 0;
+    int f = 1;
+    for(int i = 1; i <= k; i++) {
+        if(sa.count(i) && sb.count(i)) {
+            ++t;
+        }else if(sa.count(i)) {
+            ++na;
+        }else if(sb.count(i)) {
+            ++nb;
+        }else {
+            f = 0;
+        }
+    }   
+    if(na > k / 2 || nb > k / 2 || !f) {
+        cout << "NO\n";
+    }
+    else cout << "YES\n";
 }
 int main() {
     #ifdef ASHDR
@@ -105,7 +113,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

@@ -11,23 +11,11 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <numeric>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -94,7 +82,45 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 void solve() {
-    
+    int n, k;
+    cin >> n >> k;
+    int t1 = (n - k) / k, t2 = (n - k) % k;
+    queue<int> q,q1;
+    q1.push(n / 2 + 1);
+    q1.push(n / 2);
+    set<int> st;
+    while(!q1.empty()) {
+        int u = q1.front();q1.pop();
+        q.push(u);
+        if(t2) {
+            --t2;
+            if(u > n / 2) {
+                if(u + t1 + 2 <= n) q1.push(u + t1 + 2),st.insert(u+t1+2);
+            }else {
+                if(u - t1 - 2 >= 1) q1.push(u - t1 - 2),st.insert(u-t1-2);
+
+            }
+        }else {
+            if(u > n / 2) {
+                if(u + t1 + 1 <= n)q1.push(u + t1 + 1),st.insert(u+t1+1);
+            }else {
+                if(u - t1 - 1 >= 1) q1.push(u - t1 - 1),st.insert(u-t1-1);
+            }
+        }
+    }
+    vector<int> ans;
+    while(!q.empty()) {
+        int u = q.front();q.pop();
+        ans.push_back(u);
+        if(u > n / 2 && u + 1 <= n && !st.count(u + 1)) q.push(u + 1),st.insert(u+1);
+        if(u <= n / 2 && u - 1 >= 1 && !st.count(u - 1)) q.push(u - 1),st.insert(u-1);
+    }
+    assert(sz(ans) == n);
+    // for(int i = 0; i < n - k; i++) {
+    //  cout << accumulate(ans.begin() + i, ans.begin() + i + k, 0ll) << " ";
+    // }
+    cout << ans << "\n";
+
 }
 int main() {
     #ifdef ASHDR
@@ -105,7 +131,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

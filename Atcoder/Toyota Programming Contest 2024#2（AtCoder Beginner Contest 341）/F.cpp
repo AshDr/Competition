@@ -11,23 +11,13 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
 #include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <numeric>
+#include <random>
+#include <vector>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -94,7 +84,48 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 void solve() {
-    
+    int n, m;
+    cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    for(int i = 0; i < m; i++) {
+    	int u, v;
+    	cin >> u >> v;
+    	adj[u].push_back(v);
+    	adj[v].push_back(u);
+    }
+    vector<ll> a(n + 1),w(n + 1);
+    ll wmx = 0;
+    for(int i = 1; i <= n; i++) {
+    	cin >> w[i];
+        wmx = max(wmx, w[i]);
+    }
+
+    for(int i = 1; i <= n; i++) {
+    	cin >> a[i];
+    }
+
+    vector<int> id(n);
+    iota(id.begin(), id.end(),1);
+    sort(id.begin(), id.end(), [&](int x, int y) {
+    	return w[x] > w[y];
+    });
+    ll ans = 0;
+    vector<vector<int>> dp(n + 1, vector<int>(wmx, 0));
+    vector<int> f(n + 1);
+    for(int i = n - 1; i >= 0; i--) {
+        int cur = id[i];
+        int mxsum = 0;
+        for(auto x: adj[cur]) {
+            if(w[x] >= w[cur]) continue;
+            for(int j = w[cur] - 1; j >= w[x]; j--) {
+                dp[cur][j] = max(dp[cur][j], dp[cur][j - w[x]] + f[x]);
+                mxsum = max(mxsum, dp[cur][j]);
+            }
+        }
+        f[cur] = mxsum + 1;
+        ans += 1ll*f[cur] * a[cur];
+    }
+    cout << ans << "\n";
 }
 int main() {
     #ifdef ASHDR

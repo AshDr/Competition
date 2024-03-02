@@ -11,23 +11,10 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -94,7 +81,35 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 void solve() {
+	int n, k;
+	cin >> n >> k;
+	vector<vector<int>> G(n + 1);
+	vector<int> d(n + 1);
+    for(int i = 1; i <= k; i++) {
+    	vector<int> a(n);
+    	cin >> a;
+    	for(int j = 1; j < n - 1; j++) {
+    		G[a[j]].push_back(a[j + 1]);
+    		d[a[j + 1]]++;
+    	}
+    }
+    queue<int> q;
     
+    for(int i = 1; i <= n; i++) {
+    	if(d[i] == 0) q.push(i);
+    }
+
+    while(!q.empty()) {
+    	int u = q.front();q.pop();
+    	for(auto v: G[u]) {
+    		if(--d[v] == 0) {
+    			q.push(v);
+    		}
+    	}
+    }
+    int f = 1;
+    for(int i = 1; i <= n; i++) if(d[i] > 0) f = 0;
+   	cout << (f ? "YES\n": "NO\n");
 }
 int main() {
     #ifdef ASHDR
@@ -105,7 +120,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

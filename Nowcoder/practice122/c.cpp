@@ -11,23 +11,11 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <functional>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -94,7 +82,42 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 void solve() {
-    
+	const int dx[] = {1, -1, 1, -1, 2, -2, 2, -2};
+	const int dy[] = {2, 2, -2, -2, 1, 1, -1, -1};
+	auto gao = [&](int n, int m) {
+		vector<vector<int>> vis(n + 1, vector<int>(m + 1));
+		queue<pii> q;
+		q.push({1, 1});
+		vis[1][1] = 1;
+		int ans = 1;
+		while(!q.empty()) {
+			auto [x, y] = q.front();q.pop();
+			for(int i = 0; i < 7; i++) {
+				int xx = x + dx[i], yy = y + dy[i];
+				if(xx < 1 || xx > n || yy < 1 || yy > m) continue;
+				if(vis[xx][yy]) continue;
+				vis[xx][yy] = 1;
+				++ans;
+				q.push({xx ,yy});
+			}
+		}
+		return ans;
+	};
+	
+	ll n, m;
+	cin >> n >> m;
+	if(n <= 50 && m <= 50) {
+		cout << gao(n, m) << "\n";
+		return ;
+	}
+	if(min(n, m) == 1) {
+		cout << 1 << "\n";
+	}else if(min(n, m) == 2) {
+		int t = max(n, m);
+		cout << (t + 1) / 2 << "\n";
+	}else {
+		cout << n * m << "\n";
+	}
 }
 int main() {
     #ifdef ASHDR
@@ -105,7 +128,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

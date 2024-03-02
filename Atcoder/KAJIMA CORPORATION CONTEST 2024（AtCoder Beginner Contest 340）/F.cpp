@@ -11,23 +11,10 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -94,7 +81,25 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 void solve() {
-    
+    ll x, y;
+    cin >> x >> y;
+    if(abs(gcd(x, y)) > 2) {
+    	cout << "-1\n";
+    	return ;
+    }
+    if(x == 0) {
+    	cout << 2 / y << " " << 0 << "\n";
+    }else if(y == 0) {
+    	cout << 0 << " " << 2 / x << "\n";
+    }else {
+    	ll X,Y;
+    	ll d = exgcd(x, -y, X, Y);
+    	ll tb = abs(-y / d);
+    	ll B = X % tb *(2 / d % tb)%tb;
+    	ll A = __int128 (x) * B - 2;
+    	A /= 2;
+    	cout << A << " " << B << "\n";
+    }
 }
 int main() {
     #ifdef ASHDR

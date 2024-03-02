@@ -11,23 +11,11 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <random>
+#include <utility>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -88,13 +76,54 @@ ll floor(ll x, ll m) {
     ll r = (x % m + m) % m;
     return (x - r) / m;
 }// neg floor (-1, 3) = -1
-const int N = 2e5 + 10;
+const int N = 1e6 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 void solve() {
-    
+    ll x;
+    cin >> x;
+    ll ans = x, cnt = 0;
+	queue<pll> q;
+	q.push({x, 1});
+	while(1) {
+		map<ll, ll> mp;
+		while(!q.empty()) {
+			ll u = q.front().first,num = q.front().second;q.pop();
+			mp[u / 2] += num;
+			mp[(u+1) / 2] += num;
+		}
+		for(auto [k,v]: mp) {
+			q.push({k, v});
+		}
+		if((*mp.begin()).first < 2) {
+			for(auto [k,v]:mp) {
+				if(k == 2) {
+					ans += v * 2;
+				}
+			}
+			break;
+		}
+		ans += x;
+	}
+	
+	cout << ans <<"\n";
+	/*
+	15
+
+	7 8
+
+	3 4 4 4
+
+	1 2 2 2 2 2 2 2
+	
+	19
+	9 10
+	4 5 5 5
+	2 2 2 3 2 3 2 3
+	1 1 1 1 2 1 2 1 2 1
+	*/    
 }
 int main() {
     #ifdef ASHDR

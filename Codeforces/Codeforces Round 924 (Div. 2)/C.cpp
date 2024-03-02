@@ -11,23 +11,10 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -94,7 +81,31 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 void solve() {
+    //(n - 1) % (2 * k - 2) + 1 == x
+    //(n - 1) % (2 * k - 2) + 1 == 2 * k - x 
+    //(2*k-2)|(n - x) or (2 * k - 2) | (n + x - 2)
     
+    int x, n;
+    cin >> n >> x;
+    int ans = 0;
+    set<int> st;
+    auto gao = [&](int num) {
+        for(int i = 1; i * i <= num; i++) {
+            if(num % i == 0) {
+                if((i + 2) % 2 == 0 && (i + 2) / 2 != 1) {
+                    if((i + 2) / 2 >= x) st.insert((i + 2) / 2);
+                }
+                if(num / i != i) {
+                    if((num / i + 2) % 2 == 0 && (num / i + 2) / 2 != 1) {
+                        if((num / i + 2) / 2 >= x) st.insert((num / i + 2) / 2);
+                    }
+                }
+            }
+        }
+    };
+    gao(n - x);
+    gao(n + x - 2);
+    cout << sz(st) << "\n";
 }
 int main() {
     #ifdef ASHDR
@@ -105,7 +116,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

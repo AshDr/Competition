@@ -11,23 +11,10 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -94,7 +81,42 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 void solve() {
-    
+    int n, q;
+    cin >> n >> q;
+    vector<pii> OP(n);
+    vector<vector<ll>> use(60);
+    vector<ll> len(60),tlen(60);
+    int idx = 0;
+    for(int i = 0; i < n; i++) {
+    	cin >> OP[i].first >> OP[i].second;
+    }
+    for(int i = 0; i < n; i++) {
+    	if(OP[i].first == 1) {
+    		use[idx].push_back(OP[i].second);
+    		len[idx]++;
+    		if(len[idx] > 1e18) break;
+    	}else {
+    		++idx;
+    		if(len[idx - 1]  > 1e18 / (OP[i].second + 1)) {
+    			--idx;
+    			break;
+    		}
+    		tlen[idx] = len[idx] = len[idx - 1] * (OP[i].second + 1); 
+    	}
+    }
+    // for(int i = 0; i <= idx; i++) cout << len[i] << " \n"[i == idx]; 
+    while(q--) {
+    	ll pos;
+    	cin >> pos;
+    	for(int i = idx; i >= 0; i--) {
+    		pos = (pos - 1) % len[i] + 1;
+    		if(pos > tlen[i]) {
+    			cout << use[i][pos - tlen[i] - 1] << " ";
+    			break;
+    		}
+    	}
+    }
+	cout <<"\n";
 }
 int main() {
     #ifdef ASHDR
@@ -105,7 +127,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

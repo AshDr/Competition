@@ -11,23 +11,10 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -93,8 +80,72 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+int vis[61][61][61][61];
+struct State{
+	int x1,y1,x2,y2;
+	int step;
+};
+const int dx[] = {-1, 1, 0, 0};
+const int dy[] = {0,0,-1,1};
 void solve() {
-    
+	int n;
+	cin >> n;
+	vector<string> grid(n);
+	int sx1 = -1, sx2 = -1, sy1 = -1, sy2 = -1;
+	for(int i = 0; i < n; i++) {
+		cin >> grid[i];
+		for(int j = 0; j < n; j++) {
+			if(grid[i][j] == 'P') {
+				if(sx1 == -1) {
+					sx1 = i;
+					sy1 = j;
+				}else {
+					sx2 = i;
+					sy2 = j;
+				}
+			}
+		}
+	}
+	queue<State> q;
+	q.push({sx1,sy1,sx2,sy2, 0});
+	auto check = [&](int x, int y) {
+		if(x < 0 || x >= n || y < 0 || y >= n) return false;
+		return true;
+	};
+	vis[sx1][sy1][sx2][sy2] = 1;
+	while(!q.empty()) {
+		auto [x1, y1, x2, y2, step] = q.front();q.pop();
+		if(x1 == x2 && y1 == y2) {
+			cout << step << "\n";
+			return ;
+		}
+		for(int i = 0; i < 4; i++) {
+			int xx1 = x1 + dx[i],yy1 = y1 + dy[i];
+			int xx2 = x2 + dx[i],yy2 = y2 + dy[i];
+			if(check(xx1, yy1)) {
+				if(grid[xx1][yy1] == '#') xx1 = x1,yy1 = y1;
+			}else {
+				if(xx1 < 0) xx1 = 0;
+				if(xx1 >= n) xx1 = n - 1;
+				if(yy1 < 0) yy1 = 0;
+				if(yy1 >= n) yy1 = n - 1;
+			}
+
+			if(check(xx2, yy2)) {
+				if(grid[xx2][yy2] == '#') xx2 = x2,yy2 = y2;
+			}else {
+				if(xx2 < 0) xx2 = 0;
+				if(xx2 >= n) xx2 = n - 1;
+				if(yy2 < 0) yy2 = 0;
+				if(yy2 >= n) yy2 = n - 1;
+			}
+			if(!vis[xx1][yy1][xx2][yy2]) {
+				vis[xx1][yy1][xx2][yy2] = 1;
+				q.push({xx1,yy1,xx2,yy2,step+1});
+			}
+		}
+	}
+	cout << "-1\n";
 }
 int main() {
     #ifdef ASHDR

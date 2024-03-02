@@ -11,23 +11,10 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -93,8 +80,31 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+ll a[N];
+int q[N],hh = 1,tt;
 void solve() {
-    
+    int n;
+    cin >> n;
+    for(int i = 1; i <= n; i++) {
+        cin >> a[i];
+    }
+    reverse(a + 1, a + 1 + n);
+    for(int i = 1; i <= n; i++) {
+        a[i] += a[i - 1];
+    }
+    q[++tt] = 0;
+    vector<double> ans; 
+    for(int i = 1; i <= n; i++) {
+        while(hh < tt && (a[i] - a[q[tt]]) * (q[tt] - q[tt - 1]) < (a[q[tt]] - a[q[tt - 1]]) * (i - q[tt])) {
+            --tt;
+        }
+        ans.push_back(1.0*(a[i] - a[q[tt]])/(i - q[tt]));
+        q[++tt] = i;
+    }
+    for(auto x: ans | std::views::reverse) cout << x << " ";
+    cout << "\n";
+    //s_i-s_j/i-j
+
 }
 int main() {
     #ifdef ASHDR

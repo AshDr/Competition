@@ -11,23 +11,10 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -93,8 +80,28 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+const int dx[] = {-1, 0, 1, 0};
+const int dy[] = {0,1,0, -1};
 void solve() {
-    
+	int h, w, n;
+	cin >> h >> w >> n;
+	vector<vector<int>> grid(h, vector<int>(w));
+	int x = 0, y = 0;
+    int t = 0;
+    for(int i = 0; i < n; i++) {
+    	int f = grid[x][y];
+    	grid[x][y] = (1 ^ grid[x][y]);
+    	if(f == 0) t = (t + 1) %4;
+    	else t = (t - 1 + 4) % 4;
+    	x = (x + dx[t] + h) % h;y = (y + dy[t] + w) % w;
+    }
+    for(int i = 0; i < h; i++) {
+    	for(int j = 0; j < w; j++) {
+    		if(grid[i][j] == 0) cout << '.';
+    		else cout << '#';
+    	}
+    	cout << "\n";
+    }
 }
 int main() {
     #ifdef ASHDR

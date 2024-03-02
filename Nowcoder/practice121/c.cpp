@@ -11,23 +11,10 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -93,8 +80,65 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+int a[N],l[N],r[N];
 void solve() {
-    
+    int n, p;
+    cin >> n >> p;
+    for(int i = 1; i <= n; i++) {
+    	cin >> a[i];
+    	l[i] = i - 1;
+    	r[i] = i + 1;
+    }
+    a[p]++;
+    int gol = 0, gor = 0;
+    int l,r;
+	for(l = p - 1,r = p; l >= 1 && r <= n; ++r) {
+		int val = min(10 - a[r], gor); 
+		a[r] += val;
+		gor -= val;
+		if(a[r] == 10) {
+			++gor;
+			++gol;
+		}
+		while(l >= 1) {
+			int vv = min(10 - a[l], gol);
+			a[l] += vv;
+			gol -= vv;
+			if(a[l] == 10) {
+				++gol,++gor;
+				--l;
+			}else {
+				break;
+			}
+		}
+		if(a[r] < 10) {
+			if(a[r] + gor < 10) break;
+			else {
+				int vv = min(10 - a[r], gor);
+				a[r] += vv;
+				gor -= vv;
+				++gor;
+				++gol;
+			}
+		}
+	}    
+	// cout << gol << " " << gor << "!\n";
+	// cout << l <<" " << r << "?\n";
+	while(l >= 1 && a[l] + gol >= 10) {
+		gol -= 10 - a[l];
+		++gor;
+		++gol;
+		a[l] = 10;
+		--l;
+	}
+	while(r <= n && a[r] + gor >= 10) {
+		gor -= 10 - a[r];
+		++gol;
+		++gor;
+		a[r] = 10;
+		++r;
+	}
+	cout << (l == 0 ? gol : 0) <<" " << (r == n + 1 ? gor : 0) << "\n";
 }
 int main() {
     #ifdef ASHDR
@@ -105,7 +149,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

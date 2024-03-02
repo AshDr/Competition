@@ -11,23 +11,10 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -94,7 +81,30 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 void solve() {
-    
+	int n, m;
+	cin >> n >> m;
+	vector<vector<pair<int,ll>>> G(n + 1);
+    ll sum = 0;
+    for(int i = 1; i <= m; i++) {
+    	int x, y, w;
+    	cin >> x >> y >> w;
+    	if(x > y) swap(x, y);
+    	G[x].emplace_back(y, w);
+    	sum += w;
+    }
+    vector<vector<ll>> dp(n + 1, vector<ll>(n + 1));
+    for(int len = 1; len <= n; len++) {
+    	for(int l = 1; l <= n - len + 1; l++) {
+    		int r = l + len - 1;
+    		if(l < n) dp[l][r] = dp[l + 1][r]; //不取从l开始的线段
+    		for(auto [y, w]: G[l]) {
+    			if(y <= l || y > r) continue;
+    			dp[l][r] = max(dp[l][r], dp[l + 1][y - 1] + (y + 1 <= n ? dp[y + 1][r]: 0) + w);
+    		}
+    	}
+    }
+    cout << sum - dp[1][n] << "\n";
+
 }
 int main() {
     #ifdef ASHDR

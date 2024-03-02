@@ -101,6 +101,20 @@ int LCA(int x, int y) {
     return par[x][0];
 }
 int stk[N],top;
+//两次排序的做法，更简单
+auto build = [&](vector<int> tmp) {
+    int len = sz(tmp);
+    sort(all(tmp), [&](int x, int y) {return tree.in[x] < tree.in[y];});
+    for(int i = 0; i < len - 1; i++) {//这里注意是n-1
+        tmp.push_back(tree.lca(tmp[i], tmp[i+1]));
+    }
+    tmp.push_back(0);//这样每次就从0开始dfd即可
+    sort(all(tmp), [&](int x, int y) {return tree.in[x] < tree.in[y];});
+    tmp.erase(unique(all(tmp)), tmp.end());
+    for(int i = 0; i < sz(tmp) - 1; i++) G[tree.lca(tmp[i], tmp[i + 1])].push_back(tmp[i+1]);
+};
+    
+//单调栈建法
 void build(vector<int>& node) {
     top = 0;
     stk[++top] = 1;

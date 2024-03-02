@@ -11,23 +11,12 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <random>
+#include <stdint.h>
+#include <stdlib.h>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -88,13 +77,93 @@ ll floor(ll x, ll m) {
     ll r = (x % m + m) % m;
     return (x - r) / m;
 }// neg floor (-1, 3) = -1
-const int N = 2e5 + 10;
+const int N = 20 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+struct DSU {
+    std::vector<int> f, siz;
+    DSU(int n) : f(n), siz(n, 1) { std::iota(f.begin(), f.end(), 0); }
+    int leader(int x) {
+        while (x != f[x]) x = f[x] = f[f[x]];
+        return x;
+    }
+    bool same(int x, int y) { return leader(x) == leader(y); }
+    bool merge(int x, int y) {
+        x = leader(x);
+        y = leader(y);
+        if (x == y) return false;
+        siz[x] += siz[y];
+        f[y] = x;
+        return true;
+    }
+    int size(int x) { return siz[leader(x)]; }
+};
 void solve() {
-    
+    int n, m;
+    cin >> n >> m;
+    vector<int> indeg(n);
+    vector<vector<ll>> dis(n, vector<ll>(n, 1e18));
+    DSU dsu(n);
+    for(int i = 0; i < m; i++) {
+        int u, v, w;
+        cin >> u >> v >> w;
+        --u;--v;
+        dis[u][v] = w;
+        indeg[v]++;
+        dsu.merge(u, v);
+    }
+    int C_cnt = 0, tcnt = 0;
+    for(int i = 0; i < n; i++) {
+        if(dsu.leader(i) == i) ++C_cnt;
+        if(indeg[i] == 0) ++tcnt;
+    }
+    if(C_cnt > 1 || tcnt > 1) {
+        cout << "No\n";
+        return ;
+    }
+    for(int i = 0; i < n; i++) {
+        dis[i][i] = 0;
+    }
+    for(int k = 0; k < n; k++) {
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < n; j++) {
+                if(i != j) {
+                    if(dis[i][j] > dis[i][k] + dis[k][j]) dis[i][j] = dis[i][k] + dis[k][j];
+                }
+            }
+        }
+    }
+    const ll LMAX = 1e18;
+    vector<vector<ll>> dp(1 << n, vector<ll>(n, LMAX));
+
+    for(int i = 0; i < n; i++) dp[1 << i][i] = 0;
+
+    for(int mask = 1; mask < (1 << n); mask++) {
+        for(int i = 0; i < n; i++) {
+            if((mask >> i & 1) && dp[mask][i] != LMAX) {
+                for(int j = 0; j < n; j++) {
+                    if(!(mask >> j & 1)) {
+                        int nwmask = mask | (1 << j); 
+                        if(dis[i][j] != LMAX){
+                            dp[nwmask][j] = min(dp[nwmask][j], dp[mask][i] + dis[i][j]);  
+                            // for(int k = 0; k < n; k++) {
+                            //     if(nwmask >> k & 1) {
+                            //         dp[nwmask][k] = min(dp[nwmask][k], dp[nwmask][j] + dis[j][k]);
+                            //     }
+                            // }
+                        } 
+                    }
+                }
+            }
+        }
+    }
+    ll ans = LMAX;
+    for(int i = 0; i < n; i++) {
+        ans = min(ans, dp[(1 << n) - 1][i]);
+    }
+    cout << ans << "\n";
 }
 int main() {
     #ifdef ASHDR
@@ -113,3 +182,6 @@ int main() {
     #endif
     return 0;
 }
+
+
+

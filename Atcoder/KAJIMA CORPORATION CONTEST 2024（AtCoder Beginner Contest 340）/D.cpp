@@ -11,23 +11,12 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <functional>
+#include <queue>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -93,8 +82,32 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+int a[N],b[N],c[N];
+ll dis[N];
 void solve() {
-    
+    int n;
+    cin >> n;
+    vector<vector<pii>> G(n+1);
+    for(int i = 1; i < n; i++) {
+    	cin >> a[i] >> b[i] >> c[i];
+    	G[i].push_back({i+1,a[i]});
+    	G[i].push_back({c[i], b[i]});
+    }
+    fill(dis + 1, dis + 1 + n, 1e18);
+    priority_queue<pll,vector<pll>,greater<pll>> heap; 
+    dis[1] = 0;
+    heap.push({0, 1});
+    vector<int> vis(n+1);vis[1] = 1;
+    while(!heap.empty()) {
+    	int u = heap.top().second;heap.pop();
+    	for(auto [v, w]: G[u]) {
+    		if(dis[v] > dis[u] + w) {
+    			dis[v] = dis[u] + w;
+    			heap.push({dis[v], v});
+    		}
+    	}
+    }
+    cout << dis[n] << "\n";
 }
 int main() {
     #ifdef ASHDR

@@ -11,23 +11,10 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -91,10 +78,38 @@ ll floor(ll x, ll m) {
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
-const ll MOD = 1e9 + 7;
+
 int TT = 1;
 void solve() {
-    
+    int n;
+    cin >> n;
+    map<pll, ll> mp;
+    vector<pll> a(n);
+    ll MOD1 = rng() % 1000000000LL, MOD2 = rng() % 1000000000LL;
+    for(int i = 0; i < n; i++) {
+    	string s;
+    	cin >> s;
+    	ll val1 = 0, val2 = 0;
+    	for(auto ch: s) {
+    		val1 = val1 * 10 + (ch - '0');
+    		val1 %= MOD1;
+    		val2 = val2 * 10 + (ch - '0');
+    		val2 %= MOD2;
+    	}
+    	// cout << val1 << " " << val2 << "\n";
+    	a[i] = {val1, val2};
+    }
+    ll ans = 0;
+    for(int i = 0; i < n; i++) {
+    	for(int j = 0; j < n; j++) {
+    		ll val1 = a[i].first * a[j].first % MOD1;
+    		ll val2 = a[i].second * a[j].second % MOD2;
+    		// ans += mp[{val1, val2}]; 
+    		++mp[{val1, val2}];
+    	}
+    }
+    for(int i = 0; i < n; i++) ans += mp[{a[i].first, a[i].second}];
+    cout << ans << "\n";
 }
 int main() {
     #ifdef ASHDR

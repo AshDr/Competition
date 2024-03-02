@@ -11,23 +11,10 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -94,7 +81,27 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 void solve() {
-    
+    int n, m, p;
+    cin >> n >> m >> p;
+    auto print0 = [] {
+    	cout << "XiaoNian\n";
+    };
+    auto print1 = [] {
+    	cout << "YangQiShaoNian\n";
+    };
+    if(n == 1) {
+    	print1();
+    	return ;
+    }
+    if(n <= m + 1) {
+    	print0();
+    	return ;
+    }
+    if(p == 0) {
+    	print0();
+    }else {
+    	print1();
+    }
 }
 int main() {
     #ifdef ASHDR
@@ -105,7 +112,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

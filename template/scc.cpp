@@ -7,10 +7,10 @@ struct SCC{
 
     SCC(const vector<vector<int> > &g) : g(g){
         n = (int)g.size();
-        dfn.assign(n, 0);
-        low.assign(n, 0);
-        id.assign(n, -1);
-        ins.assign(n, false);
+        dfn.assign(n + 1, 0);
+        low.assign(n + 1, 0);
+        id.assign(n + 1, -1);
+        ins.assign(n + 1, false);
         stk.reserve(n);
         ts = 0;
         build();
@@ -42,7 +42,7 @@ struct SCC{
     }
 
     void build(){
-        for(int i = 0; i < n; i++){
+        for(int i = 1; i <= n; i++){
             if (!dfn[i]){
                 tarjan(i);
             }

@@ -11,23 +11,10 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -94,7 +81,40 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 void solve() {
-    
+    int h, w, n;
+    cin >> h >> w >> n;
+    string t;
+    cin >> t;
+    vector<string> s(h);
+    cin >> s;
+    int ans = 0;
+    auto check1 = [&](int x, int y) {
+    	if(x < 0 || x >= h || y < 0 || y >= w) return false;
+    	return true;
+    };
+    auto check = [&](int x, int y) {
+    	int curx = x, cury = y;
+    	if(s[curx][cury] == '#') return false;
+    	for(auto ch: t) {
+    		if(ch == 'L') {
+    			cury -= 1;
+    		}else if(ch == 'R') {
+    			cury += 1;
+    		}else if(ch == 'U') {
+    			curx -= 1;
+    		}else {
+    			curx += 1;
+    		}
+	    	if(s[curx][cury] == '#') return false;
+    	}
+    	return true;
+    };
+    for(int i = 0; i < h; i++) {
+    	for(int j = 0; j < w; j++) {
+    		if(check(i, j)) ++ans;
+    	}
+    }
+    cout << ans << "\n";
 }
 int main() {
     #ifdef ASHDR

@@ -11,23 +11,11 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <queue>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -94,7 +82,40 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 void solve() {
-    
+    int n, m;
+    cin >> n >> m;
+    priority_queue<int> heap;
+    auto func = [&](string s) {
+    	int cnt = 0;
+    	for(int i = sz(s) - 1; i >= 0; i--) {
+    		if(s[i] == '0') ++cnt;
+    		else break;    	
+    	}
+    	return cnt;
+    };
+    ll sum = 0;
+    vector<int> b;
+    for(int i = 0; i < n; i++) {
+    	string s;
+    	cin >> s;
+    	sum += sz(s);
+    	int val = func(s);
+    	b.push_back(val);
+    	heap.push(val);
+    }	
+	int round = 0;
+	while(!heap.empty()) {
+		if(round % 2 == 0) {
+			sum -= heap.top();
+			heap.pop();
+			if(heap.empty()) break;
+			heap.push(0);
+		}else {
+			heap.pop();
+		}
+    	++round;
+	}
+    cout << (sum >= m + 1? "Sasha\n":"Anna\n");
 }
 int main() {
     #ifdef ASHDR
@@ -105,7 +126,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

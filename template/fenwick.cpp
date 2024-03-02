@@ -1,36 +1,67 @@
-template <typename T>
-struct Fenwick {
-    const int n;
-    std::vector<T> a;
-    Fenwick(int n) : n(n), a(n) {}
-    void add(int x, T v) {
-        for (int i = x; i < n; i += i & -i) {
-            a[i] += v;
-        }
+template<typename T>
+struct Fenwick{
+    int n;
+    std::vector<T> tr;
+
+    Fenwick(int n) : n(n), tr(n + 1, 0){}
+
+    int lowbit(int x){
+        return x & -x;
     }
-    T sum(int x) {
-        T ans = 0;
-        if(x <= 0) return ans;
-        for (int i = x; i > 0; i -= i & -i) {
-            ans += a[i];
+
+    void modify(int x, T c){
+        for(int i = x; i <= n; i += lowbit(i)) tr[i] += c;
+    }
+
+    void modify(int l, int r, T c){
+        modify(l, c);
+        if (r + 1 <= n) modify(r + 1, -c);
+    }
+
+    T query(int x){
+        T res = T();
+        for(int i = x; i; i -= lowbit(i)) res += tr[i];
+        return res;
+    }
+
+    T query(int l, int r) {
+        return query(r) - query(l - 1);
+    }
+
+    int find_first(T sum){
+        int ans = 0; T val = 0;
+        for(int i = __lg(n); i >= 0; i--){
+            if ((ans | (1 << i)) <= n && val + tr[ans | (1 << i)] < sum){
+                ans |= 1 << i;
+                val += tr[ans];
+            }
+        }
+        return ans + 1;
+    }
+
+    int find_last(T sum){
+        int ans = 0; T val = 0;
+        for(int i = __lg(n); i >= 0; i--){
+            if ((ans | (1 << i)) <= n && val + tr[ans | (1 << i)] <= sum){
+                ans |= 1 << i;
+                val += tr[ans];
+            }
         }
         return ans;
-    }
-    T rangeSum(int l, int r) {
-        return sum(r) - sum(l - 1);
     }
     int find_kth(int k) {
         int ans = 0,cnt = 0;
         for (int i = 1 << __lg(n);i >= 0;i--)  //这里的20适当的取值，与MAX_VAL有关，一般取lg(MAX_VAL)
         {
             ans += (1 << i);
-            if (ans >= n || cnt + a[ans] >= k)
+            if (ans >= n || cnt + tr[ans] >= k)
                 ans -= (1 << i);
             else
-                cnt += a[ans];
+                cnt += tr[ans];
         }
         return ans + 1;
     }//注意k不能太大
+
 };
 /*
 开区间版 fw.sum(r) 表示 [0~r)

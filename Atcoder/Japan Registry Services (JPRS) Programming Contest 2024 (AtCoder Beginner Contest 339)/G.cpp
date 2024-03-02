@@ -11,23 +11,11 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
 #include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -93,8 +81,58 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+int n, m;
+ll a[N],b[N];
+struct node {
+	int ls, rs;
+	ll sum;
+}tr[N * 20];
+int root[N], cnt;
+void modify(int pre, int &cur, int L, int R, int pos) {
+	cur = ++cnt;
+	tr[cur] = tr[pre];tr[cur].sum += b[pos];
+	if(L == R) return ;
+	int mid = (L + R) >> 1;
+	if(pos <= mid) modify(tr[pre].ls, tr[cur].ls, L, mid, pos);
+	else modify(tr[pre].rs, tr[cur].rs, mid + 1, R, pos);
+}
+ll query(int pre, int cur, int L, int R, int val) {
+	if(b[R] <= val) {
+		return tr[cur].sum - tr[pre].sum;
+	}
+	if(L == R) {
+		return b[R] <= val ? tr[cur].sum - tr[pre].sum : 0;
+	}
+	int mid = (L + R) >> 1;
+	if(b[mid] >= val) return query(tr[pre].ls, tr[cur].ls, L, mid, val);
+	else {
+		return (tr[tr[cur].ls].sum - tr[tr[pre].ls].sum) + query(tr[pre].rs, tr[cur].rs, mid + 1, R, val);
+	}
+
+}
 void solve() {
-    
+    cin >> n;
+    for(int i = 1; i <= n; i++) {
+    	cin >> a[i];
+    	b[i] = a[i];
+    }
+    sort(b + 1, b + 1 + n);
+    int tot = unique(b + 1, b + 1 + n) - b - 1;
+    for(int i = 1; i <= n; i++) {
+    	a[i] = lower_bound(b + 1, b + 1 + tot, a[i]) - b;
+    	modify(root[i - 1], root[i], 1, tot, a[i]);
+    }
+    ll lst = 0;
+    cin >> m;
+    for(int i = 1; i <= m; i++) {
+    	ll l, r, w;
+    	cin >> l >> r >> w;
+    	l ^= lst;r ^= lst;w ^= lst;
+    	ll ans = query(root[l - 1], root[r], 1, tot, w);
+    	cout << ans << "\n";
+    	lst = ans;
+    }
+
 }
 int main() {
     #ifdef ASHDR

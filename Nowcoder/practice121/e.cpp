@@ -11,23 +11,11 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
 #include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <random>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -88,13 +76,49 @@ ll floor(ll x, ll m) {
     ll r = (x % m + m) % m;
     return (x - r) / m;
 }// neg floor (-1, 3) = -1
-const int N = 2e5 + 10;
+const int N = 5e3 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+int n;
+ll p[N],x[N],y[N];
+ll dp[N][N];
 void solve() {
-    
+	cin >> n;
+	for(int i = 1; i <= n; i++) cin >> p[i];
+	int a, b;
+	cin >> a;
+	for(int i = 1; i <= a; i++) cin >> x[i];
+	cin >> b;
+	for(int i = 1; i <= b; i++) cin >> y[i];
+	sort(p + 1, p + 1 + n);reverse(p + 1, p + 1 + n);
+	sort(x + 1, x + 1 + a);
+	sort(y + 1, y + 1 + b);reverse(y + 1, y + 1 + b);
+	ll sum = 0;
+	for(int i = 0; i <= n; i++) {
+		fill(dp[i], dp[i] + 1 + n, 1e18);
+	}
+	dp[0][0] = 0;
+	for(int i = 1; i <= n; i++) {
+		if(i <= a + b) {
+			for(int j = 0; j <= min(a, i); j++) {
+				int k = i - j;
+				if(j > 0) dp[i][j] = min(dp[i][j], dp[i - 1][j - 1] + p[i] * x[j]);
+				if(k > 0 && k <= b) {
+					dp[i][j] = min(dp[i][j], dp[i - 1][j] + max(0ll, p[i] - y[k]) * 100);
+				}
+			}
+		}else {
+			sum += p[i] * 100;
+		}
+	}
+	ll ans = 1e18;
+	int t = min(n, a + b);
+	for(int i = 0; i <= t; i++) {
+		ans = min(ans, dp[t][i]);
+	}
+	cout << 0.01 * (ans + sum) << "\n";
 }
 int main() {
     #ifdef ASHDR
@@ -105,7 +129,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

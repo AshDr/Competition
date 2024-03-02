@@ -11,23 +11,11 @@
 　　　▀██▅▇▀▎▇
 
 */
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
-#include <functional>
-#include <bitset>
-#include <chrono>
-#include <random>
-#include <iomanip>
-#include <random>
+#include <bits/stdc++.h>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
+#include <random>
+#include <set>
 #define LOG(FMT...) fprintf(stderr, FMT)
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(),(x).end()
@@ -93,7 +81,36 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+ll d0[N],d1[N];
 void solve() {
+    int n, m;
+    cin >> n >> m;
+    vector<int> X(m);
+    cin >> X;
+    ll sum = 0,ans = 1e18;
+    for(int i = 1; i < m; i++) {
+    	int l = min(X[i], X[i - 1]),r = max(X[i], X[i - 1]);
+    	sum += min(r - l, n - (r - l));
+    	if(r - l <= n / 2) {
+    		d0[l] += r - l;d0[r] -= r - l;
+    		d1[l] += n - (r - l);d1[r] -= n - (r - l);
+    	}else {
+    		d0[1] += n - (r - l);d0[l] -= n - (r - l);
+    		d1[1] += r - l;d1[l] -= r - l;
+
+    		d0[r] += n - (r - l);d0[n + 1] -= n - (r - l);
+    		d1[r] += r - l; d1[n + 1] -= r - l;
+    	}
+    }
+    //t -> n - t  delta = n - 2 * t
+    //n - t -> t  delta = 2 * t - n
+
+    ll pre0 = 0, pre1 = 0;
+    for(int i = 1; i <= n; i++) {
+    	pre0 += d0[i];pre1 += d1[i];
+    	ans = min(ans, sum - pre0 + pre1);
+    }
+    cout << ans << "\n";
     
 }
 int main() {
