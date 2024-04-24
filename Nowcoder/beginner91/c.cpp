@@ -26,6 +26,7 @@
 #include <random>
 #include <iomanip>
 #include <random>
+#include <set>
 #include <cassert>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
@@ -94,8 +95,19 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+const int dx[] = {-1, 1, 0, 0};
+const int dy[] = {0, 0, -1, 1};
 void solve() {
-    
+    int n, m, k;
+    cin >> n >> m >> k;
+    int ex = n / 2 + 1, ey = m / 2 + 1;
+    int ans = 0;
+    for(int i = 1; i <= k; i++) {
+    	int x, y;
+    	cin >> x >> y;
+    	if(abs(x - ex) + abs(y - ey) <= max(n, m) / 2) ++ans;
+    }
+    cout << ans << "\n";
 }
 int main() {
     #ifdef ASHDR

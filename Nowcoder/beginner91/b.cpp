@@ -26,6 +26,7 @@
 #include <random>
 #include <iomanip>
 #include <random>
+#include <set>
 #include <cassert>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
@@ -94,8 +95,23 @@ const int M = 1e5 + 10;
 const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
+
 void solve() {
-    
+
+    int n;
+    cin >> n;
+    if(n <= 2) {
+    	cout << "Bing\n";
+    	return ;
+    }
+    if(n & 1) {
+    	cout << "Bing\n";
+    }else {
+    	int t = n / 2;
+    	if(t & 1) cout << "Bing\n";
+    	else cout << "Bong\n";
+    }
+    // 1 2 3 4 5
 }
 int main() {
     #ifdef ASHDR
@@ -106,7 +122,7 @@ int main() {
     ios::sync_with_stdio(0);
     cin.tie(nullptr);
     cout<<fixed<<setprecision(8);
-    //cin>>TT;
+    cin>>TT;
     while(TT--) solve();
     #ifdef ASHDR
     LOG("Time: %dms\n", int ((clock()

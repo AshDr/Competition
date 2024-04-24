@@ -26,6 +26,7 @@
 #include <random>
 #include <iomanip>
 #include <random>
+#include <set>
 #include <cassert>
 //#include <ext/pb_ds/assoc_container.hpp>
 //#include <ext/pb_ds/tree_policy.hpp>
@@ -95,7 +96,26 @@ const int INF = 2147483647;
 const ll MOD = 1e9 + 7;
 int TT = 1;
 void solve() {
-    
+	int f1 = 0, f2 = 0;
+	for(int i = 0; i < 6; i++) {
+		string s;
+		cin >> s;
+		if(i == 0) {
+			if(s[3] == '|') f1 = 1;
+		}
+		if(i == 5) {
+			if(s[3] == '|') {
+				f2 = 1;
+			}
+		}
+	}    
+	if(f1 && f2) {
+		cout << "p\n";
+	}else if(f1 && !f2) {
+		cout << "m\n";
+	}else {
+		cout << "o\n";
+	}
 }
 int main() {
     #ifdef ASHDR

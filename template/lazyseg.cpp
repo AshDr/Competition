@@ -1,3 +1,4 @@
+//[1, n]
 int lg(int x) {
     return static_cast<int>(std::log2(x));
 }
