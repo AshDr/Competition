@@ -1,4 +1,5 @@
-//[1, n]
+// [1, n]
+// init处易错
 int lg(int x) {
     return static_cast<int>(std::log2(x));
 }
@@ -39,13 +40,16 @@ struct LazySegmentTree{
         info[p] = info[2 * p] + info[2 * p + 1];
     }
     
-    void apply(int p, const Tag &v){
-        ::apply(info[p], tag[p], v);
+    void apply(int l, int r, int p, const Tag &v){
+        info[p].apply(v); //may be need l and r for length
+        tag[p].apply(v);
+        // ::apply(info[p], tag[p], v);
     }
     
-    void push(int p){
-        apply(2 * p, tag[p]);
-        apply(2 * p + 1, tag[p]);
+    void push(int l, int r, int p){
+        int mid = (l + r) >> 1;
+        apply(l, mid, 2 * p, tag[p]);
+        apply(mid + 1, r, 2 * p + 1, tag[p]);
         tag[p] = Tag();
     }
     
@@ -55,7 +59,7 @@ struct LazySegmentTree{
             return;
         }
         int m = (l + r) / 2;
-        push(p);
+        push(l, r, p);
         if (x <= m){
             modify(2 * p, l, m, x, v);
         } 
@@ -77,7 +81,7 @@ struct LazySegmentTree{
             return info[p];
         }
         int m = (l + r) / 2;
-        push(p);
+        push(l, r, p);
         return query(2 * p, l, m, x, y) + query(2 * p + 1, m + 1, r, x, y);
     }
     
@@ -90,11 +94,11 @@ struct LazySegmentTree{
             return;
         }
         if (l >= x && r <= y){
-            apply(p, v);
+            apply(l, r, p, v);
             return;
         }
         int m = (l + r) / 2;
-        push(p);
+        push(l, r, p);
         modify(2 * p, l, m, x, y, v);
         modify(2 * p + 1, m + 1, r, x, y, v);
         pull(p);
@@ -112,7 +116,7 @@ struct LazySegmentTree{
             return l;
         }
         int m = (l + r) / 2;
-        push(p);
+        push(l ,r, p);
         int res = findFirst(2 * p, l, m, x, y, pred);
         if (res == -1) {
             res = findFirst(2 * p + 1, m + 1, r, x, y, pred);
@@ -132,7 +136,7 @@ struct LazySegmentTree{
             return l;
         }
         int m = (l + r) / 2;
-        push(p);
+        push(l ,r, p);
         int res = findLast(2 * p + 1, m + 1, r, x, y, pred);
         if (res == -1) {
             res = findLast(2 * p, l, m, x, y, pred);

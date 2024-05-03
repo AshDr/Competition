@@ -205,22 +205,7 @@ struct Poly : public std::vector<MInt<P>> {
     
     template<class InputIt, class = std::_RequireInputIter<InputIt>>
     explicit constexpr Poly(InputIt first, InputIt last) : std::vector<Value>(first, last) {}
-    // constexpr int size() const {
-    //     return (*this).size();
-    // }
-    // explicit constexpr operator std::vector<Value>() const {
-    //     return (*this);
-    // }
-    // constexpr Value operator[](int idx) const {
-    //     if (idx < size()) {
-    //         return (*this)[idx];
-    //     } else {
-    //         return 0;
-    //     }
-    // }
-    // constexpr Value &operator[](int idx) {
-    //     return (*this)[idx];
-    // }
+    
     template<class F>
     explicit constexpr Poly(int n, F f) : std::vector<Value>(n) {
         for (int i = 0; i < n; i++) {
@@ -479,8 +464,10 @@ Poly<P> berlekampMassey(const Poly<P> &s) {
     c.insert(c.begin(), 1);
     return c;
 }
+
+
 template<int P = 998244353>
-MInt<P> linearRecurrence(Poly<P> p, Poly<P> q, ll n) {
+MInt<P> linearRecurrence(Poly<P> p, Poly<P> q, i64 n) {
     int m = q.size() - 1;
     while (n > 0) {
         auto newq = q;

@@ -1,5 +1,5 @@
 template<class T>
-struct disc{
+struct Disc{
     vector<T>d;
     inline void insert(T k){d.push_back(k);}
     inline void init(){

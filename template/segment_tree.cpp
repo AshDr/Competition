@@ -1,4 +1,3 @@
-
 //one base, [l, r]
 template<class Info>
 struct SegmentTree{
