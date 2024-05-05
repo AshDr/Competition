@@ -370,6 +370,26 @@ struct Poly : public std::vector<MInt<P>> {
         auto f = shift(-i) * v.inv();
         return (f.log(m - i * k) * k).exp(m - i * k).shift(i * k) * power(v, k);
     }
+    constexpr Poly pow(string s, int m) const {
+        int i = 0;
+        ll k1 = 0, k2 = 0;
+        bool flag = false;
+        for(int i = 0; i < sz(s); i++) {
+            k1 = k1 * 10 + (s[i] - '0');
+            if(k1 >= P) k1 %= P,flag = true;
+            k2 = k2 * 10 + (s[i] - '0');
+            k2 %= (P - 1); // be careful
+        }
+        while (i < this->size() && (*this)[i] == 0) {
+            i++;
+        }
+        if (i == this->size() || (i && (s.size() > 8 || i * stoll(s) >= m))) {
+            return Poly(m);
+        }
+        Value v = (*this)[i];
+        auto f = shift(-i) * v.inv();
+        return (f.log(m - i * k1) * k1).exp(m - i * k1).shift(i * k1) * power(v, k2);
+    }
     constexpr Poly sqrt(int m) const {
         Poly x{1};
         int k = 1;
@@ -467,7 +487,7 @@ Poly<P> berlekampMassey(const Poly<P> &s) {
 
 
 template<int P = 998244353>
-MInt<P> linearRecurrence(Poly<P> p, Poly<P> q, i64 n) {
+MInt<P> linearRecurrence(Poly<P> p, Poly<P> q, ll n) {
     int m = q.size() - 1;
     while (n > 0) {
         auto newq = q;
