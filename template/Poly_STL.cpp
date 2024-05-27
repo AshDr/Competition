@@ -359,6 +359,11 @@ struct Poly : public std::vector<MInt<P>> {
         return x.trunc(m);
     }
     constexpr Poly pow(int k, int m) const {
+        if(k == 0) {
+            Poly res(m);
+            res[0] = 1;
+            return res;
+        }
         int i = 0;
         while (i < this->size() && (*this)[i] == 0) {
             i++;
@@ -371,20 +376,24 @@ struct Poly : public std::vector<MInt<P>> {
         return (f.log(m - i * k) * k).exp(m - i * k).shift(i * k) * power(v, k);
     }
     constexpr Poly pow(string s, int m) const {
-        int i = 0;
-        ll k1 = 0, k2 = 0;
-        bool flag = false;
-        for(int i = 0; i < sz(s); i++) {
-            k1 = k1 * 10 + (s[i] - '0');
-            if(k1 >= P) k1 %= P,flag = true;
-            k2 = k2 * 10 + (s[i] - '0');
-            k2 %= (P - 1); // be careful
+        if(s == "0") {
+            Poly res(m);
+            res[0] = 1;
+            return res;
         }
+        int i = 0;
         while (i < this->size() && (*this)[i] == 0) {
             i++;
         }
         if (i == this->size() || (i && (s.size() > 8 || i * stoll(s) >= m))) {
             return Poly(m);
+        }
+        ll k1 = 0, k2 = 0;
+        for(int i = 0; i < sz(s); i++) {
+            k1 = k1 * 10 + (s[i] - '0');
+            k2 = k2 * 10 + (s[i] - '0');
+            k2 %= (P - 1); // be careful
+            k1 %= P;
         }
         Value v = (*this)[i];
         auto f = shift(-i) * v.inv();
@@ -484,8 +493,6 @@ Poly<P> berlekampMassey(const Poly<P> &s) {
     c.insert(c.begin(), 1);
     return c;
 }
-
-
 template<int P = 998244353>
 MInt<P> linearRecurrence(Poly<P> p, Poly<P> q, ll n) {
     int m = q.size() - 1;

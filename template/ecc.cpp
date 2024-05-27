@@ -5,7 +5,7 @@ struct ECC {
     vector<int> dfn, low, stk, belong;
     int ts, cnt;
     ECC(const vector<vector<int>>& G): n(int(G.size())),g(G) {
-        cout << n << "!\n";
+        // cout << n << "!\n";
         dfn.assign(n, 0);
         low.assign(n, 0);
         belong.assign(n, -1);
