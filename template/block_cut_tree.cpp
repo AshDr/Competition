@@ -14,15 +14,15 @@ struct BlockCutTree{ //只适用于连通无向简单图
     int root, ts, cnt;
     int conn; //子图个数
 
-    BlockCutTree(const vector<vector<T> > &g) : n(int(g.size())), g(g) {
-        cut.assign(n, false);
-        dfn.assign(n, 0);
-        low.assign(n, 0);
-        ng.assign(n, {});
-        ts = 0; cnt = n; //0~n-1 n~...
+    BlockCutTree(const vector<vector<T> > &g) : n(int(g.size()) - 1), g(g) {
+        cut.assign(n + 1, false);
+        dfn.assign(n + 1, 0);
+        low.assign(n + 1, 0);
+        ng.assign(n + 1, {});
+        ts = 0; cnt = n + 1; //1~n(round) n+1~...(square)
         conn = 0;
         // 不用特判根是不是割点
-        for(root = 0; root < n; root++){
+        for(root = 1; root <= n; root++){
             if (dfn[root] == 0){
                 conn += 1;
                 stk.clear(); //注意清空 每次对于一个子图 栈里会剩一个点
