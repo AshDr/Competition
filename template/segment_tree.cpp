@@ -20,7 +20,7 @@ struct SegmentTree{
         info.assign((n << 2) + 1, Info());
         function<void(int, int, int)> build = [&](int p, int l, int r){
             if (l == r){
-                info[p] = _init[l - 1];
+                info[p] = _init[l]; // init 1~n  use l-1 for 0~n
                 return;
             }
             int m = (l + r) / 2;
