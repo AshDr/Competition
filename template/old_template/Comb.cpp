@@ -214,4 +214,6 @@ struct Comb {
       return 0;
     return fac(n) * invfac(m) * invfac(n - m);
   }
+  mint C(int n, int m) { return binom(n, m); }
+  mint A(int n, int m) { return fac(n) * invfac(n - m); }
 } comb;
