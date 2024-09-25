@@ -4,6 +4,9 @@
 度数为1的圆点都对应唯一一个方点
 每条边对应唯一一个方点
 圆方树是无根树
+注意对于割边是会建立一个方点，因此所有的点双不一定都是环。(即圆-圆的情况不会出现)
+对于找环的需求，需要在tarjan的时候特殊处理，这样对于1-2这样2个点的情况就不会产生点双
+
 */
 template<class T>
 struct BlockCutTree{ //只适用于连通无向简单图
@@ -19,7 +22,7 @@ struct BlockCutTree{ //只适用于连通无向简单图
         dfn.assign(n + 1, 0);
         low.assign(n + 1, 0);
         ng.assign(n + 1, {});
-        ts = 0; cnt = n + 1; //1~n(round) n+1~...(square)
+        ts = 0; cnt = n; //1~n(round) n+1~...(square)
         conn = 0;
         // 不用特判根是不是割点
         for(root = 1; root <= n; root++){
@@ -39,6 +42,7 @@ struct BlockCutTree{ //只适用于连通无向简单图
                 low[u] = min(low[u], low[v]);
                 if (low[v] >= dfn[u]){
                     ng.push_back({});
+                    ++cnt;//新建方点
                     int x;
                     do{
                         x = stk.back();
@@ -48,7 +52,6 @@ struct BlockCutTree{ //只适用于连通无向简单图
                     }while(x != v); // 不弹u
                     ng[u].push_back(cnt);
                     ng[cnt].push_back(u);
-                    cnt++;//新建方点
                 }
             }
             else if(v != p){
