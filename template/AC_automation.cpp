@@ -1,5 +1,5 @@
 namespace AC_automation {
-    int trie[N][30],val[N],fail[N];
+    int trie[N][30],val[N],fail[N],tot = 0;
     void build_trie(string s) {
         int len = s.size();
         int now = 0;
@@ -12,7 +12,7 @@ namespace AC_automation {
     }
     void get_fail() {
         queue<int> q;
-        for(int i  = 0 ; i < 26; i++) if(trie[0][i]) fail[trie[0][i]] = 0,q.push(trie[0][i]);
+        for(int i = 0 ; i < 26; i++) if(trie[0][i]) fail[trie[0][i]] = 0,q.push(trie[0][i]);
         while(!q.empty()) {
             int now = q.front();q.pop();
             for(int i = 0 ; i < 26; i++) {
