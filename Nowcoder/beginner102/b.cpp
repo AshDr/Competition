@@ -16,6 +16,7 @@
 #include <cassert>
 #include <chrono>
 #include <cstdio>
+#include <cstring>
 #include <functional>
 #include <iomanip>
 #include <iostream>
@@ -89,19 +90,28 @@ ll floor(ll x, ll m) {
   ll r = (x % m + m) % m;
   return (x - r) / m;
 }  // neg floor (-1, 3) = -1
-static ull randint() { return (rng() * 1ll << 32) ^ rng(); }
-struct pair_hash {
-  template <class T1, class T2>
-  std::size_t operator()(const std::pair<T1, T2> &p) const {
-    return std::hash<T1>()(p.first) ^ std::hash<T2>()(p.second);
-  }
-};
-// gp_hash_table
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 int TT = 1;
-void solve() {}
+void solve() {
+  double x;
+  cin >> x;
+  double ans = -1;
+  double fenzi = 1.0, fenmu = x;
+  double pre = x;
+  for (int i = 1; i <= 3000; i++) {
+    fenzi = x * fenmu + fenzi;
+    double cur = fenzi / fenmu;
+    if (fabs(cur - pre) < 1e-9) {
+      ans = cur;
+      break;
+    }
+    swap(fenzi, fenmu);
+    pre = cur;
+  }
+  cout << ans << '\n';
+}
 int main() {
 #ifdef ASHDR
   freopen("data.in", "r", stdin);
@@ -110,8 +120,8 @@ int main() {
 #endif
   ios::sync_with_stdio(0);
   cin.tie(nullptr);
-  cout << fixed << setprecision(8);
-  // cin>>TT;
+  cout << fixed << setprecision(10);
+  cin >> TT;
   while (TT--) solve();
 #ifdef ASHDR
   LOG("Time: %dms\n", int((clock() - nol_cl) / (double)CLOCKS_PER_SEC * 1000));

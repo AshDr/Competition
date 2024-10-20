@@ -16,6 +16,7 @@
 #include <cassert>
 #include <chrono>
 #include <cstdio>
+#include <cstring>
 #include <functional>
 #include <iomanip>
 #include <iostream>
@@ -89,19 +90,70 @@ ll floor(ll x, ll m) {
   ll r = (x % m + m) % m;
   return (x - r) / m;
 }  // neg floor (-1, 3) = -1
-static ull randint() { return (rng() * 1ll << 32) ^ rng(); }
-struct pair_hash {
-  template <class T1, class T2>
-  std::size_t operator()(const std::pair<T1, T2> &p) const {
-    return std::hash<T1>()(p.first) ^ std::hash<T2>()(p.second);
-  }
-};
-// gp_hash_table
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 int TT = 1;
-void solve() {}
+void solve() {
+  int n;
+  cin >> n;
+  vector<int> C(n + 1);
+  vector<ll> W(n + 1);
+  for (int i = 1; i <= n; i++) {
+    cin >> C[i];
+  }
+  for (int i = 1; i <= n; i++) cin >> W[i];
+  vector<vector<int>> g(n + 1);
+  for (int i = 1; i <= n - 1; i++) {
+    int u, v;
+    cin >> u >> v;
+    g[u].push_back(v);
+    g[v].push_back(u);
+  }
+  vector<ll> dp1(n + 1), dp2(n + 1);  // 最大链 次大链 （包括u）
+  vector<ll> dp3(n + 1);
+  function<void(int, int)> dfs = [&](int u, int par) {
+    dp1[u] = dp2[u] = W[u];
+    for (auto v : g[u]) {
+      if (v == par) continue;
+      dfs(v, u);
+      ll t = dp1[v] + W[u];
+      if (t > dp1[u]) {
+        dp2[u] = dp1[u];
+        dp1[u] = t;
+      } else if (t > dp2[u]) {
+        dp2[u] = t;
+      }
+    }
+  };
+  function<void(int, int)> dfs1 = [&](int u, int par) {
+    if (u != 1) {
+      if (dp3[u] > dp1[u]) {
+        dp2[u] = dp1[u];
+        dp1[u] = dp3[u];
+      } else if (dp3[u] > dp2[u]) {
+        dp2[u] = dp3[u];
+      }
+    }
+    for (auto v : g[u]) {
+      if (v == par) continue;
+      if (dp1[u] == dp1[v] + W[u])
+        dp3[v] = dp2[u] + W[v];
+      else
+        dp3[v] = dp1[u] + W[v];
+      dfs1(v, u);
+    }
+  };
+  dfs(1, 0);
+  dfs1(1, 0);
+  vector<ll> ans(n + 1, numeric_limits<ll>::min());
+  for (int i = 1; i <= n; i++) {
+    ans[C[i]] = max(ans[C[i]], dp1[i] + dp2[i] - W[i]);
+  }
+  for (int i = 1; i <= n; i++) {
+    cout << (ans[i] == numeric_limits<ll>::min() ? -1 : ans[i]) << " \n"[i == n];
+  }
+}
 int main() {
 #ifdef ASHDR
   freopen("data.in", "r", stdin);
@@ -111,7 +163,7 @@ int main() {
   ios::sync_with_stdio(0);
   cin.tie(nullptr);
   cout << fixed << setprecision(8);
-  // cin>>TT;
+  cin >> TT;
   while (TT--) solve();
 #ifdef ASHDR
   LOG("Time: %dms\n", int((clock() - nol_cl) / (double)CLOCKS_PER_SEC * 1000));

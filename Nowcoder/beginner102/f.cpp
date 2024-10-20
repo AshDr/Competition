@@ -16,6 +16,7 @@
 #include <cassert>
 #include <chrono>
 #include <cstdio>
+#include <cstring>
 #include <functional>
 #include <iomanip>
 #include <iostream>
@@ -89,19 +90,54 @@ ll floor(ll x, ll m) {
   ll r = (x % m + m) % m;
   return (x - r) / m;
 }  // neg floor (-1, 3) = -1
-static ull randint() { return (rng() * 1ll << 32) ^ rng(); }
-struct pair_hash {
-  template <class T1, class T2>
-  std::size_t operator()(const std::pair<T1, T2> &p) const {
-    return std::hash<T1>()(p.first) ^ std::hash<T2>()(p.second);
-  }
-};
-// gp_hash_table
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 int TT = 1;
-void solve() {}
+void solve() {
+  int n, rt;
+  cin >> n >> rt;
+  vector<int> C(n + 1), W(n + 1);
+  for (int i = 1; i <= n; i++) cin >> C[i];
+  for (int i = 1; i <= n; i++) cin >> W[i];
+  vector<vector<int>> G(n + 1);
+  for (int i = 1; i <= n - 1; i++) {
+    int u, v;
+    cin >> u >> v;
+    G[u].push_back(v);
+    G[v].push_back(u);
+  }
+  vector<ull> hsh1(n + 1), hsh2(n + 1), sum(n + 1);
+  for (int i = 1; i <= n; i++) {
+    hsh1[i] = rng();
+    sum[i] = sum[i - 1] + hsh1[i];
+  }
+  for (int i = 1; i <= n; i++) {
+    sum[i] += hsh1[i];
+  }
+  for (int i = 1; i <= n; i++) hsh2[i] = rng();
+  map<ull, ll> mp;
+  vector<ll> ans(n + 1, numeric_limits<ll>::min());
+  function<void(int, int, ull, ll)> dfs = [&](int u, int fa, ull hsh, ll val) {
+    ull x = sum[C[u]] - hsh + hsh1[C[rt]] + hsh2[C[u]];
+    if (mp.find(x) != mp.end()) {
+      ans[C[u]] = max(ans[C[u]], val + mp[x] - W[rt]);
+    }
+    if (mp.find(hsh + hsh2[C[u]]) == mp.end())
+      mp[hsh + hsh2[C[u]]] = val;
+    else
+      mp[hsh + hsh2[C[u]]] = max(mp[hsh + hsh2[C[u]]], val);
+    for (auto v : G[u]) {
+      if (v == fa) continue;
+      dfs(v, u, hsh + hsh1[C[v]], val + W[v]);
+    }
+  };
+  dfs(rt, 0, hsh1[C[rt]], W[rt]);
+  if (mp.find(sum[C[rt]] + hsh2[C[rt]]) != mp.end()) ans[C[rt]] = max(ans[C[rt]], mp[sum[C[rt]] + hsh2[C[rt]]]);
+  for (int i = 1; i <= n; i++) {
+    cout << (ans[i] == numeric_limits<ll>::min() ? -1 : ans[i]) << " \n"[i == n];
+  }
+}
 int main() {
 #ifdef ASHDR
   freopen("data.in", "r", stdin);
@@ -111,7 +147,7 @@ int main() {
   ios::sync_with_stdio(0);
   cin.tie(nullptr);
   cout << fixed << setprecision(8);
-  // cin>>TT;
+  cin >> TT;
   while (TT--) solve();
 #ifdef ASHDR
   LOG("Time: %dms\n", int((clock() - nol_cl) / (double)CLOCKS_PER_SEC * 1000));

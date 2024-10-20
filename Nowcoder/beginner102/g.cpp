@@ -16,6 +16,7 @@
 #include <cassert>
 #include <chrono>
 #include <cstdio>
+#include <cstring>
 #include <functional>
 #include <iomanip>
 #include <iostream>
@@ -96,12 +97,94 @@ struct pair_hash {
     return std::hash<T1>()(p.first) ^ std::hash<T2>()(p.second);
   }
 };
-// gp_hash_table
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 int TT = 1;
-void solve() {}
+map<ull, ll> mp;
+void solve() {
+  int n;
+  cin >> n;
+  vector<int> C(n + 1);
+  vector<ll> W(n + 1);
+  for (int i = 1; i <= n; i++) cin >> C[i];
+  for (int i = 1; i <= n; i++) cin >> W[i];
+  vector<vector<int>> G(n + 1);
+  for (int i = 1; i <= n - 1; i++) {
+    int u, v;
+    cin >> u >> v;
+    G[u].push_back(v);
+    G[v].push_back(u);
+  }
+  vector<ull> hsh1(n + 1), hsh2(n + 1), sum(n + 1);
+  for (int i = 1; i <= n; i++) {
+    hsh1[i] = rng();
+    sum[i] = sum[i - 1] + hsh1[i];
+  }
+  for (int i = 1; i <= n; i++) {
+    sum[i] += hsh1[i];
+  }
+  for (int i = 1; i <= n; i++) hsh2[i] = rng();
+  vector<ll> ans(n + 1, numeric_limits<ll>::min());
+  int mxpart = 1e9, root = 1, S = n;
+  vector<int> siz(n + 1), vis(n + 1);
+  function<void(int, int, ull, ll)> dfs = [&](int u, int fa, ull hsh, ll val) {
+    ull x = sum[C[u]] - hsh + hsh1[C[root]] + hsh2[C[u]];
+    if (mp.find(x) != mp.end()) {
+      ans[C[u]] = max(ans[C[u]], val + mp[x] - W[root]);
+    }
+    if (mp.find(hsh + hsh2[C[u]]) == mp.end())
+      mp[hsh + hsh2[C[u]]] = val;
+    else
+      mp[hsh + hsh2[C[u]]] = max(mp[hsh + hsh2[C[u]]], val);
+    for (auto v : G[u]) {
+      if (v == fa || vis[v]) continue;
+      dfs(v, u, hsh + hsh1[C[v]], val + W[v]);
+    }
+  };
+
+  function<void(int, int)> get_siz = [&](int u, int fa) {
+    siz[u] = 1;
+    for (auto v : G[u]) {
+      if (v == fa || vis[v]) continue;
+      get_siz(v, u);
+      siz[u] += siz[v];
+    }
+  };
+  function<void(int, int)> find_root = [&](int u, int fa) {
+    int mx = 0;
+    for (auto v : G[u]) {
+      if (vis[v] || v == fa) continue;
+      find_root(v, u);
+      mx = max(mx, siz[v]);
+    }
+    mx = max(mx, S - siz[u]);
+    if (mx < mxpart) mxpart = mx, root = u;
+  };
+  function<void(int, int)> work = [&](int u, int par) {
+    mxpart = 1e9;
+    root = u;
+    get_siz(u, 0);
+    S = siz[u];
+    find_root(u, 0);
+    // cout<<u<<" "<<root<<endl;
+    vis[root] = 1;
+    mp.clear();
+    dfs(root, 0, hsh1[C[root]], W[root]);
+    if (mp.find(sum[C[root]] + hsh2[C[root]]) != mp.end())
+      ans[C[root]] = max(ans[C[root]], mp[sum[C[root]] + hsh2[C[root]]]);
+    int curfa = root;
+    for (auto v : G[root]) {
+      if (!vis[v]) {
+        work(v, curfa);
+      }
+    }
+  };
+  work(1, 0);
+  for (int i = 1; i <= n; i++) {
+    cout << (ans[i] == numeric_limits<ll>::min() ? -1 : ans[i]) << " \n"[i == n];
+  }
+}
 int main() {
 #ifdef ASHDR
   freopen("data.in", "r", stdin);
@@ -111,7 +194,7 @@ int main() {
   ios::sync_with_stdio(0);
   cin.tie(nullptr);
   cout << fixed << setprecision(8);
-  // cin>>TT;
+  cin >> TT;
   while (TT--) solve();
 #ifdef ASHDR
   LOG("Time: %dms\n", int((clock() - nol_cl) / (double)CLOCKS_PER_SEC * 1000));
