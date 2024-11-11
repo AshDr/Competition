@@ -26,7 +26,6 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <set>
 // #include <ext/pb_ds/assoc_container.hpp>
 // #include <ext/pb_ds/tree_policy.hpp>
 #define LOG(FMT...) fprintf(stderr, FMT)
@@ -102,7 +101,19 @@ const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 int TT = 1;
-void solve() {}
+void solve() {
+	int n, x, y, z, m;
+	cin >> n >> x >> y >> z >> m;
+	int ans = x + y;
+	for(int i = 0; i < n; i++) {
+		int xx, yy, zz;
+		cin >> xx >> yy >> zz;
+		if(z + m >= zz) {
+			ans = max(ans, xx + yy);
+		}
+	}
+	cout << ans << "\n";
+}
 int main() {
 #ifdef ASHDR
   freopen("data.in", "r", stdin);

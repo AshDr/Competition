@@ -102,7 +102,40 @@ const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 int TT = 1;
-void solve() {}
+void solve() {
+  int n;
+  cin >> n;
+  vector<int> a(n);
+  cin >> a;
+  vector<int> b(n);
+  auto check = [&](int x) {
+    for(int i = 0; i < n; i++) b[i] = max(0, a[i] - x);
+    int rem_2 = x;
+    for(int i = 0; i < n; i++) {
+      if(b[i] > 0 && b[i + 1] > 0) {
+        int cost = min(min(b[i], b[i + 1]),rem_2);
+        rem_2 -= cost;
+        b[i] -= cost;
+        b[i + 1] -= cost;
+      }
+    }
+    int rem_1 = x + rem_2;
+    for(int i = 0; i < n; i++) {
+      if(b[i] <= rem_1) rem_1 -= b[i];
+      else {
+        return false;
+      }
+    }
+    return true;
+  };
+  int l = 1, r = 1e9 + 1;
+  while(l < r) {
+    int mid = (l + r) >> 1;
+    if(check(mid)) r = mid;
+    else l = mid + 1;
+  }
+  cout << l << "\n";
+}
 int main() {
 #ifdef ASHDR
   freopen("data.in", "r", stdin);

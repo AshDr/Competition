@@ -1,77 +1,74 @@
 struct SqrtDecomposition {
-  const int block_size, n;
-  std::vector<int> ls, rs; // 每个块i的段位记为[ls[i], rs[i]), 右侧是开区间
-  std::vector<bool> to_be_eval; // 该block的懒标记是否全部被清空
-
-  explicit SqrtDecomposition(const int n_)
-      : block_size(std::round(std::sqrt(n_))),
-        n((n_ + block_size - 1) / block_size) { 
-    ls.resize(n); // n是block的数量 这里上取整了
-    rs.resize(n);
-    to_be_eval.assign(n, false);
-    for (int i = 0; i < n; ++i) {
-      // 每个块i的段位记为[ls[i], rs[i]), 右侧是开区间
-      // 最后一个block里的元素的rs不一定填满了最后一个block，因此最后一个blocki的rs会等于数组长度。
-      ls[i] = block_size * i;
-      rs[i] = (i + 1 == n ? n_ : block_size * (i + 1));
+  const int block_size, bn;      // bn是block的数量
+  std::vector<int> ls, rs;       // 每个块i的段位记为[ls[i], rs[i]]
+  std::vector<bool> to_be_eval;  // 该block的懒标记是否全部被清空
+  std::vector<int> belong;
+  explicit SqrtDecomposition(const int n_)  // 1~n_
+      : block_size(std::round(std::sqrt(n_))), bn((n_ + block_size - 1) / block_size) {
+    ls.resize(n + 1);
+    rs.resize(n + 1);
+    belong.resize(n + 1);
+    to_be_eval.assign(n + 1, false);
+    for (int i = 1; i <= bn; ++i) {
+      ls[i] = block_size * (i - 1) + 1;
+      rs[i] = (i == bn ? n_ : ls[i] + block_size - 1);
+    }
+    for (int i = 1; i <= n_; i++) {
+      belong[i] = (i - 1) / block_size + 1;
     }
   }
+  template <typename T>
+  void partial_update(const int idx, const T val);  // to implemented
 
   template <typename T>
-  void partial_update(const int idx, const T val); // 这是我们需要实现的
-
-  template <typename T>
-  void total_update(const int idx, const T val); // 这是我们需要实现的
+  void total_update(const int idx, const T val);  // to implemented
 
   template <typename T>
   void update(const int l, const int r, const T val) {
-    if (r <= l) return;
-    // 这里如果想debug好用点可以改成 assert(l < r);
-    const int b_l = l / block_size, b_r = (r - 1) / block_size;
-    // b_l是左端点在的block，g_r是右端点的block， -1是因为外部调用也是开区间。
-    if (b_l < b_r) { // 不在一个区间的话，必定要分开讨论
-      if (l == ls[b_l]) { // 如果左端点恰好是区间的开始
-        total_update(b_l, val); // 只要更新这个区间就好了
+    assert(l <= r);
+    const int b_l = belong[l], b_r = belong[r];  // [l, r]->[b_l, b_r]
+    if (b_l < b_r) {
+      if (l == ls[b_l]) {  // 如果左端点恰好是区间的开始,只要更新这个区间就好了
+        total_update(b_l, val);
       } else {
-        for (int i = l; i < rs[b_l]; ++i) {
-          partial_update(i, val); // 否则我们要对左端点到下一个block之间进行暴力更新
+        for (int i = l; i <= rs[b_l]; ++i) {
+          partial_update(i, val);
         }
       }
+
       for (int i = b_l + 1; i < b_r; ++i) {
-        total_update(i, val); // 我们对中间的block进行更新
+        total_update(i, val);
       }
-      if (r == rs[b_r]) {
-        total_update(b_r, val); // 同理讨论右侧端点冒出来的点，不再赘述
+
+      if (r == rs[b_r]) {  // 如果右端点恰好是区间的结尾
+        total_update(b_r, val);
       } else {
-        for (int i = ls[b_r]; i < r; ++i) {
+        for (int i = ls[b_r]; i <= r; ++i) {
           partial_update(i, val);
         }
       }
     } else {
-      for (int i = l; i < r; ++i) {
-        partial_update(i, val); // 如果 l r本来就在一个block，只需要直接暴力更新即可。
+      for (int i = l; i <= r; ++i) {
+        partial_update(i, val);
       }
     }
   }
 
   template <typename T>
-  void partial_query(const int idx, T* val);
+  void partial_query(const int idx, T *val);
 
   template <typename T>
-  void total_query(const int idx, T* val);
+  void total_query(const int idx, T *val);
 
   template <typename T>
   T query(const int l, const int r, const T id) {
-    const int b_l = l / block_size, b_r = (r - 1) / block_size;
-    // b_l是左端点在的block，g_r是右端点的block， -1是因为外部调用也是开区间。
-    T res = id; 
-    // 这里是我们的初始值，实现的时候会具体解释，简单举例，如果是求和这里就是0，然后累加
-    // 之后的逻辑和update一模一样，不再赘述
+    const int b_l = belong[l], b_r = belong[r];  // [l, r]->[b_l, b_r]
+    T res = id;                                  // 幺元 indentity, 0 for sum, 1 for product
     if (b_l < b_r) {
       if (l == ls[b_l]) {
         total_query(b_l, &res);
       } else {
-        for (int i = l; i < rs[b_l]; ++i) {
+        for (int i = l; i <= rs[b_l]; ++i) {
           partial_query(i, &res);
         }
       }
@@ -81,39 +78,41 @@ struct SqrtDecomposition {
       if (r == rs[b_r]) {
         total_query(b_r, &res);
       } else {
-        for (int i = ls[b_r]; i < r; ++i) {
+        for (int i = ls[b_r]; i <= r; ++i) {
           partial_query(i, &res);
         }
       }
     } else {
-      for (int i = l; i < r; ++i) {
+      for (int i = l; i <= r; ++i) {
         partial_query(i, &res);
       }
     }
     return res;
   }
 };
-//instance 
+// instance
 std::vector<long long> a, b, lazy;
+// 分别是原数组，block和，懒标记
+// 其中a的长度是数组原长，b和lazy都是block的数量，记录了block的和和懒标记。
 std::vector<std::multiset<long long>> s;
 int target;
 template <typename T>
 void SqrtDecomposition::partial_update(const int idx, const T val) {
-  s[idx / block_size].erase(a[idx]);  // multiset里删除原来的数字
-  a[idx] += val;  // brutally update
-  b[idx / block_size] += val;
-  s[idx / block_size].insert(a[idx]); // multiset里加入新数字
+  s[belong[idx]].erase(a[idx]);  // multiset里删除原来的数字
+  a[idx] += val;                 // brutally update
+  b[belong[idx]] += val;
+  s[belong[idx]].insert(a[idx]);  // multiset里加入新数字
 }
 
 template <typename T>
-void SqrtDecomposition::total_update(const int idx, const T val) {
-  lazy[idx] += val;
-  to_be_eval[idx] = true;
+void SqrtDecomposition::total_update(const int b_idx, const T val) {
+  lazy[b_idx] += val;
+  to_be_eval[b_idx] = true;  // 标记block存在懒标记，计算时需要重新赋值
 }
 
 template <typename T>
-void SqrtDecomposition::partial_query(const int idx, T* val) {
-  const int block = idx / block_size;
+void SqrtDecomposition::partial_query(const int idx, T *val) {
+  const int block = belong[idx];
   if (to_be_eval[block]) {
     for (int i = ls[block]; i < rs[block]; ++i) {
       partial_update(i, lazy[block]);
@@ -121,13 +120,13 @@ void SqrtDecomposition::partial_query(const int idx, T* val) {
     lazy[block] = 0;
     to_be_eval[block] = false;
   }
-  if (a[idx] < target) *val = std::max(*val, a[idx]); // 如果当前数字小于我们要找的数字c，更新答案
+  if (a[idx] < target) *val = std::max(*val, a[idx]);  // 如果当前数字小于我们要找的数字c，更新答案
 }
 
 template <typename T>
-void SqrtDecomposition::total_query(const int idx, T* val) {
-  auto it = s[idx].lower_bound(target - lazy[idx]); // 二分，记住考虑懒标记的影响
-  if (it == s[idx].begin()) return; // 如果已经是最小的了，直接反悔
-  it--; 
-  *val = std::max(*it + lazy[idx], *val); // 更新答案
+void SqrtDecomposition::total_query(const int b_idx, T *val) {
+  auto it = s[b_idx].lower_bound(target - lazy[b_idx]);  // 二分，记住考虑懒标记的影响
+  if (it == s[b_idx].begin()) return;                    // 如果已经是最小的了，直接反悔
+  it--;
+  *val = std::max(*it + lazy[b_idx], *val);  // 更新答案
 }

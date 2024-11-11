@@ -20,6 +20,7 @@
 #include <iomanip>
 #include <iostream>
 #include <map>
+#include <numeric>
 #include <queue>
 #include <random>
 #include <string>
@@ -102,7 +103,14 @@ const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 int TT = 1;
-void solve() {}
+void solve() {
+  vector<double> p(5);
+  cin >> p;
+  double pp = accumulate(p.begin(), p.begin() + 3, 0.0);
+  double ans = pow(pp, 10);
+  ans += 10 * (1 - pp) * pow(pp, 9);
+  cout << 1 - ans << "\n";
+}
 int main() {
 #ifdef ASHDR
   freopen("data.in", "r", stdin);

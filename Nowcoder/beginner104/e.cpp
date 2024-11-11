@@ -102,7 +102,20 @@ const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 int TT = 1;
-void solve() {}
+/*
+该图一定为置换环，即每个连通块必为k个节点k条边的基环树
+*/
+void solve() {
+  int n;
+  cin >> n;
+  for(int i = 1; i <= n; i++) {
+    int k;
+    cin >> k;
+    for(int j = 1; j <= k; j++) {
+      
+    }
+  }
+}
 int main() {
 #ifdef ASHDR
   freopen("data.in", "r", stdin);

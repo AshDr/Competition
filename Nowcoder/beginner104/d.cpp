@@ -102,7 +102,106 @@ const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 int TT = 1;
-void solve() {}
+void solve() {
+  int n;
+  cin >> n;
+  vector<string> s(2 * n);
+  cin >> s;
+  vector<vector<int>> ans(n, vector<int>(4));
+  int mx_len = 2 * n;
+  auto gao = [&](int lev, pii b) {
+    int cnt = 0;
+    int x = b.first, y = b.second;
+    while(1) {
+      if(x == n - 1 && y == lev) ans[lev][0] = cnt;
+      else if(x == lev && y == n) ans[lev][1] = cnt; 
+      else if(x == n && y == mx_len - lev - 1) ans[lev][2] = cnt;
+      else if(x == mx_len - lev - 1 && y == n - 1) ans[lev][3] = cnt;
+      if(x == lev) {
+        ++y;
+      }else if(x == mx_len - lev - 1) {
+        --y;
+      }else {
+        if(y == lev) {
+          --x;
+        }else {
+          ++x;
+        }
+      }
+      if(y == mx_len - lev) {
+        ++x;
+        --y;
+      }
+      else if(x == mx_len - lev) {
+        --x;
+        --y;        
+      }
+      else if(y == lev - 1) {
+        --x;
+        ++y;
+      }else if(x == lev - 1) {
+        ++x;
+        ++y;
+      }
+      ++cnt;
+      if(cnt == 8 * (n - lev) - 4) break;
+    }
+  };
+  for(int i = 0; i < n; i++) {
+    int cnt = 0, f = 0;
+    if(!(s[mx_len - i - 1][i] == 'X' && s[mx_len - i - 1][i + 1] == 'X'))  {
+      for(int j = mx_len - i - 1; j >= i; j--) {
+        if(s[j][i] == 'X') {
+          gao(i, {j, i});
+          f = 1;
+        }
+      }  
+    }
+    if(f) continue;
+    int x = i, y = i;
+    while(1) {
+      if(s[x][y] == 'X') {
+        gao(i, {x, y});
+        break;
+      }
+      if(x == i) {
+        ++y;
+      }else if(x == mx_len - i - 1) {
+        --y;
+      }else {
+        if(y == i) {
+          --x;
+        }else {
+          ++x;
+        }
+      }
+      
+      if(y == mx_len - i) {
+        ++x;
+        --y;
+      }
+      else if(x == mx_len - i) {
+        --x;
+        --y;        
+      }
+      else if(y == i - 1) {
+        --x;
+        ++y;
+      }
+      ++cnt;
+      if(cnt == 8 * (n - i) - 4) break;
+    }
+  }
+  vector<int> sum(4);
+  for(int i = 0; i < n; i++) {
+    for(int j = 0; j < 4; j++) {
+      sum[j] += ans[i][j];
+    }
+  }
+  // cout << sum << "\n";
+  cout << *min_element(all(sum)) << "\n";
+  //side = 2 * (i + 1)    x = 2 * i + 1
+}
 int main() {
 #ifdef ASHDR
   freopen("data.in", "r", stdin);

@@ -109,10 +109,10 @@ auto build = [&](vector<int> tmp) {
   for (int i = 0; i < len - 1; i++) {  // 这里注意是n-1
     tmp.push_back(tree.lca(tmp[i], tmp[i + 1]));
   }
-  tmp.push_back(0);  // 这样每次就从0开始dfd即可
+  tmp.push_back(1);  // 这样每次就从1开始dfs即可
   sort(all(tmp), [&](int x, int y) { return tree.in[x] < tree.in[y]; });
   tmp.erase(unique(all(tmp)), tmp.end());
-  for (int i = 0; i < sz(tmp) - 1; i++) G[tree.lca(tmp[i], tmp[i + 1])].push_back(tmp[i + 1]);
+  for (int i = 0; i < sz(tmp) - 1; i++) ng[tree.lca(tmp[i], tmp[i + 1])].push_back(tmp[i + 1]);
 };
 
 // 单调栈建法
