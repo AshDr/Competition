@@ -22,11 +22,11 @@
 #include <map>
 #include <queue>
 #include <random>
+#include <set>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <set>
 // #include <ext/pb_ds/assoc_container.hpp>
 // #include <ext/pb_ds/tree_policy.hpp>
 #define LOG(FMT...) fprintf(stderr, FMT)
@@ -97,6 +97,26 @@ struct pair_hash {
     return std::hash<T1>()(p.first) ^ std::hash<T2>()(p.second);
   }
 };
+namespace interactor {
+// test data
+int query() {
+#ifdef ASHDR
+
+#endif
+#ifndef ASHDR
+
+#endif
+  return 0;
+};
+void cout_answer(vector<int> ans) {
+#ifdef ASHDR
+
+#endif
+#ifndef ASHDR
+
+#endif
+}
+};  // namespace interactor
 // gp_hash_table
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;

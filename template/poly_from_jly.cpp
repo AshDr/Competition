@@ -14,7 +14,8 @@ int norm(int x) {
   }
   return x;
 }
-template <class T> T power(T a, i64 b) {
+template <class T>
+T power(T a, i64 b) {
   T res = 1;
   for (; b; b /= 2, a *= a) {
     if (b % 2) {
@@ -72,9 +73,7 @@ struct Z {
     a = Z(v);
     return is;
   }
-  friend std::ostream &operator<<(std::ostream &os, const Z &a) {
-    return os << a.val();
-  }
+  friend std::ostream &operator<<(std::ostream &os, const Z &a) { return os << a.val(); }
 };
 std::vector<int> rev;
 std::vector<Z> roots{0, 1};
@@ -315,18 +314,17 @@ struct Poly {
       }
     };
     build(1, 0, n);
-    std::function<void(int, int, int, const Poly &)> work =
-        [&](int p, int l, int r, const Poly &num) {
-          if (r - l == 1) {
-            if (l < int(ans.size())) {
-              ans[l] = num[0];
-            }
-          } else {
-            int m = (l + r) / 2;
-            work(2 * p, l, m, num.mulT(q[2 * p + 1]).modxk(m - l));
-            work(2 * p + 1, m, r, num.mulT(q[2 * p]).modxk(r - m));
-          }
-        };
+    std::function<void(int, int, int, const Poly &)> work = [&](int p, int l, int r, const Poly &num) {
+      if (r - l == 1) {
+        if (l < int(ans.size())) {
+          ans[l] = num[0];
+        }
+      } else {
+        int m = (l + r) / 2;
+        work(2 * p, l, m, num.mulT(q[2 * p + 1]).modxk(m - l));
+        work(2 * p + 1, m, r, num.mulT(q[2 * p]).modxk(r - m));
+      }
+    };
     work(1, 0, n, mulT(q[1].inv(n)));
     return ans;
   }
@@ -342,8 +340,7 @@ struct Comb {
   Comb(int n) : Comb() { init(n); }
 
   void init(int m) {
-    if (m <= n)
-      return;
+    if (m <= n) return;
     _fac.resize(m + 1);
     _invfac.resize(m + 1);
     _inv.resize(m + 1);
@@ -360,23 +357,19 @@ struct Comb {
   }
 
   Z fac(int m) {
-    if (m > n)
-      init(2 * m);
+    if (m > n) init(2 * m);
     return _fac[m];
   }
   Z invfac(int m) {
-    if (m > n)
-      init(2 * m);
+    if (m > n) init(2 * m);
     return _invfac[m];
   }
   Z inv(int m) {
-    if (m > n)
-      init(2 * m);
+    if (m > n) init(2 * m);
     return _inv[m];
   }
   Z binom(int n, int m) {
-    if (n < m || m < 0)
-      return 0;
+    if (n < m || m < 0) return 0;
     return fac(n) * invfac(m) * invfac(n - m);
   }
 } comb;
@@ -430,18 +423,11 @@ int main() {
     f[i] *= comb.invfac(i);
   }
 
-  Poly g = Poly(n + 1, [&](int k) -> Z {
-             return k % 2 == 0 ? comb.invfac(k) : 0;
-           }).pow(m + 1, n + 1);
+  Poly g = Poly(n + 1, [&](int k) -> Z { return k % 2 == 0 ? comb.invfac(k) : 0; }).pow(m + 1, n + 1);
   for (int i = 0; i <= n; i++) {
     if (i > 0) {
-      g = (g * Poly(n + 1,
-                    [&](int k) -> Z { return k % 2 == 0 ? comb.invfac(k) : 0; })
-                   .inv(n + 1))
-              .modxk(n + 1);
-      g = (g * Poly(n + 1, [&](int k) -> Z {
-             return k % 2 == 1 ? comb.invfac(k) : 0;
-           })).modxk(n + 1);
+      g = (g * Poly(n + 1, [&](int k) -> Z { return k % 2 == 0 ? comb.invfac(k) : 0; }).inv(n + 1)).modxk(n + 1);
+      g = (g * Poly(n + 1, [&](int k) -> Z { return k % 2 == 1 ? comb.invfac(k) : 0; })).modxk(n + 1);
     }
     for (int j = i + 1; j <= n; j++) {
       f[j] -= g[j] * f[i];
