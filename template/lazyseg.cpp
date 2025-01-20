@@ -139,6 +139,7 @@ struct Tag {
 
   void apply(const Tag &t) & {
     // add tag to tag
+    // determine if legal pushdown
   }
 };
 
@@ -147,6 +148,7 @@ struct Info {
 
   void apply(const Tag &t) & {
     // add tag to info
+    // determine if legal pushdown
   }
 };
 Info operator+(const Info &a, const Info &b) {

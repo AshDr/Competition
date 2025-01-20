@@ -1,24 +1,3 @@
-void input(__int128 &x) {
-  int f = 1;
-  char ch = getchar();
-  x = 0;
-  while (ch < '0' || ch > '9') {
-    if (ch == '-') f = -1;
-    ch = getchar();
-  }
-  while (ch >= '0' && ch <= '9') {
-    x = x * 10 + ch - '0';
-    ch = getchar();
-  }
-  x = f * x;
-  return;
-}
-void output(__int128 x) {
-  if (x < 0) {
-    putchar('-');
-    x = -x;
-  }
-  if (x > 9) output(x / 10);
-  putchar(x % 10 + '0');
-  return;
-}
+using lll = __int128;
+istream &operator>>(istream &cin, lll &x) { bool flg = 0; x = 0; static string s; cin >> s; if (s[0] == '-') flg = 1, s = s.substr(1); for (char c : s) x = x * 10 + (c - '0'); if (flg) x = -x; return cin; }
+ostream &operator<<(ostream &cout, lll x) { static char s[60]; if (x < 0) cout << '-', x = -x; int tp = 1; s[0] = '0' + (x % 10); while (x /= 10) s[tp++] = '0' + (x % 10); while (tp--) cout << s[tp]; return cout; }
