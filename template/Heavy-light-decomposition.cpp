@@ -131,4 +131,28 @@ struct HLD {
     if (dep[u] > dep[v]) swap(u, v), swap(left, right);
     return f(left, q(in[u] + edge, in[v]) + right);
   }
+  // virtual tree
+  pair<vector<int>, vector<pair<int, int> > > compress(vector<int> v){
+        auto cmp = [&](int a, int b) { return in[a] < in[b]; };
+        sort(v.begin(), v.end(), cmp);
+        v.erase(unique(v.begin(), v.end()), v.end());
+        const int k = (int)v.size();
+        for(int i = 0; i + 1 < k; i++){
+            v.push_back(lca(v[i], v[i + 1]));
+        }
+        sort(v.begin(), v.end(), cmp);
+        v.erase(unique(v.begin(), v.end()), v.end());
+        vector<pair<int, int> > edges;
+        vector<int> stk;
+        for(auto x : v){
+            while(!stk.empty() && out[stk.back()] < in[x]){
+                stk.pop_back();
+            }
+            if (!stk.empty()){
+                edges.push_back({stk.back(), x});
+            }
+            stk.push_back(x);
+        }
+        return {v, edges};
+    }
 };
