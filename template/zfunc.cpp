@@ -1,13 +1,29 @@
+vector<int> get_fail(string s) { // get border(pi[i]表示从i结尾的前缀子串的border长度)
+  int n = (int)s.length();
+  vector<int> pi(n);
+  for (int i = 1; i < n; i++) {
+    int j = pi[i - 1];
+    while (j > 0 && s[i] != s[j]) j = pi[j - 1];
+    if (s[i] == s[j]) j++;
+    pi[i] = j;
+  }
+  return pi;
+}
+
 template <class T>
-std::vector<int> z_algorithm(const std::vector<T> &s) {
+std::vector<int> z_algorithm(const std::vector<T> &s) { // z[i]表示以i开始的后缀与s的lcp
   int n = int(s.size());
   if (n == 0) return {};
   vector<int> z(n);
   z[0] = 0;
-  for (int i = 1, j = 0; i < n; i++) {
-    z[i] = ((j + z[j] <= i) ? 0 : min(j + z[j] - i, z[i - j]));
-    while (i + z[i] < n && s[z[i]] == s[i + z[i]]) ++z[i];
-    if (j + z[j] < i + z[i]) j = i;
+  for (int i = 1, l = 0, r = 0; i < n; ++i) {
+    if (i <= r && z[i - l] < r - i + 1) {
+      z[i] = z[i - l];
+    } else {
+      z[i] = max(0, r - i + 1);
+      while (i + z[i] < n && s[z[i]] == s[i + z[i]]) ++z[i];
+    }
+    if (i + z[i] - 1 > r) l = i, r = i + z[i] - 1;
   }
   z[0] = n;
   return z;
