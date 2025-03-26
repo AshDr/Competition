@@ -1,13 +1,12 @@
-vector<int> get_fail(string s) { // get border(pi[i]表示从i结尾的前缀子串的border长度)
-  int n = (int)s.length();
-  vector<int> pi(n);
-  for (int i = 1; i < n; i++) {
-    int j = pi[i - 1];
-    while (j > 0 && s[i] != s[j]) j = pi[j - 1];
-    if (s[i] == s[j]) j++;
-    pi[i] = j;
+vector<int> get_border(string s) {
+  int n = s.size();
+  vector<int> border(n);
+  for(int i = 1, j = 0; i < n; i++) {
+    while(j && s[j] != s[i]) j = border[j - 1];
+    if(s[i] == s[j]) ++j;
+    border[i] = j;
   }
-  return pi;
+  return border;
 }
 
 template <class T>

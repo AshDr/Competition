@@ -216,4 +216,9 @@ struct Comb {
   }
   mint C(int n, int m) { return binom(n, m); }
   mint A(int n, int m) { return fac(n) * invfac(n - m); }
+  mint Lucas(int x,int y) {
+    if(x < y) return 0;
+    if(!x) return 1;
+    return Lucas(x / MOD,y / MOD) *1ll* binom(x % MOD,y % MOD);
+  }
 } comb;

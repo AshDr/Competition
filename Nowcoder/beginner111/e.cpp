@@ -18,16 +18,18 @@
 #include <cstdio>
 #include <functional>
 #include <iomanip>
+#include <ios>
 #include <iostream>
+#include <iterator>
 #include <map>
+#include <numeric>
 #include <queue>
 #include <random>
-#include <set>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <cstring>
+#include <set>
 // #include <ext/pb_ds/assoc_container.hpp>
 // #include <ext/pb_ds/tree_policy.hpp>
 #define LOG(FMT...) fprintf(stderr, FMT)
@@ -98,32 +100,34 @@ struct pair_hash {
     return std::hash<T1>()(p.first) ^ std::hash<T2>()(p.second);
   }
 };
-namespace interactor {
-// test data
-int query() {
-#ifdef ASHDR
-
-#endif
-#ifndef ASHDR
-
-#endif
-  return 0;
-};
-void cout_answer(vector<int> ans) {
-#ifdef ASHDR
-
-#endif
-#ifndef ASHDR
-
-#endif
-}
-};  // namespace interactor
 // gp_hash_table
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 int TT = 1;
-void solve() {}
+ll a[N],pre[N];
+void solve() {
+  int n, m, k;
+  cin>>n>>m>>k;
+  for(int i=1; i<=n; i++) {
+    cin>>a[i];
+    pre[i]=pre[i-1]+a[i];
+  }
+  ll ans = 0;
+  for(int i=1; i<=n; i++) {
+    ll r=lower_bound(a+1,a+1+n,a[i]-k)-a, l=lower_bound(a+1,a+1+n,a[i]-k-m)-a;
+    --r;
+    if(r<1) continue;
+    // cout << i << " " << l << " " << r << "\n";
+    ans+=1ll*(r-l+1)*(m-a[i]+k+1)+pre[r]-pre[l-1];
+  }  
+  for(int i=1; i<=n; i++) {
+    ll p=lower_bound(a+1,a+1+n,a[i]-m+k)-a;
+    if(p>=i) continue;
+    ans += 1ll*(i-p)*(m-a[i]-k+1)+(pre[i-1]-pre[p-1]);
+  }
+  cout<<ans<<"\n";
+}
 int main() {
 #ifdef ASHDR
   freopen("data.in", "r", stdin);
@@ -133,7 +137,7 @@ int main() {
   ios::sync_with_stdio(0);
   cin.tie(nullptr);
   cout << fixed << setprecision(8);
-  cin>>TT;
+  // cin>>TT;
   while (TT--) solve();
 #ifdef ASHDR
   LOG("Time: %dms\n", int((clock() - nol_cl) / (double)CLOCKS_PER_SEC * 1000));

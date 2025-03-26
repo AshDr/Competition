@@ -22,12 +22,11 @@
 #include <map>
 #include <queue>
 #include <random>
-#include <set>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <cstring>
+#include <set>
 // #include <ext/pb_ds/assoc_container.hpp>
 // #include <ext/pb_ds/tree_policy.hpp>
 #define LOG(FMT...) fprintf(stderr, FMT)
@@ -98,32 +97,23 @@ struct pair_hash {
     return std::hash<T1>()(p.first) ^ std::hash<T2>()(p.second);
   }
 };
-namespace interactor {
-// test data
-int query() {
-#ifdef ASHDR
-
-#endif
-#ifndef ASHDR
-
-#endif
-  return 0;
-};
-void cout_answer(vector<int> ans) {
-#ifdef ASHDR
-
-#endif
-#ifndef ASHDR
-
-#endif
-}
-};  // namespace interactor
 // gp_hash_table
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 int TT = 1;
-void solve() {}
+void solve() {
+  string s;
+  cin >> s;
+  int n=s.size();
+  int ans=0;
+  for(int i = 1; i < n; i++) {
+  	if(s[i]==s[i-1]) ++ans;
+  }
+  if(s[0]!='i') ++ans;
+  if((n+ans)&1) ++ans;
+  cout<<ans<<"\n";
+}
 int main() {
 #ifdef ASHDR
   freopen("data.in", "r", stdin);
@@ -133,7 +123,7 @@ int main() {
   ios::sync_with_stdio(0);
   cin.tie(nullptr);
   cout << fixed << setprecision(8);
-  cin>>TT;
+  // cin>>TT;
   while (TT--) solve();
 #ifdef ASHDR
   LOG("Time: %dms\n", int((clock() - nol_cl) / (double)CLOCKS_PER_SEC * 1000));

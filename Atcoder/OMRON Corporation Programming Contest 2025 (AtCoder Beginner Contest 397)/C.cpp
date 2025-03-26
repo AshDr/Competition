@@ -22,11 +22,11 @@
 #include <map>
 #include <queue>
 #include <random>
-#include <set>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <set>
 #include <cstring>
 // #include <ext/pb_ds/assoc_container.hpp>
 // #include <ext/pb_ds/tree_policy.hpp>
@@ -98,32 +98,34 @@ struct pair_hash {
     return std::hash<T1>()(p.first) ^ std::hash<T2>()(p.second);
   }
 };
-namespace interactor {
-// test data
-int query() {
-#ifdef ASHDR
-
-#endif
-#ifndef ASHDR
-
-#endif
-  return 0;
-};
-void cout_answer(vector<int> ans) {
-#ifdef ASHDR
-
-#endif
-#ifndef ASHDR
-
-#endif
-}
-};  // namespace interactor
 // gp_hash_table
-const int N = 2e5 + 10;
+const int N = 3e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 int TT = 1;
-void solve() {}
+int n;
+int a[N],pre[N],suf[N],vis[N];
+void solve() {
+	int n;
+	cin>>n;
+	for(int i = 1; i <= n; i++) {
+		cin >> a[i];
+		if(!vis[a[i]]) pre[i] = pre[i - 1] + 1;
+		else pre[i] = pre[i - 1];
+		vis[a[i]] = 1;
+	}
+	memset(vis,0,sizeof vis);
+	for(int i = n; i >= 1; i--) {
+		if(!vis[a[i]]) suf[i] = suf[i + 1] + 1;
+		else suf[i] = suf[i + 1];
+		vis[a[i]] = 1;
+	}
+	int ans = 0;
+	for(int i = 1; i < n; i++) {
+		ans = max(ans, pre[i] + suf[i + 1]);
+	}
+	cout << ans << "\n";
+}
 int main() {
 #ifdef ASHDR
   freopen("data.in", "r", stdin);
@@ -133,7 +135,7 @@ int main() {
   ios::sync_with_stdio(0);
   cin.tie(nullptr);
   cout << fixed << setprecision(8);
-  cin>>TT;
+  // cin>>TT;
   while (TT--) solve();
 #ifdef ASHDR
   LOG("Time: %dms\n", int((clock() - nol_cl) / (double)CLOCKS_PER_SEC * 1000));

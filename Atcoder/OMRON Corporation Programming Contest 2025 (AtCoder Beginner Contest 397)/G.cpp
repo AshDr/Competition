@@ -13,6 +13,7 @@
 */
 #include <algorithm>
 #include <bitset>
+#include <cstring>
 #include <cassert>
 #include <chrono>
 #include <cstdio>
@@ -22,12 +23,11 @@
 #include <map>
 #include <queue>
 #include <random>
-#include <set>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <cstring>
+#include <set>
 // #include <ext/pb_ds/assoc_container.hpp>
 // #include <ext/pb_ds/tree_policy.hpp>
 #define LOG(FMT...) fprintf(stderr, FMT)
@@ -98,32 +98,115 @@ struct pair_hash {
     return std::hash<T1>()(p.first) ^ std::hash<T2>()(p.second);
   }
 };
-namespace interactor {
-// test data
-int query() {
-#ifdef ASHDR
-
-#endif
-#ifndef ASHDR
-
-#endif
-  return 0;
-};
-void cout_answer(vector<int> ans) {
-#ifdef ASHDR
-
-#endif
-#ifndef ASHDR
-
-#endif
-}
-};  // namespace interactor
 // gp_hash_table
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 int TT = 1;
-void solve() {}
+template <class T>
+struct Flow {
+  const int n;
+  struct Edge {
+    int to;
+    T cap;
+    Edge(int to, T cap) : to(to), cap(cap) {}
+  };
+  std::vector<Edge> e;
+  std::vector<std::vector<int>> g;
+  std::vector<int> cur, h;
+  Flow(int n) : n(n), g(n) {}
+
+  bool bfs(int s, int t) {
+    h.assign(n, -1);
+    std::queue<int> que;
+    h[s] = 0;
+    que.push(s);
+    while (!que.empty()) {
+      const int u = que.front();
+      que.pop();
+      for (int i : g[u]) {
+        auto [v, c] = e[i];
+        if (c > 0 && h[v] == -1) {
+          h[v] = h[u] + 1;
+          if (v == t) {
+            return true;
+          }
+          que.push(v);
+        }
+      }
+    }
+    return false;
+  }
+
+  T dfs(int u, int t, T f) {
+    if (u == t) {
+      return f;
+    }
+    auto r = f;
+    for (int &i = cur[u]; i < int(g[u].size()); ++i) {
+      const int j = g[u][i];
+      auto [v, c] = e[j];
+      if (c > 0 && h[v] == h[u] + 1) {
+        auto a = dfs(v, t, std::min(r, c));
+        e[j].cap -= a;
+        e[j ^ 1].cap += a;
+        r -= a;
+        if (r == 0) {
+          return f;
+        }
+      }
+    }
+    return f - r;
+  }
+  void addEdge(int u, int v, T c) {
+    g[u].push_back(e.size());
+    e.emplace_back(v, c);
+    g[v].push_back(e.size());
+    e.emplace_back(u, 0);
+  }
+  T maxFlow(int s, int t) {
+    T ans = 0;
+    while (bfs(s, t)) {
+      cur.assign(n, 0);
+      ans += dfs(s, t, std::numeric_limits<T>::max());
+    }
+    return ans;
+  }
+};
+void solve() {
+  int n, m, k;
+  cin >> n >> m >> k;
+  vector<int> U(m + 1), V(m + 1);
+  for(int i = 1; i <= m; i++) {
+    cin >> U[i] >> V[i];
+  }
+  auto get_id = [&](int i, int dep) {
+    return i + (dep - 1) * n;
+  };  
+  auto check = [&](int d) {
+    if(d == 0) {
+      return true;
+    }
+    Flow<int> flow(n * d + 2);
+    for(int dep = 1; dep <= d; dep++) {
+      for(int i = 1; i <= m; i++) {
+        flow.addEdge(get_id(U[i], dep), get_id(V[i],dep),1);
+        if(dep < d) flow.addEdge(get_id(U[i], dep), get_id(V[i],dep + 1),1000);
+      }
+      if(dep < d) flow.addEdge(get_id(n, dep), get_id(n, dep + 1), 1000);
+    }
+    int ans = flow.maxFlow(get_id(1, 1),get_id(n, d));
+    return ans <= k;
+  };
+  int l = 0, r = n - 1;
+
+  while(l < r) {
+    int mid = (l + r + 1) >> 1;
+    if(check(mid)) l = mid;
+    else r = mid - 1;
+  }
+  cout << l << "\n";
+}
 int main() {
 #ifdef ASHDR
   freopen("data.in", "r", stdin);
@@ -133,7 +216,7 @@ int main() {
   ios::sync_with_stdio(0);
   cin.tie(nullptr);
   cout << fixed << setprecision(8);
-  cin>>TT;
+  // cin>>TT;
   while (TT--) solve();
 #ifdef ASHDR
   LOG("Time: %dms\n", int((clock() - nol_cl) / (double)CLOCKS_PER_SEC * 1000));

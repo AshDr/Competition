@@ -13,6 +13,7 @@
 */
 #include <algorithm>
 #include <bitset>
+#include <cstring>
 #include <cassert>
 #include <chrono>
 #include <cstdio>
@@ -22,12 +23,11 @@
 #include <map>
 #include <queue>
 #include <random>
-#include <set>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <cstring>
+#include <set>
 // #include <ext/pb_ds/assoc_container.hpp>
 // #include <ext/pb_ds/tree_policy.hpp>
 #define LOG(FMT...) fprintf(stderr, FMT)
@@ -98,32 +98,52 @@ struct pair_hash {
     return std::hash<T1>()(p.first) ^ std::hash<T2>()(p.second);
   }
 };
-namespace interactor {
-// test data
-int query() {
-#ifdef ASHDR
-
-#endif
-#ifndef ASHDR
-
-#endif
-  return 0;
-};
-void cout_answer(vector<int> ans) {
-#ifdef ASHDR
-
-#endif
-#ifndef ASHDR
-
-#endif
-}
-};  // namespace interactor
 // gp_hash_table
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 int TT = 1;
-void solve() {}
+void solve() {
+  int n, k;
+  cin >> n >> k;
+  vector G(n * k + 1,vector<int>());
+  for(int i = 1; i <= n * k - 1; i++) {
+  	int u, v;
+  	cin >> u >> v;
+  	G[u].push_back(v);
+  	G[v].push_back(u);
+  }
+  if(k == 1) {
+  	cout << "Yes\n";
+  	return ;
+  }
+  int ans = 0;
+  vector<int> f(n * k + 1);
+  int bad = 0;
+  function<void(int,int)> dfs = [&](int u, int par) {
+  	vector<int> tmp;
+  	for(auto v: G[u]) {
+  		if(v == par) continue;
+  		dfs(v, u);
+  		if(f[v] == 0) continue;
+  		tmp.push_back(f[v]);
+  	}
+  	if(tmp.size() >= 3) {
+  		bad = 1;
+  	}else if(tmp.size() == 2) {
+  		if(tmp[0] + tmp[1] + 1 != k) bad = 1;
+  		else f[u] = 0;
+  	}else if(tmp.size() == 1) {
+  		if(tmp[0] + 1 == k) f[u] = 0;
+  		else if(tmp[0] + 1 > k) bad = 1;
+  		else f[u] = tmp[0] + 1;
+  	}else {
+  		f[u] = 1;
+  	}
+  };
+  dfs(1, 0);
+  cout << (bad ? "No\n":"Yes\n");
+}
 int main() {
 #ifdef ASHDR
   freopen("data.in", "r", stdin);
@@ -133,7 +153,7 @@ int main() {
   ios::sync_with_stdio(0);
   cin.tie(nullptr);
   cout << fixed << setprecision(8);
-  cin>>TT;
+  // cin>>TT;
   while (TT--) solve();
 #ifdef ASHDR
   LOG("Time: %dms\n", int((clock() - nol_cl) / (double)CLOCKS_PER_SEC * 1000));

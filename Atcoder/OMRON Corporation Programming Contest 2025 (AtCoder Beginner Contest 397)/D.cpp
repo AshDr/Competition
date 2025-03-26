@@ -13,6 +13,8 @@
 */
 #include <algorithm>
 #include <bitset>
+#include <cmath>
+#include <cstring>
 #include <cassert>
 #include <chrono>
 #include <cstdio>
@@ -22,12 +24,11 @@
 #include <map>
 #include <queue>
 #include <random>
-#include <set>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <cstring>
+#include <set>
 // #include <ext/pb_ds/assoc_container.hpp>
 // #include <ext/pb_ds/tree_policy.hpp>
 #define LOG(FMT...) fprintf(stderr, FMT)
@@ -98,32 +99,40 @@ struct pair_hash {
     return std::hash<T1>()(p.first) ^ std::hash<T2>()(p.second);
   }
 };
-namespace interactor {
-// test data
-int query() {
-#ifdef ASHDR
-
-#endif
-#ifndef ASHDR
-
-#endif
-  return 0;
-};
-void cout_answer(vector<int> ans) {
-#ifdef ASHDR
-
-#endif
-#ifndef ASHDR
-
-#endif
-}
-};  // namespace interactor
 // gp_hash_table
 const int N = 2e5 + 10;
 const int M = 1e5 + 10;
 const int INF = 2147483647;
 int TT = 1;
-void solve() {}
+void solve() {
+  ll n;
+  cin >> n;
+  auto gao = [&](ll a, ll b, ll c)->int {
+  	ll l = 0, r = 6e8;
+  	while(l < r) {
+  		ll mid = (l + r) >> 1;
+  		if(a * mid * mid + b * mid + c < 0) {
+  			l = mid + 1;
+  		}else {
+  			r = mid;
+  		}
+  	}
+  	if(a * l * l + b * l + c == 0) return l;
+  	return -1;
+  };
+  for(ll d = 1; d * d * d <= n; d++) {
+  	// (k+d)^3-k^3=d^3+3*d^2*k+3*d*k^2 = n
+  	// 3d*k^2+2d^2*k+d^3-n = 0 -> 3*k^2+2dk+d^2-n/d=0
+  	if(n % d) continue;
+  	ll res = gao(3, 3 * d, d * d - n / d);
+  	if(res > 0) {
+  		cout << res + d << " " << res << "\n";
+  		return ;
+  	}
+  }
+  cout << -1 << "\n";
+
+}
 int main() {
 #ifdef ASHDR
   freopen("data.in", "r", stdin);
@@ -133,7 +142,7 @@ int main() {
   ios::sync_with_stdio(0);
   cin.tie(nullptr);
   cout << fixed << setprecision(8);
-  cin>>TT;
+  // cin>>TT;
   while (TT--) solve();
 #ifdef ASHDR
   LOG("Time: %dms\n", int((clock() - nol_cl) / (double)CLOCKS_PER_SEC * 1000));
