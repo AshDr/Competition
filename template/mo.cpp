@@ -71,12 +71,13 @@ int TT = 1;
 int len, n, m;
 int get(int x) { return x / len; }
 struct Q {
-  int l, r, id;
+  int l, r, x, id;
   friend bool operator<(const Q &x, const Q &y) {
     int l1 = get(x.l), l2 = get(y.l);
-    return (l1 == l2) ? (x.r < y.r) : (l1 < l2);
+    if(l1 != l2) return l1 < l2;
+    return l1 % 2? x.r < y.r : x.r > y.r;
   }
-} q[N];
+} qq[N];
 int a[N];
 int l, r;
 ll ans, cnt[N], res[N];
@@ -86,13 +87,25 @@ ll get_val(ll x) {
   else
     return x * (x - 1) * (x - 2) / 6;
 }
+// 优先用这个，否则的话要判一些边界情况
+// int l=1, r; 这样的话必须使用先add再dec的写法
+// auto dec=[&](int pos) {
+// };
+// auto add=[&](int pos) {
+// };
+// auto query=[&](int x, int y) { // 这里有的时候要先加再减, 关于指针移动的正确性，见 https://oi-wiki.org/misc/mo-algo/
+//   while (l > x) add(--l);
+//   while (r < y) add(++r);
+//   while (l < x) dec(l++);
+//   while (r > y) dec(r--);
+// };
 void update(int pos, int sign) {
   int x = a[pos];
   ans -= get_val(cnt[x]);
   cnt[x] += sign;
   ans += get_val(cnt[x]);
 }
-void query(int x, int y) {
+void query(int x, int y) { // 这里有的时候要先加再减, 关于指针移动的正确性，见 https://oi-wiki.org/misc/mo-algo/
   while (l < x) update(l++, -1);
   while (l > x) update(--l, 1);
   while (r < y) update(++r, 1);

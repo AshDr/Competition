@@ -1,5 +1,4 @@
-template <typename T>
-struct Fenwick {
+template <typename T> struct Fenwick {
   int n;
   std::vector<T> tr;
 
@@ -8,17 +7,20 @@ struct Fenwick {
   int lowbit(int x) { return x & -x; }
 
   void modify(int x, T c) {
-    for (int i = x; i <= n; i += lowbit(i)) tr[i] += c;
+    for (int i = x; i <= n; i += lowbit(i))
+      tr[i] += c;
   }
 
   void modify(int l, int r, T c) {
     modify(l, c);
-    if (r + 1 <= n) modify(r + 1, -c);
+    if (r + 1 <= n)
+      modify(r + 1, -c);
   }
 
   T query(int x) {
     T res = T();
-    for (int i = x; i; i -= lowbit(i)) res += tr[i];
+    for (int i = x; i; i -= lowbit(i))
+      res += tr[i];
     return res;
   }
 
@@ -49,7 +51,8 @@ struct Fenwick {
   }
   int find_kth(int k) {
     int ans = 0, cnt = 0;
-    for (int i = 1 << __lg(n); i >= 0; i--)  // 这里的20适当的取值，与MAX_VAL有关，一般取lg(MAX_VAL)
+    for (int i = 1 << __lg(n); i >= 0;
+         i--) // 这里的20适当的取值，与MAX_VAL有关，一般取lg(MAX_VAL)
     {
       ans += (1 << i);
       if (ans >= n || cnt + tr[ans] >= k)
@@ -58,7 +61,19 @@ struct Fenwick {
         cnt += tr[ans];
     }
     return ans + 1;
-  }  // 注意k不能太大
+  } // 注意k不能太大
+  int lower_bound(T k) { // k<=query(idx)
+    if (k <= 0)
+      return 0;
+    int ans = 0;
+    for (int i = 20; i >= 0; i--) {
+      if (ans + (1 << i) <= n && tr[ans + (1 << i)] < k) {
+        ans += (1 << i);
+        k -= tr[ans];
+      }
+    }
+    return ans + 1;
+  }
 };
 /*
 开区间版 fw.sum(r) 表示 [0~r)

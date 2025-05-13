@@ -1,20 +1,20 @@
-namespace ewsd {  // 二维数点
+namespace ewsd { // 二维数点
 int nn = 0, mxid = 0;
 struct Q {
   int down, up, x, w, id;
-  Q(int _x, int _down, int _up, int _w, int _id) : x(_x), down(_down), up(_up), w(_w), id(_id){};
+  Q(int _x, int _down, int _up, int _w, int _id)
+      : x(_x), down(_down), up(_up), w(_w), id(_id) {};
   bool operator<(const Q &rhs) { return this->x < rhs.x; }
 };
 vector<Q> qq;
 vector<int> ans;
 struct node {
   int x, y, w;
-  node(int _x, int _y, int _w) : x(_x), y(_y), w(_w){};
+  node(int _x, int _y, int _w) : x(_x), y(_y), w(_w) {};
   bool operator<(const node &rhs) { return this->x < rhs.x; }
 };
 vector<node> nds;
-template <typename T>
-struct Fenwick {
+template <typename T> struct Fenwick {
   int n;
   std::vector<T> tr;
 
@@ -23,17 +23,20 @@ struct Fenwick {
   int lowbit(int x) { return x & -x; }
 
   void modify(int x, T c) {
-    for (int i = x; i <= n; i += lowbit(i)) tr[i] += c;
+    for (int i = x; i <= n; i += lowbit(i))
+      tr[i] += c;
   }
 
   void modify(int l, int r, T c) {
     modify(l, c);
-    if (r + 1 <= n) modify(r + 1, -c);
+    if (r + 1 <= n)
+      modify(r + 1, -c);
   }
 
   T query(int x) {
     T res = T();
-    for (int i = x; i; i -= lowbit(i)) res += tr[i];
+    for (int i = x; i; i -= lowbit(i))
+      res += tr[i];
     return res;
   }
 
@@ -64,7 +67,8 @@ struct Fenwick {
   }
   int find_kth(int k) {
     int ans = 0, cnt = 0;
-    for (int i = 1 << __lg(n); i >= 0; i--)  // 这里的20适当的取值，与MAX_VAL有关，一般取lg(MAX_VAL)
+    for (int i = 1 << __lg(n); i >= 0;
+         i--) // 这里的20适当的取值，与MAX_VAL有关，一般取lg(MAX_VAL)
     {
       ans += (1 << i);
       if (ans >= n || cnt + tr[ans] >= k)
@@ -73,7 +77,7 @@ struct Fenwick {
         cnt += tr[ans];
     }
     return ans + 1;
-  }  // 注意k不能太大
+  } // 注意k不能太大
 };
 void addquery(int l, int r, int down, int up, int id) {
   qq.emplace_back(l - 1, down, up, -1, id);
@@ -99,9 +103,8 @@ void gao() {
     ans[qq[i].id] += qq[i].w * fw.query(qq[i].down, qq[i].up);
   }
 }
-}  // namespace ewsd
-template <class T>
-struct disc {
+} // namespace ewsd
+template <class T> struct disc {
   vector<T> d;
   inline void insert(T k) { d.push_back(k); }
   inline void init() {
@@ -109,6 +112,8 @@ struct disc {
     d.erase(unique(d.begin(), d.end()), d.end());
   }
   inline int size() { return d.size(); }
-  inline int query(T k) { return lower_bound(d.begin(), d.end(), k) - d.begin() + 1; }
+  inline int query(T k) {
+    return lower_bound(d.begin(), d.end(), k) - d.begin() + 1;
+  }
   inline void clear() { vector<T>().swap(d); }
-};  // 用来离散化第二维
+}; // 用来离散化第二维
