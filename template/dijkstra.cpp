@@ -13,6 +13,7 @@ struct Dijkstra {
 
   T work(int s, int t) {
     dis.assign(n, std::numeric_limits<T>::max());
+    vis.assign(n, 0);
     std::priority_queue<std::pair<T, int>, std::vector<std::pair<T, int>>, std::greater<std::pair<T, int>>> que;
     dis[s] = 0;
     que.push({0, s});

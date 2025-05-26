@@ -34,6 +34,11 @@
 #define sz(x) (int)x.size()
 #define all(x) (x).begin(), (x).end()
 #define rall(x) (x).rbegin(), (x).rend()
+#define pop_count(x) __builtin_popcountll(x)
+#define ctz(x) __builtin_ctz(x)
+#define clz(x) __builtin_clz(x)
+#define ctzl(x) __builtin_ctzll(x)
+#define clzl(x) __builtin_clzll(x)
 using namespace std;
 // using namespace __gnu_pbds;
 // typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;

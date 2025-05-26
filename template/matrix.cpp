@@ -54,12 +54,12 @@ Matrix qpow(Matrix A, ll b) {
 /*
 n * n
 */
-template <int P>
+template <typename T>
 struct Matrix {
   int n;
-  vector<vector<mint<P>>> v;
+  vector<vector<T>> v;
 
-  Matrix(int n, int d = 0) : n(n), v(n, vector<mint<P>>(n)) {
+  Matrix(int n, int d = 0) : n(n), v(n, vector<T>(n)) {
     if (d)
       for (int i = 0; i < n; i++) v[i][i] = d;
   }
@@ -80,8 +80,8 @@ struct Matrix {
     return (*this);
   }
 
-  mint<P> elim(Matrix &b) {
-    mint<P> re = 1;
+  T elim(Matrix &b) {
+    T re = 1;
     Matrix a = *this;
     for (int i = 0; i < n; i++) {
       if (a.v[i][i].v == 0) {
@@ -95,7 +95,7 @@ struct Matrix {
         }
         if (a.v[i][i].v == 0) return 0;
       }
-      const mint<P> x = a.v[i][i], invx = x.inv();
+      const T x = a.v[i][i], invx = x.inv();
       re *= x;
       for (int j = 0; j < n; j++) {
         a.v[i][j] *= invx;
@@ -103,7 +103,7 @@ struct Matrix {
       }
       for (int k = 0; k < n; k++) {
         if (k == i) continue;
-        const mint<P> y = a.v[k][i];
+        const T y = a.v[k][i];
         for (int j = 0; j < n; j++) {
           a.v[k][j] -= a.v[i][j] * y;
           b.v[k][j] -= b.v[i][j] * y;
@@ -113,14 +113,14 @@ struct Matrix {
     return re;
   }
 
-  mint<P> det() {
+  T det() {
     Matrix e(n);
     return elim(e);
   }
 
   Matrix inv() {
     Matrix e(n, 1);
-    const mint<P> d = elim(e);
+    const T d = elim(e);
     if (d.v == 0) return Matrix(0);
     return e;
   }

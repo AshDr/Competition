@@ -1,3 +1,4 @@
+// 除法很慢，尽量少做除法
 class BigInt {
 #define Value(x, nega) ((nega) ? -(x) : (x))
 #define At(vec, index) ((index) < vec.size() ? vec[(index)] : 0)
@@ -27,15 +28,15 @@ class BigInt {
  public:
   friend std::ostream &operator<<(std::ostream &os, const BigInt &n) {
     if (n.size()) {
-      if (n.nega) putchar('-');
+      if (n.nega) cout<<"-";
       for (int i = n.size() - 1; i >= 0; --i) {
         if (i == n.size() - 1)
-          printf("%lld", n[i]);
+          cout<<n[i];
         else
-          printf("%0*lld", n.Exp, n[i]);
+          cout << std::setfill('0') << std::setw(n.Exp) << n[i];
       }
     } else
-      putchar('0');
+      cout<<'0';
     return os;
   }
   friend BigInt operator+(const BigInt &lhs, const BigInt &rhs) {

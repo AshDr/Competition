@@ -54,10 +54,21 @@ struct MinCostFlow {
     T flow = 0;
     T cost = 0;
     h.assign(n, 0);
+    for (int t = 0; t < 2; t++) {
+        for (auto e : edges()) {
+            h[e.to] = std::min(h[e.to], h[e.from] + e.cost);
+        }
+    } // 建立初始的节点势能 使得规约费用非负 可能需要n-1次
+    // 边权是规约费用：cost_uv + h[u] - h[v]
     while (dijkstra(s, t)) {
       for (int i = 0; i < n; ++i) {
         h[i] += dis[i];
-      }
+      } // 更新势能
+
+      // if(h[t] >= 0) {
+      //   break;
+      // } // 当算法在残留图中找到的费用最低的增广路径，其本身的实际费用不再是负数时，算法就停止增广。并不保证得到最大流量
+      
       T aug = std::numeric_limits<int>::max();
       for (int i = t; i != s; i = e[pre[i] ^ 1].to) {
         aug = std::min(aug, e[pre[i]].cap);
