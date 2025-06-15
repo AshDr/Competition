@@ -1,5 +1,5 @@
 // 直线采用点向式： 直线上一点p和方向向量v，也可以用来表示线段、射线
-// 先判断 再求点 一般来说判断不会怎么损失精度
+// 先判断 再求(交)点 一般来说判断不会怎么损失精度
 const double pi = acos(-1);
 const double eps = 1e-8;
 int sgn(double x) {
@@ -27,9 +27,9 @@ struct Point {
   bool operator==(Point b) const { return sgn(x - b.x) == 0 && sgn(y - b.y) == 0; }
   bool operator<(Point b) const { return sgn(x - b.x) == 0 ? sgn(y - b.y) < 0 : x < b.x; }
   Point operator-(const Point &b) const { return Point(x - b.x, y - b.y); }
-  double operator^(const Point &b) const { return x * b.y - y * b.x; }
-  double operator*(const Point &b) const { return x * b.x + y * b.y; }
-  double len() { return hypot(x, y); }  // 到原点长度
+  double operator^(const Point &b) const { return x * b.y - y * b.x; }  // 叉积
+  double operator*(const Point &b) const { return x * b.x + y * b.y; }  // 点积
+  double len() { return hypot(x, y); }                                  // 到原点长度
   double len2() { return x * x + y * y; }
   double distance(Point p) { return hypot(x - p.x, y - p.y); }  // 两点距离
   Point operator+(const Point &b) const { return Point(x + b.x, y + b.y); }
@@ -72,7 +72,7 @@ vector<Point> convexHull(vector<Point> ps) {  // 求凸包
 struct Line {
   Point s, e;
   Line() {}
-  Line(Point _s, Point _e) {
+  Line(Point _s, Point _e) { // 这里两个都是点，要用方向向量的话在具体函数里求
     s = _s;
     e = _e;
   }
@@ -363,7 +363,7 @@ struct polygon {
     }
     return cnt != 0;
   }
-  // 3点上  2边上 1内部 0 外部
+  // 点和多边形的关系 3点上  2边上 1内部 0 外部
   struct cmp {
     Point p;
     cmp(const Point &p0) { p = p0; }

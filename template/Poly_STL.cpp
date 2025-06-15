@@ -100,7 +100,7 @@ int MInt<0>::Mod = 1;
 
 template <int V, int P>
 constexpr MInt<P> CInv = MInt<P>(V).inv();
-
+// 167772161 g=3,   924844033, g=5
 constexpr int P = 998244353;
 using mint = MInt<P>;
 
@@ -124,13 +124,14 @@ constexpr MInt<P> findPrimitiveRoot() {
 template <int P>
 constexpr MInt<P> primitiveRoot = findPrimitiveRoot<P>();
 
+// if change P, no need to change this
 template <>
 constexpr MInt<998244353> primitiveRoot<998244353>{31};
-
+// need sz(a)=2^k
 template <int P>
 constexpr void dft(std::vector<MInt<P>> &a) {
   int n = a.size();
-
+  // 算一遍蝴蝶变换的数组
   if (int(rev.size()) != n) {
     int k = __builtin_ctz(n) - 1;
     rev.resize(n);
@@ -144,11 +145,12 @@ constexpr void dft(std::vector<MInt<P>> &a) {
       std::swap(a[i], a[rev[i]]);
     }
   }
+  // 算一遍单位根数组
   if (roots<P>.size() < n) {
     int k = __builtin_ctz(roots<P>.size());
     roots<P>.resize(n);
     while ((1 << k) < n) {
-      auto e = power(primitiveRoot<P>, 1 << (__builtin_ctz(P - 1) - k - 1));
+      auto e = power(primitiveRoot<P>, (P - 1) >> (k + 1)); // or 1 << (__builtin_ctz(P - 1) - k - 1)
       for (int i = 1 << (k - 1); i < (1 << k); i++) {
         roots<P>[2 * i] = roots<P>[i];
         roots<P>[2 * i + 1] = roots<P>[i] * e;
@@ -179,7 +181,7 @@ constexpr void idft(std::vector<MInt<P>> &a) {
   }
 }
 
-template <int P = 998244353>
+template <int P = P>
 struct Poly : public std::vector<MInt<P>> {
   using Value = MInt<P>;
 
@@ -313,6 +315,11 @@ struct Poly : public std::vector<MInt<P>> {
     }
     return res;
   }
+  /*
+    a[0]!=0
+    mod x^1->x^2->...->x^{2^k}->trunc(x^m)
+    https://www.luogu.com.cn/problem/P4238
+  */
   constexpr Poly inv(int m) const {
     Poly x{(*this)[0].inv()};
     int k = 1;
@@ -322,7 +329,23 @@ struct Poly : public std::vector<MInt<P>> {
     }
     return x.trunc(m);
   }
+
+  /*
+    g'    mod x^(z/2)
+    g=ln(f)
+    g'=f'/f=f'*inv(f)
+    g=integr(g')
+    https://www.luogu.com.cn/problem/P4725
+  */
   constexpr Poly log(int m) const { return (deriv() * inv(m)).integr().trunc(m); }
+  
+  /*
+    use Newton iteration
+    z(g(x))=ln(g(x))-f(x)
+    g(x)=g'(x)*(1-ln(g'(x))+f(x))
+    need f(0)=0,so tht g'(mod x^1) = e^f(0)=1
+    https://www.luogu.com.cn/problem/P4726
+  */
   constexpr Poly exp(int m) const {
     Poly x{1};
     int k = 1;
@@ -332,6 +355,12 @@ struct Poly : public std::vector<MInt<P>> {
     }
     return x.trunc(m);
   }
+  /*
+    加强版pow，支持f(0)!=0
+    https://www.luogu.com.cn/problem/P5273
+
+    在次数不溢出的情况下，可以dft idft实现
+  */
   constexpr Poly pow(int k, int m) const {
     if (k == 0) {
       Poly res(m);
@@ -342,10 +371,12 @@ struct Poly : public std::vector<MInt<P>> {
     while (i < this->size() && (*this)[i] == 0) {
       i++;
     }
+    // if all [x^i] are 0 or zero term is too much, return {0,0...}
     if (i == this->size() || 1LL * i * k >= m) {
       return Poly(m);
     }
     Value v = (*this)[i];
+    // descend and mul inv(f[0]) make sure f(0) = 1
     auto f = shift(-i) * v.inv();
     return (f.log(m - i * k) * k).exp(m - i * k).shift(i * k) * power(v, k);
   }
@@ -398,34 +429,74 @@ struct Poly : public std::vector<MInt<P>> {
     std::vector<Poly> q(4 * n);
     std::vector<Value> ans(x.size());
     x.resize(n);
-    std::function<void(int, int, int)> build = [&](int p, int l, int r) {
+    
+    // c++20 friendly
+    auto build = [&](auto&& self, int p, int l, int r) -> void {
       if (r - l == 1) {
         q[p] = Poly{1, -x[l]};
       } else {
         int m = (l + r) / 2;
-        build(2 * p, l, m);
-        build(2 * p + 1, m, r);
+        self(self, 2 * p, l, m);      
+        self(self, 2 * p + 1, m, r);   
         q[p] = q[2 * p] * q[2 * p + 1];
       }
     };
-    build(1, 0, n);
-    std::function<void(int, int, int, const Poly &)> work = [&](int p, int l, int r, const Poly &num) {
+    build(build, 1, 0, n);
+    auto work = [&](auto&& self, int p, int l, int r, const Poly &num) -> void {
       if (r - l == 1) {
         if (l < int(ans.size())) {
           ans[l] = num[0];
         }
       } else {
         int m = (l + r) / 2;
-        work(2 * p, l, m, num.mulT(q[2 * p + 1]).resize(m - l));
-        work(2 * p + 1, m, r, num.mulT(q[2 * p]).resize(r - m));
+        self(self, 2 * p, l, m, num.mulT(q[2 * p + 1]).resize(m - l));
+        self(self, 2 * p + 1, m, r, num.mulT(q[2 * p]).resize(r - m));
       }
     };
-    work(1, 0, n, mulT(q[1].inv(n)));
+    work(work, 1, 0, n, mulT(q[1].inv(n)));
     return ans;
   }
+  // constexpr std::vector<Value> eval(std::vector<Value> x) const {
+  //   if (this->size() == 0) {
+  //     return std::vector<Value>(x.size(), 0);
+  //   }
+  //   const int n = std::max(x.size(), this->size());
+  //   std::vector<Poly> q(4 * n);
+  //   std::vector<Value> ans(x.size());
+  //   x.resize(n);
+  //   std::function<void(int, int, int)> build = [&](int p, int l, int r) {
+  //     if (r - l == 1) {
+  //       q[p] = Poly{1, -x[l]};
+  //     } else {
+  //       int m = (l + r) / 2;
+  //       build(2 * p, l, m);
+  //       build(2 * p + 1, m, r);
+  //       q[p] = q[2 * p] * q[2 * p + 1];
+  //     }
+  //   };
+  //   build(1, 0, n);
+  //   std::function<void(int, int, int, const Poly &)> work = [&](int p, int l, int r, const Poly &num) {
+  //     if (r - l == 1) {
+  //       if (l < int(ans.size())) {
+  //         ans[l] = num[0];
+  //       }
+  //     } else {
+  //       int m = (l + r) / 2;
+  //       work(2 * p, l, m, num.mulT(q[2 * p + 1]).resize(m - l));
+  //       work(2 * p + 1, m, r, num.mulT(q[2 * p]).resize(r - m));
+  //     }
+  //   };
+  //   work(1, 0, n, mulT(q[1].inv(n)));
+  //   return ans;
+  // }
 };
 
-template <int P = 998244353>
+constexpr Poly<P> Mul(Poly<P> a, Poly<P> b, int deg) {
+  Poly<P> res=a*b;
+  res.trunc(deg+1);
+  return res;    
+}
+template <int P = P>
 Poly<P> berlekampMassey(const Poly<P> &s) {
   Poly<P> c;
   Poly<P> oldC;
@@ -467,7 +538,7 @@ Poly<P> berlekampMassey(const Poly<P> &s) {
   c.insert(c.begin(), 1);
   return c;
 }
-template <int P = 998244353>
+template <int P = P>
 MInt<P> linearRecurrence(Poly<P> p, Poly<P> q, ll n) {
   int m = q.size() - 1;
   while (n > 0) {

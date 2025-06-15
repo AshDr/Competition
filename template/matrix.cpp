@@ -80,22 +80,26 @@ struct Matrix {
     return (*this);
   }
 
-  T elim(Matrix &b) {
+  // double version
+ T elim(Matrix &b, int& flag) { // b是增广矩阵的右侧ans列
     T re = 1;
     Matrix a = *this;
     for (int i = 0; i < n; i++) {
-      if (a.v[i][i].v == 0) {
-        for (int j = i + 1; j < n; j++) {
-          if (a.v[j][i].v) {
+      if (fabs(a.v[i][i]) < eps) {
+        for (int j = 0; j < n; j++) {
+          if(fabs(a.v[j][j])>eps&&j<i) continue;
+          if (fabs(a.v[j][i]) > eps) {
             swap(a.v[i], a.v[j]);
             swap(b.v[i], b.v[j]);
             re = -re;
             break;
           }
         }
-        if (a.v[i][i].v == 0) return 0;
+        if (fabs(a.v[i][i]) < eps) {
+          continue; // 系数矩阵不满秩，无解或者没有唯一解 
+        }
       }
-      const T x = a.v[i][i], invx = x.inv();
+      const T x = a.v[i][i], invx = 1.0 / x;
       re *= x;
       for (int j = 0; j < n; j++) {
         a.v[i][j] *= invx;
@@ -110,18 +114,60 @@ struct Matrix {
         }
       }
     }
+    // 1 唯一解， 0 无穷解， -1 无解
+    int key=1;
+    for(int i=0;i<n;i++){
+  		if(fabs(a.v[i][i])<eps){
+	  		if(fabs(b.v[i][0])>eps) key=-1;//无解优先级更高
+	  		else if(key!=-1) key=0;
+		  }
+	  }
+    if(key==1) {
+      for(int i=0; i<n; i++) {
+        cout << "x" << i+1 << "=" << fixed << setprecision(2) << (fabs(b.v[i][0]/a.v[i][i])<eps?0:b.v[i][0]/a.v[i][i]) << "\n";
+      }
+    }else {
+      cout<<key<<"\n";
+      re=0;
+    }
+    flag=key;
     return re;
   }
 
   T det() {
     Matrix e(n);
-    return elim(e);
+    int flag=0;
+    return elim(e,flag);
+  }
+
+  T det_noinv() {
+    T ret=1;
+    Matrix a = *this;
+    int f=0;
+    for (int i = 0; i < n; i++) {
+      for (int j = i + 1; j < n; ++j) {
+        while (a.v[i][i] != 0) {
+          T div = a.v[j][i] / a.v[i][i];
+          for (int k = i; k < n; ++k) {
+            a.v[j][k] = (a.v[j][k] - 1ll * div * a.v[i][k]);
+          }
+          swap(a.v[i], a.v[j]);
+          f^=1;
+        }  // 对第 i 行和第 j 行做辗转相减。
+        swap(a.v[i], a.v[j]);
+        f^=1;
+      }
+    }
+    for (int i = 0; i < n; i++) ret *= a.v[i][i];
+    if(f) ret=-ret;
+    return ret;
   }
 
   Matrix inv() {
     Matrix e(n, 1);
-    const T d = elim(e);
-    if (d.v == 0) return Matrix(0);
+    int flag=1;
+    const T d = elim(e,flag);
+    if (d == 0) return Matrix(0);
     return e;
   }
 
