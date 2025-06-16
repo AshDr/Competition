@@ -25,7 +25,7 @@ void FFT(Complex a[], int inv) {
   }
   if (inv == -1)
     for (int i = 0; i < tot; ++i)
-      a[i].x = (int)(a[i].x / tot + 0.5);  // 变成系数表示的时候 c_k = a_k / n，需要的时候在这里mod
+      a[i].x = (int)round(a[i].x / tot);  // 变成系数表示的时候 c_k = a_k / n，需要的时候在这里mod
 }
 void Mul(Complex a[], Complex b[], Complex c[], int deg) {
   for (int i = 0; i < tot; i++) {
