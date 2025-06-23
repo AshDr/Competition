@@ -54,6 +54,8 @@ Matrix qpow(Matrix A, ll b) {
 /*
 n * n
 */
+const double eps=1e-8;
+
 template <typename T>
 struct Matrix {
   int n;

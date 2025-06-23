@@ -41,7 +41,7 @@
 #define clzl(x) __builtin_clzll(x)
 using namespace std;
 // using namespace __gnu_pbds;
-// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;
+// typedef tree<int,null_type,less<>,rb_tree_tag,tree_order_statistics_node_update> Bst;  //ascend
 typedef long long ll;
 typedef pair<int, int> pii;
 typedef pair<ll, ll> pll;

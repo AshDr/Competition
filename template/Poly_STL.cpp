@@ -51,6 +51,12 @@ struct MInt {
     assert(x != 0);
     return power(*this, getMod() - 2);
   }
+  constexpr MInt pow(long long n) const {
+    if (n < 0) {
+      return power(*this, -n).inv();
+    }
+    return power(*this, n);
+  }
   constexpr MInt &operator*=(MInt rhs) & {
     x = 1LL * x * rhs.x % getMod();
     return *this;
@@ -101,8 +107,8 @@ int MInt<0>::Mod = 1;
 template <int V, int P>
 constexpr MInt<P> CInv = MInt<P>(V).inv();
 // 167772161 g=3,   924844033, g=5
-constexpr int P = 998244353;
-using mint = MInt<P>;
+constexpr int MOD = 998244353;
+using mint = MInt<MOD>;
 
 std::vector<int> rev;
 template <int P>
@@ -181,7 +187,7 @@ constexpr void idft(std::vector<MInt<P>> &a) {
   }
 }
 
-template <int P = P>
+template <int P = MOD>
 struct Poly : public std::vector<MInt<P>> {
   using Value = MInt<P>;
 
@@ -491,12 +497,12 @@ struct Poly : public std::vector<MInt<P>> {
   // }
 };
 
-constexpr Poly<P> Mul(Poly<P> a, Poly<P> b, int deg) {
-  Poly<P> res=a*b;
+constexpr Poly<MOD> Mul(Poly<MOD> a, Poly<MOD> b, int deg) {
+  Poly<MOD> res=a*b;
   res.trunc(deg+1);
   return res;    
 }
-template <int P = P>
+template <int P = MOD>
 Poly<P> berlekampMassey(const Poly<P> &s) {
   Poly<P> c;
   Poly<P> oldC;
@@ -538,7 +544,7 @@ Poly<P> berlekampMassey(const Poly<P> &s) {
   c.insert(c.begin(), 1);
   return c;
 }
-template <int P = P>
+template <int P = MOD>
 MInt<P> linearRecurrence(Poly<P> p, Poly<P> q, ll n) {
   int m = q.size() - 1;
   while (n > 0) {
@@ -558,3 +564,58 @@ MInt<P> linearRecurrence(Poly<P> p, Poly<P> q, ll n) {
   }
   return p[0] / q[0];
 }
+struct Comb {
+  int n;
+  std::vector<mint> _fac;
+  std::vector<mint> _invfac;
+  std::vector<mint> _inv;
+
+  Comb() : n{0}, _fac{1}, _invfac{1}, _inv{0} {}
+  Comb(int n) : Comb() { init(n); }
+
+  void init(int m) {
+    if (m <= n)
+      return;
+    _fac.resize(m + 1);
+    _invfac.resize(m + 1);
+    _inv.resize(m + 1);
+
+    for (int i = n + 1; i <= m; i++) {
+      _fac[i] = _fac[i - 1] * i;
+    }
+    _invfac[m] = _fac[m].inv();
+    for (int i = m; i > n; i--) {
+      _invfac[i - 1] = _invfac[i] * i;
+      _inv[i] = _invfac[i] * _fac[i - 1];
+    }
+    n = m;
+  }
+
+  mint fac(int m) {
+    if (m > n)
+      init(2 * m);
+    return _fac[m];
+  }
+  mint invfac(int m) {
+    if (m > n)
+      init(2 * m);
+    return _invfac[m];
+  }
+  mint inv(int m) {
+    if (m > n)
+      init(2 * m);
+    return _inv[m];
+  }
+  mint binom(int n, int m) {
+    if (n < m || m < 0)
+      return 0;
+    return fac(n) * invfac(m) * invfac(n - m);
+  }
+  mint C(int n, int m) { return binom(n, m); }
+  mint A(int n, int m) { return fac(n) * invfac(n - m); }
+  mint Lucas(int x,int y) {
+    if(x < y) return 0;
+    if(!x) return 1;
+    return Lucas(x / MOD,y / MOD) *1ll* binom(x % MOD,y % MOD);
+  }
+} comb;
