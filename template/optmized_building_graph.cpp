@@ -2,6 +2,7 @@
 如果是森林的话，就不能用st表了，除非对每个森林用hld,一般做法是注意到我们只会有一个
 dfn区间不是一条重链上一段前缀的形式（跨过 LCA的那个区间），于是对这个区间线段树优化建图，
 其他预处理重链后前缀优化建图
+到达树、出发树
 */
 int tot_ecnt = n;
 vector<vector<int>> edgedown(n, vector<int>(22)), edgeup(n, vector<int>(22));

@@ -1,3 +1,4 @@
+int lg(int x) { return static_cast<int>(std::log2(x)); }
 template <typename T>
 struct Fenwick {
   int n;
@@ -26,11 +27,11 @@ struct Fenwick {
     assert(l <= r);
     return query(r) - query(l - 1);
   }
-
+  //sum[1~k]>=k equiv lower_bound
   int find_first(T sum) {
     int ans = 0;
     T val = 0;
-    for (int i = __lg(n); i >= 0; i--) {
+    for (int i = lg(n); i >= 0; i--) {
       if ((ans | (1 << i)) <= n && val + tr[ans | (1 << i)] < sum) {
         ans |= 1 << i;
         val += tr[ans];
@@ -38,11 +39,11 @@ struct Fenwick {
     }
     return ans + 1;
   }
-
+  // sum[1~k]<=k equiv upper_bound-1
   int find_last(T sum) {
     int ans = 0;
     T val = 0;
-    for (int i = __lg(n); i >= 0; i--) {
+    for (int i = lg(n); i >= 0; i--) {
       if ((ans | (1 << i)) <= n && val + tr[ans | (1 << i)] <= sum) {
         ans |= 1 << i;
         val += tr[ans];
@@ -50,76 +51,9 @@ struct Fenwick {
     }
     return ans;
   }
-  int find_kth(int k) {
-    int ans = 0, cnt = 0;
-    for (int i = 1 << __lg(n); i >= 0; i--)  // 这里的20适当的取值，与MAX_VAL有关，一般取lg(MAX_VAL)
-    {
-      ans += (1 << i);
-      if (ans >= n || cnt + tr[ans] >= k)
-        ans -= (1 << i);
-      else
-        cnt += tr[ans];
-    }
-    return ans + 1;
-  }                       // 注意k不能太大
-  int lower_bound(T k) {  // k<=query(idx)
-    if (k <= 0) return 0;
-    int ans = 0;
-    for (int i = 20; i >= 0; i--) {
-      if (ans + (1 << i) <= n && tr[ans + (1 << i)] < k) {
-        ans += (1 << i);
-        k -= tr[ans];
-      }
-    }
-    return ans + 1;
-  }
+  // 已经出现的所有数的第k小
+  int kth(int k) {
+    assert(k>0);
+    return find_first(k);
+  }                      
 };
-/*
-开区间版 fw.sum(r) 表示 [0~r)
-下标[0,n-1]
-template <typename T>
-struct Fenwick {
-    int n;
-    std::vector<T> a;
-
-    Fenwick(int n = 0) {
-        init(n);
-    }
-
-    void init(int n) {
-        this->n = n;
-        a.assign(n, T());
-    }
-
-    void add(int x, T v) {
-        for (int i = x + 1; i <= n; i += i & -i) {
-            a[i - 1] += v;
-        }
-    }
-
-    T sum(int x) {
-        auto ans = T();
-        for (int i = x; i > 0; i -= i & -i) {
-            ans += a[i - 1];
-        }
-        return ans;
-    }//[1, x)
-
-    T rangeSum(int l, int r) {
-        return sum(r) - sum(l);
-    }//[0~r)-[0~l)
-
-
-    int kth(T k) {
-        int x = 0;
-        T cur{}
-        for (int i = 1 << std::__lg(n); i; i /= 2) {
-            if (x + i <= n && cur + a[x + i - 1] <= k) {
-                x += i;
-                cur = cur + a[x - 1];
-            }
-        }
-        return x;
-    }
-};
-*/

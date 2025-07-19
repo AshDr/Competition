@@ -100,3 +100,132 @@ struct LinkCutTree {
     return p->parent != nullptr;
   }
 };
+/*
+
+struct LinkCutTree{
+    using Info = int;
+ 
+    struct Node{
+        int s[2] = {}, p = 0;
+        Info v = Info(), sum = Info();
+        // Tag tag = Tag();
+        bool rev = false;
+ 
+        void reverse(){
+            swap(s[0], s[1]);
+            rev ^= 1;
+        }
+ 
+    }tr[maxn];
+    int stk[maxn];
+ 
+    bool is_root(int x){
+        return tr[tr[x].p].s[0] != x && tr[tr[x].p].s[1] != x;
+    }
+ 
+    // void apply(Node &x, Tag f){
+ 
+    // }
+ 
+    void pushdown(int x){
+        if (tr[x].rev){
+            tr[tr[x].s[0]].reverse();
+            tr[tr[x].s[1]].reverse();
+            tr[x].rev = 0;
+        }
+        // if (tr[x].s[0]) apply(tr[tr[x].s[0]], tr[x].tag);
+        // if (tr[x].s[1]) apply(tr[tr[x].s[1]], tr[x].tag);
+        // tr[x].tag = Tag();
+    }
+ 
+    void pushup(int x){
+        tr[x].sum = tr[tr[x].s[0]].sum + tr[x].v + tr[tr[x].s[1]].sum;
+    }
+ 
+    void rotate(int x){
+        int y = tr[x].p, z = tr[y].p;
+        int k = tr[y].s[1] == x;
+        if (!is_root(y)) tr[z].s[tr[z].s[1] == y] = x;
+        tr[x].p = z;
+        tr[y].s[k] = tr[x].s[k ^ 1], tr[tr[x].s[k ^ 1]].p = y;
+        tr[x].s[k ^ 1] = y, tr[y].p = x;
+        pushup(y), pushup(x);
+    }
+ 
+    void splay(int x){
+        int top = 0, r = x;
+        stk[++top] = x;
+        while(!is_root(r)) stk[++top] = r = tr[r].p;
+        while(top) pushdown(stk[top--]);
+        while(!is_root(x)){
+            int y = tr[x].p, z = tr[y].p;
+            if (!is_root(y)){
+                if ((tr[y].s[1] == x) ^ (tr[z].s[1] == y)) rotate(x);
+                else rotate(y);
+            }
+            rotate(x);
+        }
+    }
+ 
+    void access(int x){
+        int z = x;
+        for(int y = 0; x; y = x, x = tr[x].p){
+            splay(x);
+            tr[x].s[1] = y, pushup(x);
+        }
+        splay(z);
+    }
+ 
+    void make_root(int x){
+        access(x);
+        tr[x].reverse();
+    }
+ 
+    int find_root(int x){
+      access(x);
+      while(tr[x].s[0]) x = tr[x].s[0];
+      splay(x);
+      return x;
+  }
+ 
+    bool is_same(int x, int y){
+        make_root(x);
+        return find_root(y) == x;
+    }
+ 
+    void split(int x, int y){
+        make_root(x);
+        access(y);
+    }
+ 
+    void link(int x, int y){
+        make_root(x);
+        tr[x].p = y;
+    }
+ 
+    void cut(int x, int y){
+        make_root(x);
+        access(y);
+        splay(x);
+        tr[x].s[1] = tr[y].p = 0;
+        pushup(x);
+    }
+ 
+    Info query(int x, int y){
+        split(x, y);
+        return tr[y].sum;
+    }
+    
+    void modify(int x, const Info &info){
+        splay(x);
+        tr[x].v = info;
+        pushup(x);
+    }
+ 
+    // void modify(int x, int y, const Tag &tag){
+    //     split(x, y);
+    //     apply(tr[y], tag);
+    // }
+ 
+}LCT;
+*/

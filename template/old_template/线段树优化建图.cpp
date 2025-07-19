@@ -1,4 +1,6 @@
-// 线段树优化建图
+/* 线段树优化建图
+注意区间到区间连边的时候新建虚点来连通两个区间
+*/
 #include<bits/stdc++.h>
 //#define cerr cout<<"#case:"
 #define lt (i<<1)
@@ -27,8 +29,10 @@ void build(int i,int l, int r) {
         return ;
     }
     int mid = (l + r) >> 1;
+    // 到达树
     g[i].push_back({lt,0});
     g[i].push_back({rt,0});
+    // 出发树
     g[lt + D].push_back({i + D,0});
     g[rt + D].push_back({i + D,0});
     build(lt,l,mid);
